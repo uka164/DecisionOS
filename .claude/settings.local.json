@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Skill(clean-code)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Admin\\\\desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\" -Recurse -Directory)",
+      "Bash(Select-Object -First 30 FullName)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\Admin\\\\desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\"; Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules' -and $_.Extension -notmatch '\\\\.\\(png|jpg|svg|ico\\)$' } | Sort-Object LastWriteTime -Descending | Select-Object -First 20 | ForEach-Object { \"$\\($_.LastWriteTime.ToString\\('MM/dd HH:mm'\\)\\) $\\($_.Name\\)\" })",
+      "Skill(tailwind-patterns)",
+      "Bash(Select-String -Path \"C:\\\\Users\\\\Admin\\\\desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\\\\components\\\\wizards\\\\new-decision-wizard.tsx\" -Pattern 'text-\\\\[7px\\\\]|text-\\\\[8px\\\\]|text-\\\\[9px\\\\]|SYS_ONLINE|THREAT ASSESSMENT|FAILURE VECTORS|EXECUTE DECISION|Mission Parameters|Private Beta')",
+      "Bash(Select-Object LineNumber, Line)",
+      "Skill(update-config)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Admin\\\\Desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\" -Recurse -Force)",
+      "Bash(Select-Object FullName)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Admin\\\\Desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\\\\lib\" -File)",
+      "Bash(Select-Object Name)",
+      "Bash(npm install *)",
+      "Bash(npx playwright *)",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Admin\\\\Desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\\\\scripts\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Admin\\\\Desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\\\\__screenshots__\\\\baseline\")",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Admin\\\\Desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\\\\__screenshots__\\\\current\")",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\Admin\\\\Desktop\\\\DecisionOS\\\\decision-intelligence-dashboard\\\\__screenshots__\\\\diff\")",
+      "Bash(Write-Host \"done\")",
+      "Bash(Remove-Item *)",
+      "Bash(npm run *)",
+      "Bash(npx next *)"
+    ]
+  }
+}
