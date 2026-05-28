@@ -78,6 +78,14 @@ describe("store persistence", () => {
         options: [{ title: "A", description: "desc" }],
         constraints: ["Budget"],
         risks: [{ text: "Data loss", severity: 80 }],
+        executionTrail: [
+          {
+            id: "step-1",
+            text: "Run the pilot",
+            done: false,
+            createdAt: "2024-01-02T00:00:00.000Z",
+          },
+        ],
       },
     ]
     store.set(state)
@@ -86,6 +94,39 @@ describe("store persistence", () => {
     expect(retrieved.decisions[0].title).toBe("Roundtrip Test")
     expect(retrieved.decisions[0].qualityScore).toBe(88)
     expect(retrieved.decisions[0].tradeoffs[0].value).toBe(90)
+    expect(retrieved.decisions[0].executionTrail?.[0].text).toBe("Run the pilot")
+  })
+
+  it("migrates older decisions without dropping them when riskLevel is absent", () => {
+    mockStorage["decisionos_store"] = JSON.stringify({
+      schemaVersion: 2,
+      decisions: [
+        {
+          id: "legacy-1",
+          title: "Legacy decision",
+          status: "draft",
+          createdAt: "2024-01-01T00:00:00.000Z",
+          impact: 3,
+          qualityScore: 40,
+          tags: [],
+          rawThinking: "",
+          tradeoffs: [],
+          badges: [],
+          options: [],
+          constraints: [],
+          risks: [],
+        },
+      ],
+      experiments: [],
+      settings: { theme: "void", reducedMotion: false, animationIntensity: 70, ambientMotion: false },
+      lastSynced: null,
+    })
+
+    const state = store.get()
+
+    expect(state.decisions).toHaveLength(1)
+    expect(state.decisions[0].riskLevel).toBeNull()
+    expect(state.decisions[0].executionTrail).toEqual([])
   })
 
   it("clear() removes storage key and get() returns defaults", () => {

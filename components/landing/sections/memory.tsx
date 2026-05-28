@@ -32,11 +32,11 @@ export function Memory() {
               compounds instead of disappearing.
             </p>
             <p className="mt-5 max-w-md text-pretty text-lg font-medium leading-relaxed text-white/80">
-              Not a forgotten artifact. A memory your organization can reason
+              Not a forgotten artifact. A memory your future self can reason
               from.
             </p>
             <div className="mt-8">
-              <CTAButton href="#request" variant="ghost" icon="arrow">
+              <CTAButton href="/app" variant="ghost" icon="arrow">
                 See the memory layer
               </CTAButton>
             </div>

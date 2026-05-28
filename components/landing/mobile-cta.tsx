@@ -40,8 +40,8 @@ export function MobileCTA() {
           className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-bg-body/85 px-4 py-3 backdrop-blur-xl md:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
-          <CTAButton href="#request" variant="primary" size="lg" className="w-full">
-            Request access
+          <CTAButton href="/app" variant="primary" size="lg" className="w-full">
+            Open app
           </CTAButton>
         </motion.div>
       )}

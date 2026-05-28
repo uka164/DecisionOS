@@ -10,11 +10,11 @@ const TABS = [
   {
     id: "leadership",
     label: "Leadership",
-    cta: "Use DecisionOS for leadership alignment",
+    cta: "Use DecisionOS for high-stakes calls",
     flows: [
-      { title: "Board decisions", desc: "Frame the call, the options, and the reasoning the board can audit later." },
+      { title: "Big commitments", desc: "Frame the call, the options, and the reasoning you can audit later." },
       { title: "Strategic bets", desc: "Weigh long-horizon investments with explicit confidence and risk." },
-      { title: "Resource allocation", desc: "Decide where capital and headcount go — and revisit when it changes." },
+      { title: "Resource allocation", desc: "Decide where time, money, and attention go, then revisit when reality changes." },
     ],
   },
   {
@@ -49,7 +49,7 @@ const TABS = [
   },
   {
     id: "ai-native",
-    label: "AI-native teams",
+    label: "AI work",
     cta: "Use DecisionOS for AI decisions",
     flows: [
       { title: "Model selection", desc: "Compare models on cost, quality, and latency with a clear rationale." },
@@ -72,7 +72,7 @@ export function UseCases() {
               Use cases
             </Eyebrow>
             <Heading className="mt-5 text-3xl leading-[1.12] sm:text-4xl lg:text-[2.85rem]">
-              Built for the decisions your team actually makes.
+              Built for decisions that deserve a second look.
             </Heading>
           </Reveal>
         </div>

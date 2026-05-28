@@ -72,8 +72,8 @@ export function LandingNav() {
             <CTAButton href="/app" variant="ghost" icon="none">
               Open app
             </CTAButton>
-            <CTAButton href="#request" variant="primary" icon="arrow">
-              Request access
+            <CTAButton href="/app" variant="primary" icon="arrow">
+              Open app
             </CTAButton>
           </div>
 
@@ -114,13 +114,13 @@ export function LandingNav() {
               ))}
               <div className="mt-6 flex flex-col gap-3">
                 <CTAButton
-                  href="#request"
+                  href="/app"
                   variant="primary"
                   size="lg"
                   className="w-full"
                   onClick={() => setMenuOpen(false)}
                 >
-                  Request access
+                  Open app
                 </CTAButton>
                 <CTAButton
                   href="#how"

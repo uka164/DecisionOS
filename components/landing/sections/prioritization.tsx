@@ -76,8 +76,8 @@ export function Prioritization() {
               Priorities become explainable, revisable, and aligned.
             </Heading>
             <p className="mt-5 text-pretty text-base leading-relaxed text-white/55">
-              Set what your team values. The ranking updates live — and anyone
-              can see exactly why one initiative outranks another.
+              Set what matters to you. The ranking updates live, so you can
+              see exactly why one option outranks another.
             </p>
           </Reveal>
         </div>

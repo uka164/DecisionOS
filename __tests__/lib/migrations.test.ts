@@ -10,19 +10,19 @@ describe("needsMigration", () => {
     expect(needsMigration({ schemaVersion: 1, decisions: [] })).toBe(true)
   })
 
-  it("returns false when schemaVersion is 2", () => {
-    expect(needsMigration({ schemaVersion: 2, decisions: [] })).toBe(false)
+  it("returns true when schemaVersion is 2", () => {
+    expect(needsMigration({ schemaVersion: 2, decisions: [] })).toBe(true)
   })
 
-  it("returns false when schemaVersion is greater than 2", () => {
+  it("returns false when schemaVersion is 3", () => {
     expect(needsMigration({ schemaVersion: 3, decisions: [] })).toBe(false)
   })
 })
 
 describe("migrateV1toV2", () => {
-  it("stamps schemaVersion: 2", () => {
+  it("stamps schemaVersion: 3", () => {
     const result = migrateV1toV2({ decisions: [] })
-    expect(result.schemaVersion).toBe(2)
+    expect(result.schemaVersion).toBe(3)
   })
 
   it("preserves existing decisions that have all required fields", () => {
@@ -67,6 +67,8 @@ describe("migrateV1toV2", () => {
     expect(migrated.badges).toEqual([])
     expect(migrated.options).toEqual([])
     expect(migrated.tradeoffs).toEqual([])
+    expect(migrated.executionTrail).toEqual([])
+    expect(migrated.riskLevel).toBeNull()
   })
 
   it("does not overwrite existing array values", () => {
@@ -112,7 +114,7 @@ describe("migrateV1toV2", () => {
   it("handles missing decisions field gracefully", () => {
     const result = migrateV1toV2({ schemaVersion: 1 })
     expect(result.decisions).toEqual([])
-    expect(result.schemaVersion).toBe(2)
+    expect(result.schemaVersion).toBe(3)
   })
 
   it("preserves experiments array", () => {

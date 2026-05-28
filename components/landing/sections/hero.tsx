@@ -64,9 +64,9 @@ export function Hero() {
             transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.05 }}
             className="mt-7 text-balance text-[2.55rem] font-semibold leading-[1.05] text-white sm:text-6xl lg:text-[4.35rem]"
           >
-            The operating system for{" "}
+            A private journal for{" "}
             <span className="bg-gradient-to-r from-white via-primary to-secondary bg-clip-text text-transparent">
-              organizational intelligence.
+              better decisions.
             </span>
           </motion.h1>
 
@@ -76,8 +76,8 @@ export function Hero() {
             transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.12 }}
             className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/62 sm:text-lg"
           >
-            DecisionOS helps teams reason clearly, prioritize what matters,
-            preserve context, and execute with alignment.
+            DecisionOS helps you record the decision, schedule the revisit,
+            and write down what your reasoning got wrong.
           </motion.p>
 
           <motion.div
@@ -86,8 +86,8 @@ export function Hero() {
             transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.18 }}
             className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
           >
-            <CTAButton href="#request" variant="primary" size="lg" className="w-full sm:w-auto">
-              Request access
+            <CTAButton href="/app" variant="primary" size="lg" className="w-full sm:w-auto">
+              Open app
             </CTAButton>
             <CTAButton href="#how" variant="secondary" size="lg" icon="play" className="w-full sm:w-auto">
               Watch walkthrough

@@ -42,6 +42,14 @@ const tradeoffSchema = z.object({
   value: z.number(),
 })
 
+const executionStepSchema = z.object({
+  id: z.string().min(1),
+  text: z.string(),
+  done: z.boolean(),
+  createdAt: z.string(),
+  doneAt: z.string().optional(),
+})
+
 const decisionSchema = z.object({
   id: z.string().min(1),
   title: z.string(),
@@ -88,6 +96,7 @@ const decisionSchema = z.object({
   regret: z.boolean().optional(),
   revisitAt: z.string().optional(),
   gotWrong: z.string().optional(),
+  executionTrail: z.array(executionStepSchema).optional(),
   review: z.object({
     whatHappened: z.string().optional(),
     originalAssumption: z.string().optional(),

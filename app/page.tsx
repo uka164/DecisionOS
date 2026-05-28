@@ -19,13 +19,13 @@ import { FAQ } from "@/components/landing/sections/faq"
 import { FinalCTA } from "@/components/landing/sections/final-cta"
 
 export const metadata: Metadata = {
-  title: "DecisionOS — The operating system for organizational intelligence",
+  title: "DecisionOS - Private decision journal",
   description:
-    "DecisionOS helps teams reason clearly, prioritize what matters, preserve context, and execute with alignment.",
+    "DecisionOS helps you log decisions, revisit assumptions, and learn what your reasoning got wrong.",
   openGraph: {
-    title: "DecisionOS — The operating system for organizational intelligence",
+    title: "DecisionOS - Private decision journal",
     description:
-      "Reason clearly, prioritize what matters, preserve context, and execute with alignment.",
+      "Log decisions, revisit assumptions, and learn what your reasoning got wrong.",
     type: "website",
   },
 }

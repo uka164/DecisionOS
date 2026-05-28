@@ -22,10 +22,10 @@ const COLUMNS = [
     ],
   },
   {
-    title: "Company",
+    title: "Start",
     links: [
       { label: "Open the app", href: "/app" },
-      { label: "Request access", href: "#request" },
+      { label: "How it works", href: "#how" },
     ],
   },
 ]
@@ -43,12 +43,12 @@ export function LandingFooter() {
               </span>
             </a>
             <p className="mt-4 max-w-xs text-pretty text-sm leading-relaxed text-white/45">
-              The operating system for organizational intelligence. Reason
-              clearly, prioritize what matters, and execute with alignment.
+              A private, local-first journal for decisions you want to learn
+              from instead of merely remember.
             </p>
             <div className="mt-6">
-              <CTAButton href="#request" variant="secondary" icon="arrow">
-                Request access
+              <CTAButton href="/app" variant="secondary" icon="arrow">
+                Open app
               </CTAButton>
             </div>
           </div>
@@ -81,7 +81,7 @@ export function LandingFooter() {
             &copy; {new Date().getFullYear()} DecisionOS. All rights reserved.
           </p>
           <p className="font-mono text-[11px] text-white/30">
-            Designed for teams who decide carefully.
+            Designed for people who want cleaner judgment loops.
           </p>
         </div>
       </Container>

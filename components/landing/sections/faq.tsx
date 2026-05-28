@@ -10,27 +10,27 @@ import { CTAButton } from "../cta-button"
 const FAQS = [
   {
     q: "What exactly is DecisionOS?",
-    a: "A system of record for how your team thinks, decides, and executes. Not a chat tool and not another doc — a persistent layer that keeps reasoning, priorities, and outcomes connected over time.",
+    a: "A private decision journal for recording what you decided, why you decided it, and what you learned when reality answered back.",
   },
   {
     q: "How is this different from docs, wikis, or project tools?",
-    a: "Those each store a fragment. DecisionOS keeps the whole decision coherent: the reasoning, the trade-offs, the owners, and what actually happened — all linked, so context never goes missing.",
+    a: "Those usually preserve the artifact. DecisionOS preserves the reasoning loop: options, trade-offs, risks, revisit dates, outcomes, and the lesson.",
   },
   {
     q: "How do people actually use it day to day?",
-    a: "Capture a decision, structure the options, weigh them against criteria you control, assign owners, and set a date to revisit. The reasoning stays attached from first draft to final outcome.",
+    a: "Capture a decision, structure the options, weigh what matters, set a revisit date, and later write what your original thinking got wrong.",
   },
   {
-    q: "Does the AI make decisions for us?",
-    a: "No. AI surfaces structure and reasoning; people decide. Every suggestion shows its logic, traces back to its source, and nothing moves forward without human approval.",
+    q: "Does it make decisions for me?",
+    a: "No. It gives your thinking structure. You still decide, and the app keeps the audit trail honest enough to learn from later.",
   },
   {
     q: "How does it improve decision quality over time?",
-    a: "Past decisions become reusable context. New decisions inherit the reasoning behind earlier ones, so your team stops relitigating settled questions and starts compounding what it has already learned.",
+    a: "Past decisions become evidence. You see repeated assumptions, neglected risks, and the difference between a bad outcome and a bad process.",
   },
   {
-    q: "How do we get started?",
-    a: "Start with one team and one strategic workflow. Request access and we'll help you stand up your first persistent decision system — from reasoning to execution.",
+    q: "How do I get started?",
+    a: "Open the app and log one real decision before you make it. The value appears when you revisit it after the outcome is visible.",
   },
 ]
 
@@ -48,12 +48,12 @@ export function FAQ() {
               Questions, answered.
             </Heading>
             <p className="mt-5 max-w-sm text-pretty text-base leading-relaxed text-white/55">
-              What DecisionOS is, how teams use it, and how it makes thinking
-              and execution compound.
+              What DecisionOS is, how it works locally, and why the revisit
+              loop matters more than another note.
             </p>
             <div className="mt-8 hidden lg:block">
-              <CTAButton href="#request" variant="secondary" icon="arrow">
-                Request access
+              <CTAButton href="/app" variant="secondary" icon="arrow">
+                Open app
               </CTAButton>
             </div>
           </Reveal>

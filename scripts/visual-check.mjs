@@ -75,7 +75,7 @@ const SHOTS = [
     url: "/app",
     prepare: async (page) => {
       await page.waitForLoadState("networkidle")
-      await page.getByRole("button", { name: /log your first real decision/i }).click()
+      await page.getByRole("button", { name: /log a decision/i }).click()
       await page
         .getByRole("dialog", { name: /new decision wizard/i })
         .waitFor({ state: "visible" })

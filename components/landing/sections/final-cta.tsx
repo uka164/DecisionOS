@@ -43,11 +43,11 @@ export function FinalCTA() {
               as="h2"
               className="mt-5 text-[2.2rem] leading-[1.08] sm:text-5xl lg:text-[3.4rem]"
             >
-              Give your organization a memory for decisions.
+              Start a record your future self can audit.
             </Heading>
             <p className="mx-auto mt-6 max-w-lg text-pretty text-base leading-relaxed text-white/55 sm:text-lg">
-              Start with one team, one strategic workflow, and one persistent
-              system for reasoning to execution.
+              Open the app, capture the decision, and come back later to write
+              what your original reasoning missed.
             </p>
           </Reveal>
 
@@ -81,15 +81,15 @@ export function FinalCTA() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    aria-label="Work email"
+                    placeholder="you@example.com"
+                    aria-label="Email"
                     className="h-12 flex-1 rounded-full border border-white/12 bg-white/[0.03] px-5 text-sm text-white placeholder:text-white/35 backdrop-blur-md transition-colors focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                   />
                   <button
                     type="submit"
                   className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-medium text-primary-foreground shadow-[0_8px_26px_-12px_var(--primary-glow)] transition-all duration-300 hover:-translate-y-px hover:shadow-[0_12px_34px_-14px_var(--primary-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-body"
                   >
-                    Request access
+                    Join beta
                     <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                   </button>
                 </motion.form>
@@ -102,7 +102,7 @@ export function FinalCTA() {
               </CTAButton>
             </div>
             <p className="mt-6 text-xs text-white/30">
-              Private beta · No spam · One strategic workflow to start
+              Private beta. No spam. Local-first by design.
             </p>
           </Reveal>
         </div>

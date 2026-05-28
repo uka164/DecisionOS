@@ -124,8 +124,8 @@ export function SocialProof() {
               ))}
             </div>
             <div className="mt-8 flex justify-center">
-              <CTAButton href="#request" variant="primary" icon="arrow">
-                Request access
+              <CTAButton href="/app" variant="primary" icon="arrow">
+                Open app
               </CTAButton>
             </div>
           </Reveal>
