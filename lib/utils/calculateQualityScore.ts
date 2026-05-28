@@ -87,13 +87,20 @@ export function getQualityBreakdown(input: QualityInput) {
 }
 
 export function getQualityBreakdownFromDecision(decision: Partial<Decision>) {
+  const reflectionText = [
+    decision.rawThinking,
+    decision.valuesAtStake,
+    decision.humanCost,
+    decision.guidingPrinciple,
+  ].filter((text) => text?.trim()).join("\n")
+
   return getQualityBreakdown({
     options: decision.options,
     preMortem: decision.preMortem,
     riskLevel: decision.riskLevel,
     retrospective: decision.retrospective,
     title: decision.title,
-    rawThinking: decision.rawThinking,
+    rawThinking: reflectionText,
     constraints: decision.constraints,
   })
 }

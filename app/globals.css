@@ -29,22 +29,22 @@
   /* Accent colours */
   --primary: #06b6d4;
   /* cyan-500  */
-  --primary-glow: rgba(6, 182, 212, 0.5);
+  --primary-glow: rgba(6, 182, 212, 0.18);
   --secondary: #8b5cf6;
-  /* violet-500 */
-  --secondary-glow: rgba(139, 92, 246, 0.4);
-  --accent-glow: rgba(6, 182, 212, 0.5);
+  /* violet-500 — brand accent, used sparingly */
+  --secondary-glow: rgba(139, 92, 246, 0.13);
+  --accent-glow: rgba(6, 182, 212, 0.18);
   /* alias for primary glow */
-  --accent-primary-alpha: rgba(6, 182, 212, 0.4);
+  --accent-primary-alpha: rgba(6, 182, 212, 0.3);
   /* neural-background node color */
 
   /* Borders */
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(6, 182, 212, 0.30);
+  --border-accent: rgba(6, 182, 212, 0.22);
 
-  /* Mesh gradient layers */
-  --mesh-1: rgba(6, 182, 212, 0.15);
-  --mesh-2: rgba(139, 92, 246, 0.10);
+  /* Mesh gradient layers — kept faint so most surfaces read as calm neutral */
+  --mesh-1: rgba(6, 182, 212, 0.05);
+  --mesh-2: rgba(139, 92, 246, 0.03);
 
   /* Existing tokens — kept for components not yet migrated */
   --card: rgba(255, 255, 255, 0.05);
@@ -84,19 +84,19 @@
 
   --primary: #818cf8;
   /* indigo-400 — softer than 500 */
-  --primary-glow: rgba(129, 140, 248, 0.5);
+  --primary-glow: rgba(129, 140, 248, 0.18);
   --secondary: #a78bfa;
-  /* violet-400 */
-  --secondary-glow: rgba(167, 139, 250, 0.4);
-  --accent-glow: rgba(129, 140, 248, 0.5);
-  --accent-primary-alpha: rgba(129, 140, 248, 0.4);
+  /* violet-400 — brand accent, used sparingly */
+  --secondary-glow: rgba(167, 139, 250, 0.13);
+  --accent-glow: rgba(129, 140, 248, 0.18);
+  --accent-primary-alpha: rgba(129, 140, 248, 0.3);
   /* neural-background node color */
 
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-accent: rgba(129, 140, 248, 0.30);
 
-  --mesh-1: rgba(129, 140, 248, 0.18);
-  --mesh-2: rgba(167, 139, 250, 0.12);
+  --mesh-1: rgba(129, 140, 248, 0.05);
+  --mesh-2: rgba(167, 139, 250, 0.035);
 
   --primary-rgb: 129, 140, 248;
   --ring: #818cf8;
@@ -119,19 +119,19 @@
 
   --primary: #e879f9;
   /* fuchsia-400 */
-  --primary-glow: rgba(232, 121, 249, 0.5);
+  --primary-glow: rgba(232, 121, 249, 0.18);
   --secondary: #fb923c;
   /* orange-400 */
-  --secondary-glow: rgba(251, 146, 60, 0.4);
-  --accent-glow: rgba(232, 121, 249, 0.5);
-  --accent-primary-alpha: rgba(232, 121, 249, 0.4);
+  --secondary-glow: rgba(251, 146, 60, 0.13);
+  --accent-glow: rgba(232, 121, 249, 0.18);
+  --accent-primary-alpha: rgba(232, 121, 249, 0.3);
   /* neural-background node color */
 
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-accent: rgba(232, 121, 249, 0.30);
 
-  --mesh-1: rgba(232, 121, 249, 0.14);
-  --mesh-2: rgba(251, 146, 60, 0.10);
+  --mesh-1: rgba(232, 121, 249, 0.05);
+  --mesh-2: rgba(251, 146, 60, 0.035);
 
   --primary-rgb: 232, 121, 249;
   --ring: #e879f9;
@@ -249,6 +249,19 @@
   body {
     @apply text-foreground;
     background: var(--bg-body);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings carry hierarchy through weight + tracking, not color or glow */
+  h1, h2, h3 {
+    letter-spacing: -0.011em;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+    color: var(--foreground);
   }
 
   /* Global focus ring for keyboard navigation (WCAG AA) */

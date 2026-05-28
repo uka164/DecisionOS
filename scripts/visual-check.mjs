@@ -51,7 +51,7 @@ const DIRS = {
 const SHOTS = [
   {
     name: "dashboard",
-    url: "/",
+    url: "/app",
     prepare: async (page) => {
       await page.waitForLoadState("networkidle")
     },
@@ -72,7 +72,7 @@ const SHOTS = [
   },
   {
     name: "wizard-step1",
-    url: "/",
+    url: "/app",
     prepare: async (page) => {
       await page.waitForLoadState("networkidle")
       await page.getByRole("button", { name: /log your first real decision/i }).click()

@@ -1,0 +1,130 @@
+"use client"
+
+import {
+  Inbox,
+  LayoutList,
+  GitCompare,
+  Gauge,
+  Users,
+  Workflow,
+  Archive,
+} from "lucide-react"
+import { motion, useReducedMotion } from "framer-motion"
+import {
+  Container,
+  Section,
+  Eyebrow,
+  Heading,
+  Reveal,
+  Stagger,
+  StaggerItem,
+} from "../primitives"
+import { CTAButton } from "../cta-button"
+
+const STEPS = [
+  { icon: Inbox, title: "Capture", line: "Pull in messy inputs from anywhere." },
+  { icon: LayoutList, title: "Structure", line: "Turn them into a clear decision brief." },
+  { icon: GitCompare, title: "Reason", line: "Lay out options, trade-offs, assumptions." },
+  { icon: Gauge, title: "Prioritize", line: "Score by weighted, explainable criteria." },
+  { icon: Users, title: "Align", line: "Assign owners and surface dependencies." },
+  { icon: Workflow, title: "Execute", line: "Track the decision as it becomes work." },
+  { icon: Archive, title: "Remember", line: "Preserve the reasoning as reusable memory." },
+]
+
+export function HowItWorks() {
+  const reduce = useReducedMotion()
+
+  return (
+    <Section id="how" className="border-y border-white/[0.05] bg-white/[0.012]">
+      <Container>
+        <div className="max-w-2xl">
+          <Reveal>
+            <Eyebrow index="03">How it works</Eyebrow>
+            <Heading className="mt-5 text-3xl leading-[1.12] sm:text-4xl lg:text-[2.85rem]">
+              From scattered signal to aligned action.
+            </Heading>
+            <p className="mt-5 text-pretty text-base leading-relaxed text-white/55">
+              Seven steps move a decision from noise to durable knowledge —
+              capture messy inputs, convert them into structured decision paths,
+              and keep the reasoning long after the work ships.
+            </p>
+          </Reveal>
+        </div>
+
+        {/* desktop horizontal flow */}
+        <div className="mt-16 hidden lg:block">
+          {/* connector */}
+          <div className="relative mb-8 h-px">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+            {!reduce && (
+              <motion.div
+                className="absolute top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-primary shadow-[0_0_12px_var(--primary-glow)]"
+                animate={{ left: ["0%", "100%"] }}
+                transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
+              />
+            )}
+          </div>
+          <Stagger className="grid grid-cols-7 gap-3">
+            {STEPS.map((step, i) => {
+              const Icon = step.icon
+              return (
+                <StaggerItem key={step.title}>
+                  <div className="group flex flex-col items-center text-center">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/[0.08] bg-bg-card/60 text-white/50 backdrop-blur-md transition-all duration-500 group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="mt-3 font-mono text-[10px] text-white/30">
+                      0{i + 1}
+                    </span>
+                    <h3 className="mt-1 text-sm font-semibold text-white">
+                      {step.title}
+                    </h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-white/45">
+                      {step.line}
+                    </p>
+                  </div>
+                </StaggerItem>
+              )
+            })}
+          </Stagger>
+        </div>
+
+        {/* mobile vertical timeline */}
+        <Stagger className="relative mt-12 space-y-5 pl-8 lg:hidden">
+          <div className="absolute bottom-2 left-[15px] top-2 w-px bg-gradient-to-b from-primary/40 via-white/10 to-transparent" />
+          {STEPS.map((step, i) => {
+            const Icon = step.icon
+            return (
+              <StaggerItem key={step.title}>
+                <div className="relative">
+                  <span className="absolute -left-8 flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-bg-card text-white/55">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div className="pt-0.5">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-mono text-[10px] text-white/30">
+                        0{i + 1}
+                      </span>
+                      <h3 className="text-sm font-semibold text-white">
+                        {step.title}
+                      </h3>
+                    </div>
+                    <p className="mt-1 text-sm leading-relaxed text-white/50">
+                      {step.line}
+                    </p>
+                  </div>
+                </div>
+              </StaggerItem>
+            )
+          })}
+        </Stagger>
+
+        <Reveal delay={0.1} className="mt-14">
+          <CTAButton href="#product" variant="secondary" icon="play">
+            Watch the flow
+          </CTAButton>
+        </Reveal>
+      </Container>
+    </Section>
+  )
+}

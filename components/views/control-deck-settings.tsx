@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { toast } from "sonner"
 import {
   User,
   RefreshCw,
@@ -10,8 +11,11 @@ import {
   HardDrive,
   AlertTriangle,
   Check,
+  Bell,
 } from "lucide-react"
 import { LOCAL_PROFILE } from "@/lib/local-profile"
+import { requestRevisitNotificationPermission } from "@/hooks/useRevisitNotifications"
+import { cn } from "@/lib/utils"
 
 function HardwareToggle({
   enabled,
@@ -207,11 +211,34 @@ export function ControlDeckSettings({
 
   const reducedMotion    = settings?.reducedMotion ?? false
   const animationIntensity = settings?.animationIntensity ?? 70
-  const ambientMotion    = settings?.ambientMotion ?? true
+  const ambientMotion    = settings?.ambientMotion ?? false
+  const notifyRevisits   = settings?.notifyRevisits ?? false
   const theme: AppSettings["theme"] = settings?.theme ?? "void"
 
   const toggle = (key: keyof Pick<AppSettings, "reducedMotion" | "ambientMotion">) => {
     onUpdateSettings?.({ [key]: !(settings?.[key] ?? false) })
+  }
+
+  const handleNotifyToggle = async () => {
+    if (notifyRevisits) {
+      onUpdateSettings?.({ notifyRevisits: false })
+      return
+    }
+    const result = await requestRevisitNotificationPermission()
+    if (result === "granted") {
+      onUpdateSettings?.({ notifyRevisits: true })
+      toast.success("Notifications enabled", {
+        description: "You'll get a browser nudge when a revisit is due — only when this tab is open.",
+      })
+    } else if (result === "denied") {
+      toast.error("Notifications blocked", {
+        description: "Your browser denied the request. Enable notifications for this site in your browser settings.",
+      })
+    } else {
+      toast("Notifications not enabled", {
+        description: "Permission wasn't granted.",
+      })
+    }
   }
 
   const themes: { id: AppSettings["theme"]; label: string; colors: string[] }[] = [
@@ -312,7 +339,7 @@ export function ControlDeckSettings({
         </div>
 
         {/* Module 3: Local Storage - real data only */}
-        <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5 md:col-span-2 lg:col-span-1">
+        <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <HardDrive className="w-4 h-4 text-emerald-400" />
             <h3 className="text-sm font-semibold text-white">Local Storage</h3>
@@ -326,6 +353,49 @@ export function ControlDeckSettings({
                 {decisionCount != null ? decisionCount.toLocaleString() : "-"}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Module: Notifications */}
+        <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="w-4 h-4 text-violet-400" />
+            <h3 className="text-sm font-semibold text-white">Notifications</h3>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs text-white/45 leading-relaxed">
+              Browser nudge when a revisit is due. Only fires while this tab is open — there's no background process.
+            </p>
+            <button
+              type="button"
+              onClick={handleNotifyToggle}
+              aria-pressed={notifyRevisits}
+              className={cn(
+                "w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl border transition-colors text-left",
+                notifyRevisits
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                  : "border-white/10 bg-white/[0.025] text-white/70 hover:bg-white/[0.05]"
+              )}
+            >
+              <span className="text-sm font-medium">
+                {notifyRevisits ? "Notifications enabled" : "Enable revisit notifications"}
+              </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "relative w-10 h-5 rounded-full border transition-colors flex-shrink-0",
+                  notifyRevisits ? "bg-emerald-500/30 border-emerald-500/45" : "bg-white/[0.05] border-white/15"
+                )}
+              >
+                <span
+                  className={cn(
+                    "absolute top-0.5 w-4 h-4 rounded-full transition-transform",
+                    notifyRevisits ? "translate-x-5 bg-emerald-300" : "translate-x-0.5 bg-white/45"
+                  )}
+                />
+              </span>
+            </button>
           </div>
         </div>
 

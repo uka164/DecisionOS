@@ -42,7 +42,7 @@ export function CommandPalette() {
       shortcut: "G D",
       icon: <LayoutDashboard className="w-4 h-4" />,
       category: "navigation",
-      action: () => navigate("/"),
+      action: () => navigate("/app"),
     },
     {
       id: "decisions",

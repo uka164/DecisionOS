@@ -133,6 +133,7 @@ describe("store persistence", () => {
       reducedMotion: true,
       animationIntensity: 30,
       ambientMotion: false,
+      notifyRevisits: false,
     })
     expect("sync" in state.settings).toBe(false)
     expect("backup" in state.settings).toBe(false)

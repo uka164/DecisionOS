@@ -56,7 +56,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   theme: "void",
   reducedMotion: false,
   animationIntensity: 70,
-  ambientMotion: true,
+  ambientMotion: false,
+  notifyRevisits: false,
 }
 
 // ── Tests ───────────────────────────────────────────────────────────────────

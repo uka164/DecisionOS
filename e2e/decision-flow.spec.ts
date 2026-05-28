@@ -25,7 +25,7 @@ async function getStoredDecisions(page: Page): Promise<unknown[]> {
 }
 
 async function openDecisionWizard(page: Page) {
-  await page.getByRole("button", { name: /log your first real decision/i }).click()
+  await page.getByRole("button", { name: /^log a decision$/i }).click()
 }
 
 async function startBlankDecision(page: Page) {
@@ -37,7 +37,7 @@ async function startBlankDecision(page: Page) {
 
 test.describe("Create Decision flow", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/")
+    await page.goto("/app")
     await clearStorage(page)
     await page.reload()
     // Wait for store hydration
@@ -62,6 +62,9 @@ test.describe("Create Decision flow", () => {
     // ── Step 1: Brief ──
     await page.fill("#decision-name", "Adopt TypeScript Strict Mode")
     await page.fill("#decision-context", "We need to reduce runtime errors in production.")
+    await page.fill("#values-at-stake", "Engineering reliability and user trust.")
+    await page.fill("#human-cost", "Support and product teams absorb confusion if rollout fails.")
+    await page.fill("#guiding-principle", "Prefer explicit safety over hidden speed.")
     await dialog.getByRole("button", { name: /continue/i }).click()
 
     // ── Step 2: Options ──
@@ -134,7 +137,7 @@ test.describe("Export / Import round-trip", () => {
 
   test("export produces valid JSON and import restores data", async ({ page }) => {
     // Seed localStorage with a known decision
-    await page.goto("/")
+    await page.goto("/app")
     await page.evaluate(
       ([key, state]) => localStorage.setItem(key as string, JSON.stringify(state)),
       [STORAGE_KEY, SEED_STATE]
@@ -185,7 +188,7 @@ test.describe("Export / Import round-trip", () => {
     await expect(page.getByText(/import complete/i)).toBeVisible({ timeout: 8_000 })
 
     // Verify data restored in localStorage
-    await page.goto("/")
+    await page.goto("/app")
     await page.waitForLoadState("networkidle")
 
     const restored = await getStoredDecisions(page)
@@ -197,6 +200,100 @@ test.describe("Export / Import round-trip", () => {
 
     // Cleanup temp file
     fs.unlinkSync(tmpPath)
+  })
+})
+
+// ─── Suite: Review Mode ───────────────────────────────────────────────────────
+
+test.describe("Review Mode flow", () => {
+  test("captures a structured review and saves it to localStorage", async ({ page }) => {
+    const decision = {
+      id: "user-e2e-review-001",
+      title: "Review Mode E2E Decision",
+      status: "decided",
+      createdAt: new Date("2026-01-01").toISOString(),
+      impact: 4,
+      qualityScore: 70,
+      tags: [],
+      rawThinking: "We chose path A because it was simpler.",
+      valuesAtStake: "Trust",
+      revisitAt: "2026-04-01",
+      tradeoffs: [],
+      riskLevel: "medium",
+      badges: [],
+      options: [
+        { title: "Path A", description: "Simpler" },
+        { title: "Path B", description: "Faster" },
+      ],
+      constraints: [],
+      risks: [],
+    }
+
+    await page.goto("/app")
+    await page.evaluate(
+      ([key, state]) => localStorage.setItem(key as string, JSON.stringify(state)),
+      [
+        STORAGE_KEY,
+        {
+          schemaVersion: 3,
+          decisions: [decision],
+          experiments: [],
+          settings: { theme: "void", reducedMotion: false, animationIntensity: 70, ambientMotion: true },
+          lastSynced: new Date().toISOString(),
+        },
+      ]
+    )
+
+    // Deep-link directly into Review Mode via ?focus=review
+    await page.goto(`/decisions/${decision.id}?focus=review`)
+    await page.waitForLoadState("networkidle")
+
+    const dialog = page.getByRole("dialog", { name: /review decision/i })
+    await expect(dialog).toBeVisible()
+
+    // ── Step 1: Reality ──
+    await page.fill("#review-what-happened", "Path A shipped but caused two outages.")
+    await page.fill("#review-original-assumption", "Simpler meant safer.")
+    await page.fill("#review-underestimated", "Migration coupling")
+
+    await dialog.getByRole("button", { name: /continue/i }).click()
+
+    // ── Step 2: Judgement ──
+    await dialog.getByRole("button", { name: /bad it did not work/i }).click()
+    await dialog.getByRole("button", { name: /poor.*rationalising/i }).click()
+    await dialog.getByRole("button", { name: /different.*not choose this again/i }).click()
+
+    await dialog.getByRole("button", { name: /continue/i }).click()
+
+    // ── Step 3: Lesson ──
+    await page.fill("#review-wrong-assumption", "Simple in code is not simple in operations.")
+    await page.fill("#review-lesson", "Always check the operational shape before choosing the 'simpler' option.")
+
+    const saveBtn = dialog.getByRole("button", { name: /save review/i })
+    await expect(saveBtn).toBeEnabled()
+    await saveBtn.click()
+
+    await expect(page.getByText(/review saved/i)).toBeVisible()
+
+    // Verify it persisted
+    const stored = await page.evaluate((key) => {
+      const raw = localStorage.getItem(key)
+      if (!raw) return null
+      const parsed = JSON.parse(raw)
+      const target = parsed.decisions.find((d: { id: string }) => d.id === "user-e2e-review-001")
+      return target?.review ?? null
+    }, STORAGE_KEY)
+
+    expect(stored).not.toBeNull()
+    expect(stored.outcome).toBe("bad")
+    expect(stored.processQuality).toBe("poor")
+    expect(stored.sameAgain).toBe("different")
+    expect(stored.whatHappened).toContain("Path A shipped")
+    expect(stored.lesson).toContain("operational shape")
+    expect(stored.completedAt).toBeTruthy()
+
+    // Verify the structured review section now renders
+    await expect(page.getByText(/lesson carried forward/i)).toBeVisible()
   })
 })
 
@@ -213,6 +310,9 @@ test.describe("Decision detail page", () => {
       qualityScore: 60,
       tags: ["ARCH"],
       rawThinking: "Some thinking here",
+      valuesAtStake: "Operational honesty",
+      humanCost: "Support team handles confusing incidents",
+      guidingPrinciple: "Make the reversible path visible",
       tradeoffs: [],
       riskLevel: "medium",
       badges: [{ label: "ARCH", type: "purple" }],
@@ -224,7 +324,7 @@ test.describe("Decision detail page", () => {
       risks: [],
     }
 
-    await page.goto("/")
+    await page.goto("/app")
     await page.evaluate(
       ([key, state]) => localStorage.setItem(key as string, JSON.stringify(state)),
       [
@@ -243,5 +343,8 @@ test.describe("Decision detail page", () => {
     await page.waitForLoadState("networkidle")
 
     await expect(page.getByRole("heading", { name: "Detail Page Test Decision" })).toBeVisible()
+    await expect(page.getByText("Operational honesty")).toBeVisible()
+    await expect(page.getByText("Support team handles confusing incidents")).toBeVisible()
+    await expect(page.getByText("Make the reversible path visible")).toBeVisible()
   })
 })

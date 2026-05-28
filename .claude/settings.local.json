@@ -25,7 +25,14 @@
       "Bash(Write-Host \"done\")",
       "Bash(Remove-Item *)",
       "Bash(npm run *)",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(npm test *)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(npx eslint *)",
+      "Bash(BASE=http://localhost:3000 node scripts/shot-landing.mjs)",
+      "Bash(node scripts/shot-landing.mjs)",
+      "Bash(node scripts/shot-verify.mjs)",
+      "Bash(npx vitest *)"
     ]
   }
 }

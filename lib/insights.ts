@@ -21,6 +21,7 @@ const LOW_QUALITY_SCORE = 60
 const RISK_QUALITY_COUNT = 3
 const AGING_MS = 7 * 24 * 60 * 60 * 1000
 const CONSTRAINT_CLUSTER_PCT = 40
+const HUMAN_FRAME_OMISSION_PCT = 50
 
 const ROLLBACK_KEYWORDS = ["rollback", "fallback", "revert"] as const
 
@@ -47,6 +48,32 @@ function checkRollbackOmission(decisions: Decision[]): Insight | null {
     description: `${Math.round(pct)}% of high-impact decisions lack rollback, fallback, or revert language in raw thinking.`,
     metric: `${missing.length} / ${pool.length}`,
     action: { label: "Review decisions", href: "/decisions?status=in-progress" },
+  }
+}
+
+function hasHumanFrame(decision: Decision): boolean {
+  return Boolean(
+    decision.valuesAtStake?.trim() ||
+    decision.humanCost?.trim() ||
+    decision.guidingPrinciple?.trim()
+  )
+}
+
+function checkHumanFrameOmission(decisions: Decision[]): Insight | null {
+  const highImpact = decisions.filter((d) => d.impact >= HIGH_IMPACT_THRESHOLD)
+  if (highImpact.length === 0) return null
+
+  const missing = highImpact.filter((d) => !hasHumanFrame(d))
+  const pct = (missing.length / highImpact.length) * 100
+  if (pct <= HUMAN_FRAME_OMISSION_PCT) return null
+
+  return {
+    id: "human-frame-omission",
+    type: "warning",
+    title: "Human frame missing",
+    description: `${Math.round(pct)}% of high-impact decisions do not name values, affected people, or a guiding principle.`,
+    metric: `${missing.length} / ${highImpact.length}`,
+    action: { label: "Review high impact", href: "/decisions" },
   }
 }
 
@@ -128,6 +155,7 @@ export function generateInsights(decisions: Decision[], now: number): Insight[] 
 
   const results = [
     checkRollbackOmission(decisions),
+    checkHumanFrameOmission(decisions),
     checkRiskQualityBlindspot(decisions),
     checkDecisionAging(decisions, now),
     checkConstraintClustering(decisions),

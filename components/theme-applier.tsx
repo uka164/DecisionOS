@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useLayoutEffect } from "react"
 import { MotionConfig } from "framer-motion"
 import { useSettingsStore } from "@/stores"
 
@@ -8,7 +8,7 @@ export function ThemeApplier({ children }: { children: React.ReactNode }) {
   const settings = useSettingsStore((s) => s.settings)
   const { theme, animationIntensity, reducedMotion } = settings
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const html = document.documentElement
     html.setAttribute("data-theme", theme)
     // 0–100 → 0–2 (100% = normal speed 1, slider above centre = slower)

@@ -10,7 +10,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   theme: "void",
   reducedMotion: false,
   animationIntensity: 70,
-  ambientMotion: true,
+  ambientMotion: false,
+  notifyRevisits: false,
 }
 
 type QuotaErrorHandler = (message: string) => void
@@ -51,6 +52,9 @@ const decisionSchema = z.object({
   qualityScore: z.number(),
   tags: z.array(z.string()),
   rawThinking: z.string(),
+  valuesAtStake: z.string().optional(),
+  humanCost: z.string().optional(),
+  guidingPrinciple: z.string().optional(),
   tradeoffs: z.array(tradeoffSchema),
   riskLevel: z.enum(["low", "medium", "high", "critical"]).nullable(),
   badges: z.array(z.object({
@@ -84,6 +88,18 @@ const decisionSchema = z.object({
   regret: z.boolean().optional(),
   revisitAt: z.string().optional(),
   gotWrong: z.string().optional(),
+  review: z.object({
+    whatHappened: z.string().optional(),
+    originalAssumption: z.string().optional(),
+    wrongAssumption: z.string().optional(),
+    underestimated: z.string().optional(),
+    overestimated: z.string().optional(),
+    sameAgain: z.enum(["same-again", "different", "unsure"]).optional(),
+    lesson: z.string().optional(),
+    outcome: z.enum(["good", "mixed", "bad"]).optional(),
+    processQuality: z.enum(["good", "mixed", "poor"]).optional(),
+    completedAt: z.string().optional(),
+  }).optional(),
 })
 
 const experimentSchema = z.object({
@@ -142,6 +158,7 @@ function normalizeSettings(settings?: Partial<AppSettings>): AppSettings {
     reducedMotion: settings?.reducedMotion ?? DEFAULT_SETTINGS.reducedMotion,
     animationIntensity: settings?.animationIntensity ?? DEFAULT_SETTINGS.animationIntensity,
     ambientMotion: settings?.ambientMotion ?? DEFAULT_SETTINGS.ambientMotion,
+    notifyRevisits: settings?.notifyRevisits ?? DEFAULT_SETTINGS.notifyRevisits,
   }
 }
 

@@ -14,11 +14,15 @@ const REPORT_PATH = path.join(ROOT, ".lighthouse", "report.json")
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm"
 const npxCommand = process.platform === "win32" ? "npx.cmd" : "npx"
 
+function spawnCommand(command, args, options) {
+  if (process.platform !== "win32") return spawn(command, args, options)
+  return spawn("cmd.exe", ["/d", "/s", "/c", command, ...args], options)
+}
+
 function run(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
+    const child = spawnCommand(command, args, {
       cwd: ROOT,
-      shell: process.platform === "win32",
       stdio: "inherit",
     })
     child.on("error", reject)
@@ -53,6 +57,28 @@ async function waitForServer(url, server) {
   throw new Error(`Timed out waiting for ${url}`)
 }
 
+function stopServer(server) {
+  return new Promise((resolve) => {
+    if (!server.pid || server.exitCode !== null) {
+      resolve()
+      return
+    }
+
+    if (process.platform === "win32") {
+      const killer = spawn("taskkill.exe", ["/pid", String(server.pid), "/t", "/f"], {
+        stdio: "ignore",
+      })
+      killer.on("exit", () => resolve())
+      killer.on("error", () => resolve())
+      return
+    }
+
+    server.kill("SIGTERM")
+    server.once("exit", () => resolve())
+    setTimeout(resolve, 2_000)
+  })
+}
+
 function printSummary() {
   const report = JSON.parse(fs.readFileSync(REPORT_PATH, "utf8"))
   const categories = report.categories
@@ -76,9 +102,8 @@ fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true })
 
 await run(npmCommand, ["run", "build"])
 
-const server = spawn(npxCommand, ["next", "start", "-p", PORT], {
+const server = spawnCommand(npxCommand, ["next", "start", "-p", PORT], {
   cwd: ROOT,
-  shell: process.platform === "win32",
   stdio: ["ignore", "pipe", "pipe"],
 })
 
@@ -98,5 +123,5 @@ try {
   ])
   printSummary()
 } finally {
-  server.kill()
+  await stopServer(server)
 }

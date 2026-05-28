@@ -5,9 +5,7 @@ import { ThemeApplier } from '@/components/theme-applier'
 import { StoreHydration } from '@/components/store-hydration'
 import { Toaster } from '@/components/ui/sonner'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
-import { NeuralBackground } from '@/components/ui/neural-background'
-import { CommandPalette } from '@/components/ui/command-palette'
-import { QuickCapture } from '@/components/ui/quick-capture'
+import { AppChrome } from '@/components/app-chrome'
 import { WizardProvider } from '@/contexts/WizardContext'
 import './globals.css'
 
@@ -58,9 +56,7 @@ export default function RootLayout({
                 <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:text-sm focus:font-medium">
                   Skip to content
                 </a>
-                <NeuralBackground />
-                <CommandPalette />
-                <QuickCapture />
+                <AppChrome />
                 <div id="main-content" className="relative z-10">
                   {children}
                 </div>

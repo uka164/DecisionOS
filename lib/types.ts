@@ -39,6 +39,29 @@ export interface DecisionRisk {
   severity: number
 }
 
+export type ReviewOutcome = "good" | "mixed" | "bad"
+export type ReviewProcessQuality = "good" | "mixed" | "poor"
+export type ReviewVerdict = "same-again" | "different" | "unsure"
+
+/**
+ * A structured, honest review of a decision after the fact.
+ * Outcome (what happened) is intentionally separate from process quality
+ * (how the decision was made). A good decision can have a bad outcome,
+ * and a bad decision can get lucky.
+ */
+export interface DecisionReview {
+  whatHappened?: string
+  originalAssumption?: string
+  wrongAssumption?: string
+  underestimated?: string
+  overestimated?: string
+  sameAgain?: ReviewVerdict
+  lesson?: string
+  outcome?: ReviewOutcome
+  processQuality?: ReviewProcessQuality
+  completedAt?: string
+}
+
 export interface Decision {
   id: string
   title: string
@@ -49,6 +72,9 @@ export interface Decision {
   qualityScore: number
   tags: string[]
   rawThinking: string
+  valuesAtStake?: string
+  humanCost?: string
+  guidingPrinciple?: string
   tradeoffs: TradeoffAxis[]
   riskLevel: RiskLevel | null
   badges: DecisionBadge[]
@@ -67,6 +93,7 @@ export interface Decision {
   regret?: boolean
   revisitAt?: string
   gotWrong?: string
+  review?: DecisionReview
 }
 
 export type ExperimentStatus = "active" | "paused" | "concluded"
@@ -109,6 +136,7 @@ export interface AppSettings {
   reducedMotion: boolean
   animationIntensity: number
   ambientMotion: boolean
+  notifyRevisits: boolean
 }
 
 export interface StoreState {

@@ -9,7 +9,7 @@ import { LOCAL_PROFILE } from "@/lib/local-profile"
 import { useWizard } from "@/contexts/WizardContext"
 
 const primaryNav = [
-  { icon: LayoutDashboard, label: "Dashboard",  href: "/",            note: null },
+  { icon: LayoutDashboard, label: "Dashboard",  href: "/app",         note: null },
   { icon: Network,         label: "Decisions",  href: "/decisions",   note: null },
 ]
 

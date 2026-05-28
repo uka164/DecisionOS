@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import { LOCAL_PROFILE } from "@/lib/local-profile"
 
 const primaryNav = [
-  { icon: LayoutDashboard, label: "Dashboard",   href: "/" },
+  { icon: LayoutDashboard, label: "Dashboard",   href: "/app" },
   { icon: Network,         label: "Decisions",   href: "/decisions" },
 ]
 

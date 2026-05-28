@@ -178,7 +178,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     theme: "void",
     reducedMotion: false,
     animationIntensity: 70,
-    ambientMotion: true,
+    ambientMotion: false,
+    notifyRevisits: false,
   },
   lastSynced: null,
 

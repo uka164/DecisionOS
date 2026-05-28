@@ -1,9 +1,9 @@
 ﻿"use client"
 
 import { useMemo, useState, useRef, useEffect, useCallback } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, FileText, Trash2, AlertTriangle, ChevronRight, ChevronDown, Pencil, Check, FlaskConical, X, Save, Plus, HeartCrack, Calendar } from "lucide-react"
+import { ArrowLeft, FileText, Trash2, AlertTriangle, ChevronRight, ChevronDown, Pencil, Check, FlaskConical, X, Save, Plus, HeartCrack, Calendar, CheckCircle2, Eye } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "sonner"
 import { useDecisionsStore, useExperimentsStore, useSettingsStore } from "@/stores"
@@ -13,8 +13,11 @@ import { QualityRing } from "@/components/ui/quality-ring"
 import { TradeoffRadar } from "@/components/ui/tradeoff-radar"
 import { LeftSidebar } from "@/components/dashboard/left-sidebar"
 import { MobileNav } from "@/components/dashboard/mobile-nav"
+import { ReviewMode } from "@/components/review/review-mode"
+import { InlineBlindSpots } from "@/components/review/inline-blind-spots"
+import { useNow } from "@/hooks/useNow"
 import { cn } from "@/lib/utils"
-import type { Decision, DecisionStatus, DecisionOption } from "@/lib/types"
+import type { Decision, DecisionStatus, DecisionOption, DecisionReview } from "@/lib/types"
 
 // Status helpers
 
@@ -359,6 +362,9 @@ function NotFound() {
 interface EditDraft {
   title: string
   rawThinking: string
+  valuesAtStake: string
+  humanCost: string
+  guidingPrinciple: string
   summary: string
   preMortem: string
   tags: string[]
@@ -370,6 +376,9 @@ function createDraft(d: Decision): EditDraft {
   return {
     title: d.title,
     rawThinking: d.rawThinking,
+    valuesAtStake: d.valuesAtStake ?? "",
+    humanCost: d.humanCost ?? "",
+    guidingPrinciple: d.guidingPrinciple ?? "",
     summary: d.summary ?? "",
     preMortem: d.preMortem ?? "",
     tags: [...d.tags],
@@ -380,9 +389,101 @@ function createDraft(d: Decision): EditDraft {
 
 // Main
 
+const REVIEW_OUTCOME_STYLES: Record<NonNullable<DecisionReview["outcome"]>, string> = {
+  good: "bg-emerald-500/12 border-emerald-500/30 text-emerald-300",
+  mixed: "bg-amber-500/12 border-amber-500/30 text-amber-300",
+  bad: "bg-rose-500/12 border-rose-500/30 text-rose-300",
+}
+
+const REVIEW_PROCESS_STYLES: Record<NonNullable<DecisionReview["processQuality"]>, string> = {
+  good: "bg-emerald-500/12 border-emerald-500/30 text-emerald-300",
+  mixed: "bg-amber-500/12 border-amber-500/30 text-amber-300",
+  poor: "bg-rose-500/12 border-rose-500/30 text-rose-300",
+}
+
+const REVIEW_VERDICT_LABEL: Record<NonNullable<DecisionReview["sameAgain"]>, string> = {
+  "same-again": "Same again",
+  "different": "Would not repeat",
+  "unsure": "Unsure",
+}
+
+function ReviewSummary({ review }: { review: DecisionReview }) {
+  const completed = review.completedAt
+    ? new Date(review.completedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : null
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {review.outcome && (
+          <span className={cn("text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border", REVIEW_OUTCOME_STYLES[review.outcome])}>
+            Outcome: {review.outcome}
+          </span>
+        )}
+        {review.processQuality && (
+          <span className={cn("text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border", REVIEW_PROCESS_STYLES[review.processQuality])}>
+            Process: {review.processQuality}
+          </span>
+        )}
+        {review.sameAgain && (
+          <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-violet-500/10 border-violet-500/25 text-violet-300">
+            {REVIEW_VERDICT_LABEL[review.sameAgain]}
+          </span>
+        )}
+        {completed && (
+          <span className="text-[10px] font-mono text-white/35 uppercase tracking-wider ml-auto">
+            Reviewed {completed}
+          </span>
+        )}
+      </div>
+
+      {review.whatHappened && (
+        <div>
+          <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">What happened</p>
+          <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{review.whatHappened}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {review.originalAssumption && (
+          <div>
+            <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">Original assumption</p>
+            <p className="text-sm text-white/60 leading-relaxed">{review.originalAssumption}</p>
+          </div>
+        )}
+        {review.wrongAssumption && (
+          <div>
+            <p className="text-[10px] font-mono text-rose-400/70 uppercase tracking-wider mb-1.5">Wrong assumption</p>
+            <p className="text-sm text-white/60 leading-relaxed">{review.wrongAssumption}</p>
+          </div>
+        )}
+        {review.underestimated && (
+          <div>
+            <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">Underestimated</p>
+            <p className="text-sm text-white/60 leading-relaxed">{review.underestimated}</p>
+          </div>
+        )}
+        {review.overestimated && (
+          <div>
+            <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">Overestimated</p>
+            <p className="text-sm text-white/60 leading-relaxed">{review.overestimated}</p>
+          </div>
+        )}
+      </div>
+
+      {review.lesson && (
+        <div className="rounded-xl border border-violet-500/25 bg-violet-500/[0.06] p-3.5">
+          <p className="text-[10px] font-mono text-violet-300/70 uppercase tracking-wider mb-1.5">Lesson carried forward</p>
+          <p className="text-sm text-white/80 leading-relaxed">{review.lesson}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function DecisionDetailPage() {
   const params  = useParams()
   const router  = useRouter()
+  const searchParams = useSearchParams()
   const id      = Array.isArray(params.id) ? (params.id[0] ?? "") : (params.id ?? "")
 
   const decisions = useDecisionsStore((s) => s.decisions)
@@ -391,6 +492,7 @@ export default function DecisionDetailPage() {
   const isLoading = useDecisionsStore((s) => s.isLoading)
   const experiments = useExperimentsStore((s) => s.experiments)
   const settings = useSettingsStore((s) => s.settings)
+  const now = useNow()
 
   const decision = useMemo(
     () => decisions.find((d) => d.id === id) ?? null,
@@ -410,6 +512,26 @@ export default function DecisionDetailPage() {
   // Celebration state for "decided" transition
   const [showCelebration, setShowCelebration] = useState(false)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [isReviewOpen, setIsReviewOpen] = useState(false)
+  const reviewAutoOpened = useRef(false)
+
+  // Auto-open review when ?focus=review is present
+  useEffect(() => {
+    if (!decision || reviewAutoOpened.current) return
+    const focus = searchParams.get("focus")
+    if (focus === "review") {
+      setIsReviewOpen(true)
+      reviewAutoOpened.current = true
+    }
+  }, [decision, searchParams])
+
+  const handleReviewSave = useCallback(
+    (review: DecisionReview, regret: boolean) => {
+      if (!decision) return
+      updateDecision(decision.id, { review, regret })
+    },
+    [decision, updateDecision]
+  )
 
   const startEditing = useCallback(() => {
     if (!decision) return
@@ -427,6 +549,9 @@ export default function DecisionDetailPage() {
     updateDecision(decision.id, {
       title: draft.title.trim() || decision.title,
       rawThinking: draft.rawThinking,
+      valuesAtStake: draft.valuesAtStake.trim() || undefined,
+      humanCost: draft.humanCost.trim() || undefined,
+      guidingPrinciple: draft.guidingPrinciple.trim() || undefined,
       summary: draft.summary || undefined,
       preMortem: draft.preMortem || undefined,
       tags: draft.tags,
@@ -499,6 +624,9 @@ export default function DecisionDetailPage() {
   const nextQualitySignal = qualityBreakdown.missing[0]
 
   const displayRawThinking = isEditing && draft ? draft.rawThinking : decision.rawThinking
+  const displayValuesAtStake = isEditing && draft ? draft.valuesAtStake : (decision.valuesAtStake ?? "")
+  const displayHumanCost = isEditing && draft ? draft.humanCost : (decision.humanCost ?? "")
+  const displayGuidingPrinciple = isEditing && draft ? draft.guidingPrinciple : (decision.guidingPrinciple ?? "")
   const displaySummary = isEditing && draft ? draft.summary : (decision.summary ?? "")
   const displayPreMortem = isEditing && draft ? draft.preMortem : (decision.preMortem ?? "")
   const displayTags = isEditing && draft ? draft.tags : decision.tags
@@ -607,6 +735,13 @@ export default function DecisionDetailPage() {
         ) : (
           <>
             <button
+              onClick={() => setIsReviewOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-200 hover:bg-violet-500/15 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:outline-none"
+            >
+              {decision.review?.completedAt ? <Eye className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
+              {decision.review?.completedAt ? "Update Review" : "Review this decision"}
+            </button>
+            <button
               onClick={startEditing}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/25 text-primary hover:bg-cyan-500/15 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none"
             >
@@ -623,6 +758,8 @@ export default function DecisionDetailPage() {
           </>
         )}
       </div>
+
+      {!isEditing && <InlineBlindSpots decisionId={decision.id} />}
 
       {/* Regret toggle + revisit date — always accessible */}
       {!isEditing && (
@@ -816,6 +953,76 @@ export default function DecisionDetailPage() {
         </SectionCard>
       )}
 
+      {/* Human frame */}
+      {(displayValuesAtStake || displayHumanCost || displayGuidingPrinciple || isEditing) && (
+        <SectionCard title="Human Frame">
+          {isEditing && draft ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <label htmlFor="edit-values-at-stake" className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                  Values at stake
+                </label>
+                <textarea
+                  id="edit-values-at-stake"
+                  value={draft.valuesAtStake}
+                  onChange={(e) => updateDraft("valuesAtStake", e.target.value)}
+                  rows={4}
+                  placeholder="What value could be compromised?"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="edit-human-cost" className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                  Human cost
+                </label>
+                <textarea
+                  id="edit-human-cost"
+                  value={draft.humanCost}
+                  onChange={(e) => updateDraft("humanCost", e.target.value)}
+                  rows={4}
+                  placeholder="Who pays if this is wrong?"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="edit-guiding-principle" className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                  Guiding principle
+                </label>
+                <textarea
+                  id="edit-guiding-principle"
+                  value={draft.guidingPrinciple}
+                  onChange={(e) => updateDraft("guidingPrinciple", e.target.value)}
+                  rows={4}
+                  placeholder="What rule should still hold?"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {displayValuesAtStake && (
+                <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-white/30">Values</div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/60">{displayValuesAtStake}</p>
+                </div>
+              )}
+              {displayHumanCost && (
+                <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-white/30">Human cost</div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/60">{displayHumanCost}</p>
+                </div>
+              )}
+              {displayGuidingPrinciple && (
+                <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-white/30">Principle</div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/60">{displayGuidingPrinciple}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </SectionCard>
+      )}
+
       {/* Options */}
       {(displayOptions.length > 0 || isEditing) && (
         <SectionCard title="Options Considered">
@@ -877,7 +1084,6 @@ export default function DecisionDetailPage() {
           <div className="space-y-2">
             {decision.risks.map((risk, i) => (
               <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.07] rounded-xl">
-                <span className="text-[9px] font-mono text-white/40 flex-shrink-0">V_{String(i + 1).padStart(2, "0")}</span>
                 <span className="flex-1 text-sm text-white/65">{risk.text}</span>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <div className="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
@@ -918,6 +1124,34 @@ export default function DecisionDetailPage() {
           </div>
         </SectionCard>
       )}
+
+      {/* Structured Review */}
+      {decision.review?.completedAt ? (
+        <SectionCard title="Review">
+          <ReviewSummary review={decision.review} />
+        </SectionCard>
+      ) : decision.revisitAt && now != null && new Date(decision.revisitAt).getTime() <= now ? (
+        <div className="rounded-2xl border border-violet-500/25 bg-violet-500/[0.06] p-5">
+          <div className="flex items-start gap-3">
+            <div className="rounded-xl bg-violet-500/15 border border-violet-500/30 p-2">
+              <CheckCircle2 className="w-4 h-4 text-violet-300" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-sm font-semibold text-white">Time to look back honestly</h2>
+              <p className="mt-1 text-sm text-white/55 leading-relaxed">
+                You said you would review this. Do it before the memory rewrites itself.
+              </p>
+              <button
+                onClick={() => setIsReviewOpen(true)}
+                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-500/15 border border-violet-500/35 text-violet-200 text-sm font-medium hover:bg-violet-500/20 transition-colors"
+              >
+                Start review
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* Retrospective — always editable */}
       <SectionCard title="Retrospective">
@@ -1017,6 +1251,13 @@ export default function DecisionDetailPage() {
           </button>
         </div>
       )}
+
+      <ReviewMode
+        isOpen={isReviewOpen}
+        decision={decision}
+        onClose={() => setIsReviewOpen(false)}
+        onSave={handleReviewSave}
+      />
 
     </div>
   )

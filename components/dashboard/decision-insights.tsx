@@ -6,7 +6,7 @@ import { useDecisionInsights } from "@/stores"
 import { useDecisionsStore } from "@/stores"
 import type { InsightType } from "@/lib/insights"
 
-const MIN_FOR_INSIGHTS = 3
+const MIN_FOR_INSIGHTS = 5
 
 const CONFIG: Record<
   InsightType,
@@ -21,19 +21,19 @@ const CONFIG: Record<
     icon: AlertTriangle,
     iconClass: "text-amber-400",
     labelClass: "bg-amber-400/10 text-amber-400 border-amber-400/20",
-    label: "Warning",
+    label: "Blind spot",
   },
   info: {
     icon: Info,
     iconClass: "text-primary",
     labelClass: "bg-primary/10 text-primary border-primary/20",
-    label: "Info",
+    label: "Context",
   },
   action: {
     icon: Zap,
     iconClass: "text-secondary",
     labelClass: "bg-secondary/10 text-secondary border-secondary/20",
-    label: "Action",
+    label: "Next step",
   },
   pattern: {
     icon: TrendingUp,
@@ -55,8 +55,8 @@ export function DecisionInsights() {
         <Lock className="w-3.5 h-3.5 text-white/20 flex-shrink-0" />
         <p className="text-xs text-white/30">
           {remaining > 0
-            ? `Log ${remaining} more decision${remaining !== 1 ? "s" : ""} to unlock pattern insights.`
-            : "Building insights from your decisions…"}
+            ? `Log ${remaining} more decision${remaining !== 1 ? "s" : ""} to surface recurring blind spots.`
+            : "Building reflection prompts from your decisions..."}
         </p>
       </div>
     )
@@ -65,14 +65,14 @@ export function DecisionInsights() {
   if (insights.length === 0) return null
 
   return (
-    <section aria-label="Local decision insights">
+    <section aria-label="Local reflection prompts">
       <div className="flex items-center gap-2 mb-3">
         <ScanLine className="w-3.5 h-3.5 text-white/25" aria-hidden />
         <h2 className="text-xs font-mono text-white/35 uppercase tracking-wider">
-          Insights
+          Reflection prompts
         </h2>
         <span className="text-xs font-mono text-white/20">
-          · {insights.length} signal{insights.length !== 1 ? "s" : ""}
+          · {insights.length} pattern{insights.length !== 1 ? "s" : ""}
         </span>
       </div>
 

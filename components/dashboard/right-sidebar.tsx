@@ -119,7 +119,7 @@ export function RightSidebar() {
               return (
                 <li key={d.id}>
                   <button
-                    onClick={() => router.push(`/decisions/${d.id}`)}
+                    onClick={() => router.push(`/decisions/${d.id}?focus=review`)}
                     className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors group text-left"
                   >
                     <div className="flex-1 min-w-0">
@@ -127,7 +127,7 @@ export function RightSidebar() {
                         {d.title}
                       </p>
                       <span className="text-[10px] font-mono text-violet-400/80">
-                        {overdue === 0 ? "Due today" : `${overdue}d overdue`}
+                        {overdue === 0 ? "Review today" : `${overdue}d overdue · review`}
                       </span>
                     </div>
                     {d.regret && (

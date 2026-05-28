@@ -440,7 +440,7 @@ export function NeuralMapView() {
 
       {/* Empty / loading state */}
       {!isLoading && nodes.length === 0 && (
-        <EmptyMapState onCreateClick={() => router.push("/")} />
+        <EmptyMapState onCreateClick={() => router.push("/app")} />
       )}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">

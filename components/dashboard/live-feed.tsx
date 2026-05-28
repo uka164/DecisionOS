@@ -95,7 +95,7 @@ export function LiveFeed() {
             <div className="py-8 text-center">
               <p className="text-white/35 text-xs mb-3">No decisions yet.</p>
               <button
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/app")}
                 className="text-[10px] text-primary hover:text-cyan-300 transition-colors underline underline-offset-2"
               >
                 Create your first one
