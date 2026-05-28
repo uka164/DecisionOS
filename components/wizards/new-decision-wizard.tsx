@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   X, AlertTriangle, Zap, Target, Shield,
-  Plus, Trash2, CheckCircle2, ChevronRight, Check,
+  Plus, Trash2, CheckCircle2, ChevronRight, Check, Calendar,
 } from "lucide-react"
 import { useDecisionsStore } from "@/stores"
 import { getQualityBreakdown } from "@/lib/utils/calculateQualityScore"
@@ -36,15 +36,27 @@ interface DecisionData {
   risks: { text: string; severity: number }[]
   skipRisks: boolean
   acceptRisk: boolean
+  revisitAt: string
+  firstMove: string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const STEPS = [
-  { id: 1, code: "01", label: "BRIEF",   sublabel: "Context",             icon: Target        },
-  { id: 2, code: "02", label: "OPTIONS", sublabel: "Compare paths",       icon: Zap           },
-  { id: 3, code: "03", label: "RISKS",   sublabel: "Pre-mortem",          icon: AlertTriangle },
-  { id: 4, code: "04", label: "REVIEW",  sublabel: "Record decision",     icon: Shield        },
+  { id: 1, code: "01", label: "CONTEXT", sublabel: "Context",             icon: Target        },
+  { id: 2, code: "02", label: "PATHS",   sublabel: "Compare paths",       icon: Zap           },
+  { id: 3, code: "03", label: "RISK",    sublabel: "Pre-mortem",          icon: AlertTriangle },
+  { id: 4, code: "04", label: "LOOP",    sublabel: "Review and execute",  icon: Shield        },
+] as const
+
+const RITUAL_STAGES = [
+  "Context",
+  "Compare Paths",
+  "Pre Mortem",
+  "Human Frame",
+  "Review",
+  "Revisit Schedule",
+  "Execution Trail",
 ] as const
 
 const CONSTRAINTS    = ["Budget", "Time", "Team", "Tech Debt", "Security", "Scale"]
@@ -65,6 +77,8 @@ const EMPTY_DATA: DecisionData = {
   risks: [],
   skipRisks: false,
   acceptRisk: false,
+  revisitAt: "",
+  firstMove: "",
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -72,8 +86,8 @@ const EMPTY_DATA: DecisionData = {
 function LiveQualityRing({ score }: { score: number }) {
   const r = 28, circ = 2 * Math.PI * r
   const offset = circ - (score / 100) * circ
-  // Indigo→Cyan palette — semantically distinct from red/amber/green risk colors
-  const color = score >= 80 ? "#06b6d4" : score >= 50 ? "#818cf8" : "#6366f1"
+  // Clarity follows the semantic action, attention, and aligned roles.
+  const color = score >= 80 ? "var(--success)" : score >= 50 ? "var(--primary)" : "var(--warning)"
   const label = score >= 80 ? "CLEAR" : score >= 50 ? "FORMING" : "THIN"
   return (
     <div className="flex flex-col items-center gap-2">
@@ -82,7 +96,7 @@ function LiveQualityRing({ score }: { score: number }) {
           <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
           <motion.circle cx="32" cy="32" r={r} fill="none" stroke={color} strokeWidth="4" strokeLinecap="round"
             strokeDasharray={circ} animate={{ strokeDashoffset: offset }}
-            transition={{ duration: 0.45, ease: "easeOut" }} style={{ filter: `drop-shadow(0 0 5px ${color}60)` }} />
+            transition={{ duration: 0.45, ease: "easeOut" }} />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
           <motion.span key={score} className="font-mono font-bold text-[15px] leading-none" style={{ color }}
@@ -90,8 +104,8 @@ function LiveQualityRing({ score }: { score: number }) {
         </div>
       </div>
       <div className="text-center leading-tight">
-        <div className="text-[11px] font-mono text-white/40 tracking-wide">Reflection</div>
-        <div className="text-[11px] font-mono tracking-wide" style={{ color }}>{label}</div>
+        <div className="font-mono text-[11px] text-white/40">Clarity</div>
+        <div className="font-mono text-[11px]" style={{ color }}>{label}</div>
       </div>
     </div>
   )
@@ -168,6 +182,19 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
     data.valuesAtStake.trim().length > 0 ||
     data.humanCost.trim().length > 0 ||
     data.guidingPrinciple.trim().length > 0
+  const ritualActiveIndex =
+    step === 1 ? (hasHumanFrame ? 3 : 0) :
+    step === 2 ? 1 :
+    step === 3 ? 2 :
+    data.firstMove.trim().length > 0 ? 6 :
+    data.revisitAt ? 5 :
+    4
+
+  const ritualStageState = (index: number): "done" | "active" | "pending" => {
+    if (index < ritualActiveIndex) return "done"
+    if (index === ritualActiveIndex) return "active"
+    return "pending"
+  }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -248,6 +275,15 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
         preMortem:   preMortem || undefined,
         constraints: data.constraints,
         risks:       data.risks,
+        revisitAt:   data.revisitAt || undefined,
+        executionTrail: data.firstMove.trim()
+          ? [{
+              id: `step-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              text: data.firstMove.trim(),
+              done: false,
+              createdAt: new Date().toISOString(),
+            }]
+          : undefined,
       })
 
       onSubmit?.(data)
@@ -285,7 +321,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
             exit={{ opacity: 0, scale: 0.97, y: 12 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-[900px]" style={{ maxHeight: "90vh" }}
           >
-            <div className="relative flex flex-col rounded-2xl overflow-hidden bg-bg-surface border border-white/10 shadow-2xl" style={{ maxHeight: "90vh" }}>
+            <div className="relative flex flex-col overflow-hidden rounded-lg border border-white/[0.08] bg-bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.36)]" style={{ maxHeight: "90vh" }}>
 
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] flex-shrink-0">
@@ -303,7 +339,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
               <div className="flex flex-1 min-h-0">
 
                 {/* Left nav panel */}
-                <div className="hidden sm:flex flex-col w-[180px] flex-shrink-0 border-r border-white/[0.06] p-4 gap-5">
+                <div className="hidden sm:flex w-[200px] flex-shrink-0 flex-col gap-4 border-r border-white/[0.06] p-4">
                   <nav className="flex flex-col gap-0.5" aria-label="Wizard steps">
                     {STEPS.map((s) => {
                       const done = step > s.id, active = step === s.id, Icon = s.icon
@@ -314,13 +350,13 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                         )}>
                           <div className={cn(
                             "w-[22px] h-[22px] rounded-full border flex items-center justify-center flex-shrink-0 mt-0.5",
-                            done && "border-emerald-500/35 bg-emerald-500/10",
+                            done && "border-success/35 bg-success/10",
                             active && "border-primary/50 bg-primary/10",
                             !done && !active && "border-white/10 bg-white/[0.02]"
                           )}>
                             <Icon className={cn(
                               "w-2.5 h-2.5",
-                              done && "text-emerald-400",
+                              done && "text-success",
                               active && "text-primary",
                               !done && !active && "text-white/40"
                             )} />
@@ -328,7 +364,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           <div className="min-w-0 pt-0.5">
                             <div className={cn(
                               "text-xs font-medium leading-none",
-                              done && "text-emerald-300/65",
+                              done && "text-success/65",
                               active && "text-white",
                               !done && !active && "text-white/55"
                             )}>{s.sublabel}</div>
@@ -337,9 +373,41 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                       )
                     })}
                   </nav>
+                  <div className="border-t border-white/[0.05] pt-4">
+                    <div className="mb-2 text-[10px] font-medium uppercase text-white/30">
+                      Ritual path
+                    </div>
+                    <div className="space-y-1.5">
+                      {RITUAL_STAGES.map((label, index) => {
+                        const state = ritualStageState(index)
+                        return (
+                          <div key={label} className="flex items-center gap-2">
+                            <span
+                              className={cn(
+                                "h-1.5 w-1.5 rounded-full",
+                                state === "done" && "bg-success/70",
+                                state === "active" && "bg-primary",
+                                state === "pending" && "bg-white/15"
+                              )}
+                            />
+                            <span
+                              className={cn(
+                                "text-[11px] leading-none",
+                                state === "done" && "text-white/45",
+                                state === "active" && "text-white/75",
+                                state === "pending" && "text-white/25"
+                              )}
+                            >
+                              {label}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
                   {step === 4 && (
                     <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/[0.05]">
-                      <div className="text-xs text-white/45">Reflection depth</div>
+                      <div className="text-xs text-white/45">Decision clarity</div>
                       <LiveQualityRing score={quality} />
                       {nextQualitySignal && (
                         <p className="max-w-[140px] text-center text-[11px] leading-snug text-white/35">
@@ -386,7 +454,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                 }
                                 setShowTemplatePicker(false)
                               }}
-                              className="flex flex-col items-start gap-1 p-3.5 rounded-xl border border-white/[0.08] bg-white/[0.025] hover:bg-white/[0.05] hover:border-primary/25 transition-colors text-left group"
+                              className="flex flex-col items-start gap-1 rounded-lg border border-white/[0.08] bg-white/[0.025] p-3.5 text-left transition-colors hover:border-primary/25 hover:bg-white/[0.05] group"
                             >
                               <span className="text-sm font-medium text-white group-hover:text-primary transition-colors">
                                 {tpl.name}
@@ -409,7 +477,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                         <div key={s.id} className={cn(
                           "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium flex-shrink-0",
                           active && "bg-primary/10 border-primary/25 text-primary",
-                          done && !active && "bg-emerald-500/[0.08] border-emerald-500/15 text-emerald-400/60",
+                          done && !active && "bg-success/[0.08] border-success/15 text-success/60",
                           !active && !done && "bg-white/[0.02] border-white/[0.05] text-white/45"
                         )}>
                           <Icon className="w-3 h-3" />{s.sublabel}
@@ -436,9 +504,9 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             <input id="decision-name" name="decision-title" type="text" value={data.name}
                               onChange={(e) => setData({ ...data, name: e.target.value })}
                               placeholder="e.g., Rewrite auth, or patch it again?"
-                              className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-base placeholder:text-white/25 focus:outline-none focus:border-primary/40 focus:bg-white/[0.055] transition-colors" />
+                              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-base text-white transition-colors placeholder:text-white/25 focus:border-primary/40 focus:bg-white/[0.055] focus:outline-none" />
                             {data.name.length > 0 && data.name.length <= 5 && (
-                              <p className="text-xs text-amber-400/70">A few more characters — make the decision name specific.</p>
+                              <p className="text-xs text-warning/70">A few more characters — make the decision name specific.</p>
                             )}
                           </div>
                           <div className="space-y-2">
@@ -448,9 +516,9 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             <textarea id="decision-context" name="decision-context" value={data.context} rows={6}
                               onChange={(e) => setData({ ...data, context: e.target.value })}
                               placeholder="Describe the situation, constraints, and what triggered this. Plain language."
-                              className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-colors" />
+                              className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-white transition-colors placeholder:text-white/25 focus:border-primary/40 focus:outline-none" />
                           </div>
-                          <div className="space-y-3 rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
+                          <div className="space-y-3 rounded-lg border border-white/[0.07] bg-white/[0.02] p-4">
                             <div>
                               <h3 className="text-sm font-semibold text-white">Human frame</h3>
                               <p className="mt-1 text-xs text-white/45 leading-relaxed">
@@ -518,7 +586,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {/* Option A */}
                             <div className={cn(
-                              "rounded-xl p-4 border bg-white/[0.025] transition-colors",
+                              "rounded-lg p-4 border bg-white/[0.025] transition-colors",
                               focusedPath === "A" && "border-primary/30 bg-primary/[0.04]",
                               focusedPath !== "A" && "border-white/[0.07]"
                             )}>
@@ -536,21 +604,21 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             </div>
                             {/* Option B */}
                             <div className={cn(
-                              "rounded-xl p-4 border bg-white/[0.025] transition-colors",
-                              focusedPath === "B" && "border-purple-500/30 bg-purple-500/[0.04]",
+                              "rounded-lg p-4 border bg-white/[0.025] transition-colors",
+                              focusedPath === "B" && "border-brand/30 bg-brand/[0.04]",
                               focusedPath !== "B" && "border-white/[0.07]"
                             )}>
                               <div className="flex items-center gap-2 mb-3">
-                                <span className="text-xs font-semibold text-purple-400">Option B</span>
+                                <span className="text-xs font-semibold text-brand">Option B</span>
                               </div>
                               <input type="text" value={data.pathB.title} onFocus={() => setFocusedPath("B")} onBlur={() => setFocusedPath(null)}
                                 onChange={(e) => setData({ ...data, pathB: { ...data.pathB, title: e.target.value } })}
                                 placeholder="Option name" aria-label="Option B title"
-                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-purple-500/40 transition-colors mb-2.5" />
+                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-brand/40 transition-colors mb-2.5" />
                               <textarea value={data.pathB.description} rows={3} onFocus={() => setFocusedPath("B")} onBlur={() => setFocusedPath(null)}
                                 onChange={(e) => setData({ ...data, pathB: { ...data.pathB, description: e.target.value } })}
                                 placeholder="Describe this approach..." aria-label="Option B description"
-                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-purple-500/40 transition-colors resize-none" />
+                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-brand/40 transition-colors resize-none" />
                             </div>
                           </div>
 
@@ -563,7 +631,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                   className={cn(
                                     "px-3 py-1.5 rounded-lg text-xs transition-colors border min-h-[34px]",
                                     data.constraints.includes(c)
-                                      ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                                      ? "bg-warning/10 border-warning/30 text-warning"
                                       : "bg-white/[0.025] border-white/[0.07] text-white/50 hover:bg-white/[0.05] hover:text-white/70"
                                   )}>
                                   {c}
@@ -582,7 +650,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                   className={cn(
                                     "flex-1 py-2 rounded-lg border text-sm font-medium transition-colors",
                                     data.impact === val
-                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                                      ? "bg-success/10 border-success/30 text-success"
                                       : "bg-white/[0.025] border-white/[0.07] text-white/50 hover:bg-white/[0.05] hover:text-white/70"
                                   )}>
                                   {val}
@@ -624,8 +692,8 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                         <motion.div key="s3" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18 }} className="space-y-5">
                           <div className="flex items-start gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center flex-shrink-0">
-                              <AlertTriangle className="w-4 h-4 text-rose-400" />
+                            <div className="w-9 h-9 rounded-lg bg-destructive/10 border border-destructive/25 flex items-center justify-center flex-shrink-0">
+                              <AlertTriangle className="w-4 h-4 text-destructive" />
                             </div>
                             <div>
                               <h2 className="text-xl font-semibold text-white">Pre-mortem</h2>
@@ -636,20 +704,20 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           <div className="space-y-2.5">
                             <AnimatePresence initial={false}>
                               {data.risks.map((risk, i) => {
-                                const borderColor = risk.severity >= 80 ? "border-rose-500/35" : risk.severity >= 60 ? "border-rose-500/20" : risk.severity >= 35 ? "border-amber-500/20" : "border-white/[0.07]"
+                                const borderColor = risk.severity >= 80 ? "border-destructive/35" : risk.severity >= 60 ? "border-destructive/20" : risk.severity >= 35 ? "border-warning/20" : "border-white/[0.07]"
                                 return (
                                   <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>
-                                    <div className={cn("rounded-xl p-4 border bg-white/[0.025]", borderColor)}>
+                                    <div className={cn("rounded-lg p-4 border bg-white/[0.025]", borderColor)}>
                                       <div className="flex items-start gap-3">
                                         <div className="flex-1 space-y-3">
                                           <input type="text" value={risk.text} onChange={(e) => updateRisk(i, "text", e.target.value)}
                                             placeholder="Describe the failure mode..." aria-label={`Risk ${i + 1} description`}
-                                            className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-rose-500/40 transition-colors" />
+                                            className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-destructive/40 transition-colors" />
                                           <div className="flex items-center gap-3">
                                             <span className="text-xs text-white/55 flex-shrink-0">Severity</span>
                                             <SeverityBar value={risk.severity} />
                                             <input type="range" min="5" max="100" value={risk.severity} onChange={(e) => updateRisk(i, "severity", parseInt(e.target.value))} aria-label={`Risk ${i + 1} severity: ${risk.severity}%`}
-                                              className="w-[72px] h-1 bg-transparent appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-rose-400 [&::-webkit-slider-thumb]:cursor-pointer" />
+                                              className="w-[72px] h-1 bg-transparent appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-destructive [&::-webkit-slider-thumb]:cursor-pointer" />
                                             <span className="text-xs w-[34px] text-right flex-shrink-0 tabular-nums"
                                               style={{ color: risk.severity >= 80 ? "#f43f5e" : risk.severity >= 60 ? "#fb923c" : risk.severity >= 35 ? "#f59e0b" : "#10b981" }}>{risk.severity}%</span>
                                           </div>
@@ -667,7 +735,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
 
                             {!data.skipRisks && (
                               <button onClick={addRisk}
-                                className="w-full py-3 border border-dashed border-white/[0.09] rounded-xl text-white/50 text-sm hover:bg-white/[0.02] hover:border-white/[0.18] hover:text-white/70 transition-colors flex items-center justify-center gap-2 min-h-[44px]">
+                                className="w-full py-3 border border-dashed border-white/[0.09] rounded-lg text-white/50 text-sm hover:bg-white/[0.02] hover:border-white/[0.18] hover:text-white/70 transition-colors flex items-center justify-center gap-2 min-h-[44px]">
                                 <Plus className="w-3.5 h-3.5" />Add risk
                               </button>
                             )}
@@ -677,7 +745,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                               <button
                                 onClick={() => setData((p) => ({ ...p, skipRisks: !p.skipRisks, acceptRisk: !p.skipRisks }))}
                                 aria-pressed={data.skipRisks}
-                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
                                   data.skipRisks
                                     ? "bg-white/[0.04] border-white/[0.12] text-white/55"
                                     : "bg-white/[0.015] border-white/[0.06] text-white/45 hover:border-white/[0.1] hover:text-white/55"
@@ -697,7 +765,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           <AnimatePresence>
                             {data.risks.length > 0 && (
                               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
-                                className="flex items-center justify-between p-4 bg-white/[0.025] border border-white/[0.07] rounded-xl">
+                                className="flex items-center justify-between p-4 bg-white/[0.025] border border-white/[0.07] rounded-lg">
                                 <div>
                                   <div className="text-sm text-white/75 font-medium">Accept these risks?</div>
                                   <div className="text-xs text-white/45 mt-0.5">Required before you can record the decision.</div>
@@ -706,11 +774,11 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                   aria-label="Toggle risk acceptance" aria-pressed={data.acceptRisk}
                                   className={cn(
                                     "relative w-12 h-6 rounded-full transition-colors border focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:outline-none",
-                                    data.acceptRisk ? "bg-emerald-500/20 border-emerald-500/40" : "bg-white/5 border-white/15"
+                                    data.acceptRisk ? "bg-success/20 border-success/40" : "bg-white/5 border-white/15"
                                   )}>
                                   <div className={cn(
                                     "absolute top-0.5 w-5 h-5 rounded-full transition-transform",
-                                    data.acceptRisk ? "translate-x-6 bg-emerald-400" : "translate-x-0.5 bg-white/40"
+                                    data.acceptRisk ? "translate-x-6 bg-success" : "translate-x-0.5 bg-white/40"
                                   )} />
                                 </button>
                               </motion.div>
@@ -732,28 +800,28 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           </div>
 
                           <div className="grid grid-cols-2 gap-2">
-                            <div className="p-3.5 bg-white/[0.025] border border-white/[0.07] rounded-xl">
+                            <div className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3.5">
                               <div className="text-xs text-white/45 mb-1.5">Title</div>
                               <div className="text-sm font-medium text-white truncate">{data.name || "—"}</div>
                             </div>
-                            <div className="p-3.5 bg-white/[0.025] border border-white/[0.07] rounded-xl">
+                            <div className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3.5">
                               <div className="text-xs text-white/45 mb-1.5">Impact</div>
-                              <div className="text-sm font-medium text-emerald-300">
+                              <div className="text-sm font-medium text-success">
                                 {data.impact}/5 — {IMPACT_LABELS[data.impact]}
                               </div>
                             </div>
-                            <div className="p-3.5 bg-primary/[0.04] border border-primary/15 rounded-xl">
+                            <div className="rounded-lg border border-primary/15 bg-primary/[0.04] p-3.5">
                               <div className="text-xs text-primary/55 mb-1.5">Option A</div>
                               <div className="text-sm font-medium text-primary truncate">{data.pathA.title || "—"}</div>
                             </div>
-                            <div className="p-3.5 bg-purple-500/[0.04] border border-purple-500/15 rounded-xl">
-                              <div className="text-xs text-purple-400/55 mb-1.5">Option B</div>
-                              <div className="text-sm font-medium text-purple-400 truncate">{data.pathB.title || "—"}</div>
+                            <div className="rounded-lg border border-brand/15 bg-brand/[0.04] p-3.5">
+                              <div className="text-xs text-brand/55 mb-1.5">Option B</div>
+                              <div className="text-sm font-medium text-brand truncate">{data.pathB.title || "—"}</div>
                             </div>
                           </div>
 
                           {hasHumanFrame && (
-                            <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3.5">
+                            <div className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3.5">
                               <div className="text-sm font-medium text-white/70 mb-3">Human frame</div>
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {data.valuesAtStake.trim() && (
@@ -778,20 +846,20 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between p-3.5 bg-rose-500/[0.03] border border-rose-500/[0.12] rounded-xl">
+                          <div className="flex items-center justify-between rounded-lg border border-destructive/[0.12] bg-destructive/[0.03] p-3.5">
                             <div>
-                              <div className="text-xs text-rose-300/65 mb-1">Risks identified</div>
-                              <div className="text-sm text-rose-300">
+                              <div className="text-xs text-destructive/65 mb-1">Risks identified</div>
+                              <div className="text-sm text-destructive">
                                 {data.skipRisks ? "No risks documented" : `${data.risks.length} risk${data.risks.length !== 1 ? "s" : ""} acknowledged`}
                               </div>
                             </div>
                             {derivedRiskLevel() && (
                               <div className={cn(
                                 "px-2.5 py-1 rounded-lg text-xs border",
-                                derivedRiskLevel() === "critical" && "bg-rose-500/12 border-rose-500/30 text-rose-300",
-                                derivedRiskLevel() === "high" && "bg-orange-500/12 border-orange-500/30 text-orange-300",
-                                derivedRiskLevel() === "medium" && "bg-amber-500/12 border-amber-500/30 text-amber-300",
-                                derivedRiskLevel() === "low" && "bg-emerald-500/12 border-emerald-500/30 text-emerald-300"
+                                derivedRiskLevel() === "critical" && "bg-destructive/[0.12] border-destructive/30 text-destructive",
+                                derivedRiskLevel() === "high" && "bg-destructive/[0.12] border-destructive/30 text-destructive",
+                                derivedRiskLevel() === "medium" && "bg-warning/[0.12] border-warning/30 text-warning",
+                                derivedRiskLevel() === "low" && "bg-success/[0.12] border-success/30 text-success"
                               )}>{derivedRiskLevel()}</div>
                             )}
                           </div>
@@ -800,10 +868,10 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             <button
                               onClick={() => setData((p) => ({ ...p, acceptRisk: !p.acceptRisk }))}
                               aria-pressed={data.acceptRisk}
-                              className={`w-full flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                              className={`w-full flex items-center justify-between gap-3 rounded-lg border px-4 py-3 text-left transition-colors ${
                                 data.acceptRisk
-                                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                                  : "border-amber-500/25 bg-amber-500/[0.06] text-amber-200/80 hover:bg-amber-500/10"
+                                  ? "border-success/30 bg-success/10 text-success"
+                                  : "border-warning/25 bg-warning/[0.06] text-warning/80 hover:bg-warning/10"
                               }`}
                             >
                               <span className="text-sm">
@@ -814,15 +882,78 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           )}
 
                           {!data.acceptRisk && !data.skipRisks && (
-                            <p className="text-xs leading-relaxed text-amber-200/65">
+                            <p className="text-xs leading-relaxed text-warning/65">
                               The decision can only be recorded after you explicitly accept the documented risks.
                             </p>
                           )}
 
+                          {/* Revisit schedule — pre-commit to looking back */}
+                          <div className="space-y-2.5 rounded-lg border border-white/[0.07] bg-white/[0.02] p-3.5">
+                            <div className="flex items-center gap-2">
+                              <Calendar className="w-3.5 h-3.5 text-warning/70" />
+                              <h3 className="text-sm font-medium text-white/80">Schedule an honest revisit</h3>
+                            </div>
+                            <p className="text-xs leading-relaxed text-white/45">
+                              Pre-commit to a date. When it arrives, the system asks what your reasoning got wrong — not just whether it worked.
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              {([30, 60, 90] as const).map((days) => (
+                                <button
+                                  key={days}
+                                  type="button"
+                                  onClick={() =>
+                                    setData((p) => ({
+                                      ...p,
+                                      revisitAt: new Date(Date.now() + days * 86400000).toISOString().slice(0, 10),
+                                    }))
+                                  }
+                                  className="px-3 py-1.5 rounded-lg text-xs border bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-white/[0.05] hover:text-white/75 transition-colors min-h-[34px]"
+                                >
+                                  +{days} days
+                                </button>
+                              ))}
+                              <input
+                                type="date"
+                                value={data.revisitAt}
+                                onChange={(e) => setData((p) => ({ ...p, revisitAt: e.target.value }))}
+                                aria-label="Revisit date"
+                                className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] border border-white/[0.08] text-white/70 focus:outline-none focus:border-primary/40 transition-colors"
+                              />
+                              {data.revisitAt && (
+                                <button
+                                  type="button"
+                                  onClick={() => setData((p) => ({ ...p, revisitAt: "" }))}
+                                  className="text-white/30 hover:text-white/60 transition-colors"
+                                  aria-label="Clear revisit date"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* First move — bridge the decision into execution */}
+                          <div className="space-y-2 rounded-lg border border-white/[0.07] bg-white/[0.02] p-3.5">
+                            <div className="flex items-center gap-2">
+                              <Target className="w-3.5 h-3.5 text-primary/70" />
+                              <h3 className="text-sm font-medium text-white/80">
+                                First move <span className="font-normal text-white/35">· optional</span>
+                              </h3>
+                            </div>
+                            <input
+                              type="text"
+                              value={data.firstMove}
+                              onChange={(e) => setData((p) => ({ ...p, firstMove: e.target.value }))}
+                              placeholder="The first concrete action that turns this into execution."
+                              aria-label="First execution step"
+                              className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors"
+                            />
+                          </div>
+
                           <button onClick={handleSubmit} disabled={(!data.acceptRisk && !data.skipRisks) || isSubmitting}
                             aria-label="Record decision"
                             className={cn(
-                              "w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors border",
+                              "w-full py-3.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors border",
                               (data.acceptRisk || data.skipRisks) && !isSubmitting
                                 ? "bg-primary text-bg-body hover:opacity-90 border-primary cursor-pointer"
                                 : "bg-white/[0.04] text-white/45 cursor-not-allowed border-white/[0.07]"
@@ -858,7 +989,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                   {step < 4 && (
                     <button onClick={() => canProceed() && setStep((s) => s + 1)} disabled={!canProceed()}
                       className={cn(
-                        "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors min-h-[40px] border",
+                        "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[40px] border",
                         canProceed()
                           ? "bg-primary/10 border-primary/30 text-primary hover:bg-primary/15"
                           : "bg-white/[0.025] border-white/[0.06] text-white/45 cursor-not-allowed"
@@ -884,7 +1015,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                       initial={{ opacity: 0, scale: 0.96, y: 10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.96, y: 10 }}
-                      className="w-full max-w-sm rounded-2xl border border-amber-500/20 bg-[#0a0f14] p-5 shadow-2xl"
+                      className="w-full max-w-sm rounded-lg border border-warning/20 bg-[#0a0f14] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.34)]"
                     >
                       <h2 id="discard-decision-title" className="text-base font-semibold text-white">Discard this draft?</h2>
                       <p className="mt-2 text-sm leading-relaxed text-white/55">
@@ -893,13 +1024,13 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                       <div className="mt-5 flex justify-end gap-2">
                         <button
                           onClick={() => setShowDiscardConfirm(false)}
-                          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/65 transition-colors hover:bg-white/10 hover:text-white"
+                          className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/65 transition-colors hover:bg-white/10 hover:text-white"
                         >
                           Keep editing
                         </button>
                         <button
                           onClick={discardAndClose}
-                          className="rounded-xl border border-rose-500/30 bg-rose-500/15 px-4 py-2 text-sm font-medium text-rose-300 transition-colors hover:bg-rose-500/20"
+                          className="rounded-lg border border-destructive/30 bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/20"
                         >
                           Discard
                         </button>

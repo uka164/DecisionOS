@@ -15,7 +15,7 @@ const NeuralMapView = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     ),
   }
@@ -125,7 +125,7 @@ function DecisionsContent() {
     filters.statuses.length > 0
 
   if (isLoading) return <div className="py-24 text-center text-white/40 text-sm">Loading decisions…</div>
-  if (error)     return <div className="py-24 text-center text-rose-400 text-sm">Error: {error}</div>
+  if (error)     return <div className="py-24 text-center text-destructive text-sm">Error: {error}</div>
 
   return (
     <div className={view === "map" ? "h-[calc(100vh-4rem)] lg:h-screen flex flex-col" : "p-4 sm:p-6 space-y-5"}>
@@ -136,7 +136,7 @@ function DecisionsContent() {
         view === "map" && "flex-shrink-0 px-4 sm:px-6 pt-4 sm:pt-6"
       )}>
         <div>
-          <h1 className="text-2xl font-bold text-white">Decisions</h1>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Decisions</h1>
           <p className="text-white/50 text-sm mt-1">
             {view === "list"
               ? `${filtered.length} of ${decisions.length} decision${decisions.length !== 1 ? "s" : ""}`
@@ -193,7 +193,7 @@ function DecisionsContent() {
                   aria-pressed={filters.statuses.includes(status)}
                   className={`px-3 py-1 rounded-lg text-xs font-medium border transition-all min-h-[32px] ${
                     filters.statuses.includes(status)
-                      ? "bg-purple-500/20 border-purple-500/40 text-purple-400"
+                      ? "bg-secondary/20 border-secondary/40 text-secondary"
                       : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/80"
                   }`}
                 >

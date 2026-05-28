@@ -89,7 +89,7 @@ function TugOfWarBar({
           top: `${50 - Math.min(40, Math.max(-40, deviation))}%`,
         }}
         className={`absolute w-3 h-3 rounded-full ${
-          isSuccess ? "bg-emerald-500" : "bg-rose-500"
+          isSuccess ? "bg-success" : "bg-destructive"
         }`}
         style={{
           boxShadow: `0 0 12px ${isSuccess ? "#10b981" : "#f43f5e"}`,
@@ -97,8 +97,8 @@ function TugOfWarBar({
       />
 
       {/* Labels */}
-      <span className="absolute -top-5 text-[9px] text-emerald-400 font-mono">+</span>
-      <span className="absolute -bottom-5 text-[9px] text-rose-400 font-mono">−</span>
+      <span className="absolute -top-5 text-[9px] text-success font-mono">+</span>
+      <span className="absolute -bottom-5 text-[9px] text-destructive font-mono">−</span>
     </div>
   )
 }
@@ -122,7 +122,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
         </p>
         <a
           href="/decisions"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-primary text-sm hover:bg-cyan-500/15 transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm hover:bg-primary/15 transition-all"
         >
           <ArrowRight className="w-4 h-4" />
           View Decisions
@@ -193,7 +193,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/15 text-primary text-xs rounded-lg hover:bg-cyan-500/25 transition-colors border border-cyan-500/20"
+            className="flex items-center gap-2 px-3 py-1.5 bg-primary/15 text-primary text-xs rounded-lg hover:bg-primary/25 transition-colors border border-primary/20"
           >
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">New Experiment</span>
@@ -210,18 +210,18 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
         <div className="flex-1 p-4 sm:p-6 lg:border-r border-white/10">
           <div className="h-full bg-[#0a0f14] border border-white/10 rounded-2xl p-5 flex flex-col">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-4 h-4 text-purple-400" />
+              <Sparkles className="w-4 h-4 text-secondary" />
               <h3 className="text-sm font-semibold text-white">Hypothesis</h3>
             </div>
 
             {/* Terminal-style Input */}
             <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4 border border-white/5">
               <div className="flex items-center gap-2 text-white/40 mb-2">
-                <span className="text-purple-400">$</span>
+                <span className="text-secondary">$</span>
                 <span>expected_outcome</span>
               </div>
-              <div className="pl-4 border-l-2 border-purple-500/50">
-                <p className="text-cyan-400">
+              <div className="pl-4 border-l-2 border-secondary/50">
+                <p className="text-primary">
                   {experiment.hypothesis.metric}:{" "}
                   <span className="text-white">
                     {experiment.hypothesis.expected}
@@ -243,7 +243,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
             <div className="mt-4 pt-4 border-t border-white/10">
               <p className="text-xs text-white/40 mb-2">Target</p>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-mono font-bold text-purple-400">
+                <span className="text-4xl font-mono font-bold text-secondary">
                   {experiment.hypothesis.expected}
                 </span>
                 <span className="text-lg text-white/40">{experiment.hypothesis.unit}</span>
@@ -266,7 +266,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
           <div className="h-full bg-[#0a0f14] border border-white/10 rounded-2xl p-5 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-cyan-400" />
+                <Clock className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-white">Reality</h3>
               </div>
               <span className="text-xs text-white/40 font-mono">
@@ -290,7 +290,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                   <div className="flex items-baseline justify-center gap-1">
                     <span
                       className={`text-5xl font-mono font-bold ${
-                        isSuccess ? "text-emerald-400" : "text-rose-400"
+                        isSuccess ? "text-success" : "text-destructive"
                       }`}
                     >
                       {experiment.result.actual}
@@ -301,13 +301,13 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                   </div>
                   <div className="mt-2 flex items-center justify-center gap-1">
                     {isSuccess ? (
-                      <CheckCircle className="w-4 h-4 text-emerald-400" />
+                      <CheckCircle className="w-4 h-4 text-success" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-rose-400" />
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
                     )}
                     <span
                       className={`text-sm font-mono ${
-                        isSuccess ? "text-emerald-400" : "text-rose-400"
+                        isSuccess ? "text-success" : "text-destructive"
                       }`}
                     >
                       {deviation! > 0 ? "+" : ""}
@@ -317,7 +317,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                 </div>
               ) : (
                 <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+                  <div className="w-12 h-12 mx-auto mb-3 border-2 border-warning/30 border-t-warning rounded-full animate-spin" />
                   <p className="text-sm text-white/40">Collecting data...</p>
                 </div>
               )}
@@ -329,8 +329,8 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                 onClick={() => setIsRunning(!isRunning)}
                 className={`w-full py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                   isRunning
-                    ? "bg-amber-500/20 text-amber-400"
-                    : "bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
+                    ? "bg-warning/20 text-warning"
+                    : "bg-primary/20 text-primary hover:bg-primary/30"
                 }`}
                 whileTap={{ scale: 0.98 }}
               >
@@ -410,7 +410,7 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
         onClick={() => setExpanded((e) => !e)}
         className="flex items-center gap-2 mb-3 group"
       >
-        <Clock className="w-4 h-4 text-purple-400" />
+        <Clock className="w-4 h-4 text-secondary" />
         <h3 className="text-sm font-semibold text-white">Observations</h3>
         <span className="text-[10px] text-white/30 font-mono">
           {entries.length > 0 ? `(${entries.length})` : ""}
@@ -436,7 +436,7 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
             <button
               onClick={addEntry}
               disabled={!draft.trim()}
-              className="px-3 py-2 bg-purple-500/20 text-purple-400 text-xs font-medium rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed self-end"
+              className="px-3 py-2 bg-secondary/20 text-secondary text-xs font-medium rounded-lg hover:bg-secondary/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed self-end"
             >
               Log
             </button>
@@ -449,7 +449,7 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
                   key={`${entry.timestamp}-${i}`}
                   className="flex items-start gap-2 p-2 bg-white/[0.03] border border-white/[0.06] rounded-lg"
                 >
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-400/50 mt-1.5 flex-shrink-0" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-secondary/50 mt-1.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-white/60 font-mono whitespace-pre-wrap">{entry.text}</p>
                     <p className="text-[10px] text-white/25 font-mono mt-1">
@@ -540,7 +540,7 @@ function CreateExperimentModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
-            <FlaskConical className="w-4 h-4 text-purple-400" />
+            <FlaskConical className="w-4 h-4 text-secondary" />
             <span id="new-experiment-title" className="text-sm font-semibold text-white">New Experiment</span>
           </div>
           <button onClick={requestClose} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Close">
@@ -638,7 +638,7 @@ function CreateExperimentModal({ onClose }: { onClose: () => void }) {
             aria-modal="true"
             aria-labelledby="discard-experiment-title"
           >
-            <div className="w-full max-w-sm rounded-2xl border border-amber-500/20 bg-[#0a0f18] p-5 shadow-2xl">
+            <div className="w-full max-w-sm rounded-2xl border border-warning/20 bg-[#0a0f18] p-5 shadow-2xl">
               <h3 id="discard-experiment-title" className="text-base font-semibold text-white">Discard this experiment?</h3>
               <p className="mt-2 text-sm leading-relaxed text-white/55">
                 Closing now will lose the experiment details entered here.
@@ -652,7 +652,7 @@ function CreateExperimentModal({ onClose }: { onClose: () => void }) {
                 </button>
                 <button
                   onClick={onClose}
-                  className="rounded-xl border border-rose-500/30 bg-rose-500/15 px-4 py-2 text-sm font-medium text-rose-300 transition-colors hover:bg-rose-500/20"
+                  className="rounded-xl border border-destructive/30 bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/20"
                 >
                   Discard
                 </button>

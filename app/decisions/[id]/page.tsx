@@ -17,16 +17,16 @@ import { ReviewMode } from "@/components/review/review-mode"
 import { InlineBlindSpots } from "@/components/review/inline-blind-spots"
 import { useNow } from "@/hooks/useNow"
 import { cn } from "@/lib/utils"
-import type { Decision, DecisionStatus, DecisionOption, DecisionReview } from "@/lib/types"
+import type { Decision, DecisionStatus, DecisionOption, DecisionReview, ExecutionStep } from "@/lib/types"
 
 // Status helpers
 
 
 const RISK_STYLES: Record<NonNullable<Decision["riskLevel"]>, string> = {
-  low:      "bg-emerald-500/10 border-emerald-500/25 text-emerald-400",
-  medium:   "bg-amber-500/10 border-amber-500/25 text-amber-400",
-  high:     "bg-rose-500/10 border-rose-500/25 text-rose-400",
-  critical: "bg-rose-500/20 border-rose-500/40 text-rose-400",
+  low:      "bg-success/10 border-success/25 text-success",
+  medium:   "bg-warning/10 border-warning/25 text-warning",
+  high:     "bg-destructive/10 border-destructive/25 text-destructive",
+  critical: "bg-destructive/20 border-destructive/40 text-destructive",
 }
 
 function formatDate(iso: string) {
@@ -52,11 +52,11 @@ const STATUS_FLOW_TERMINAL: DecisionStatus[] = ["voided", "superseded"]
 
 const STATUS_PICKER_STYLES: Record<DecisionStatus, string> = {
   draft:         "bg-white/5 border-white/10 text-white/55 hover:border-white/20",
-  "in-progress": "bg-cyan-500/10 border-cyan-500/20 text-primary hover:bg-cyan-500/15",
-  decided:       "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/15",
+  "in-progress": "bg-primary/10 border-primary/20 text-primary hover:bg-primary/15",
+  decided:       "bg-success/10 border-success/20 text-success hover:bg-success/15",
   archived:      "bg-white/5 border-white/10 text-white/40 hover:border-white/20",
-  voided:        "bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/15",
-  superseded:    "bg-amber-500/10 border-amber-500/20 text-amber-400 hover:bg-amber-500/15",
+  voided:        "bg-destructive/10 border-destructive/20 text-destructive hover:bg-destructive/15",
+  superseded:    "bg-warning/10 border-warning/20 text-warning hover:bg-warning/15",
 }
 
 function StatusEditor({ current, onChange }: { current: DecisionStatus; onChange: (s: DecisionStatus) => void }) {
@@ -156,8 +156,8 @@ function InlineEditor({
     if (draft !== (value ?? "")) onSave(draft)
   }
 
-  const borderFocus = accentColor === "rose" ? "border-rose-500/30 focus:border-rose-500/50" : "border-emerald-500/30 focus:border-emerald-500/50"
-  const borderDisplay = accentColor === "rose" ? "border-rose-500/30" : "border-emerald-500/30"
+  const borderFocus = accentColor === "rose" ? "border-destructive/30 focus:border-destructive/50" : "border-success/30 focus:border-success/50"
+  const borderDisplay = accentColor === "rose" ? "border-destructive/30" : "border-success/30"
 
   if (!editing && !draft) {
     return (
@@ -220,7 +220,7 @@ function OptionsEditor({
         {options.map((opt, i) => (
           <div key={i} className="p-3.5 bg-white/[0.03] border border-white/[0.07] rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${i === 0 ? "bg-cyan-500/15 text-primary" : "bg-purple-500/15 text-purple-400"}`}>
+              <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${i === 0 ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}>
                 {String.fromCharCode(65 + i)}
               </div>
               <span className="text-sm font-medium text-white">{opt.title}</span>
@@ -239,7 +239,7 @@ function OptionsEditor({
       {options.map((opt, i) => (
         <div key={i} className="p-3.5 bg-white/[0.03] border border-primary/15 rounded-xl space-y-2">
           <div className="flex items-center gap-2">
-            <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${i === 0 ? "bg-cyan-500/15 text-primary" : "bg-purple-500/15 text-purple-400"}`}>
+            <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${i === 0 ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}>
               {String.fromCharCode(65 + i)}
             </div>
             <input
@@ -306,7 +306,7 @@ function TagsEditor({
         <span key={tag} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white/50 text-xs flex items-center gap-1.5">
           {tag}
           {isEditing && (
-            <button onClick={() => removeTag(tag)} className="hover:text-rose-400 transition-colors" aria-label={`Remove tag ${tag}`}>
+            <button onClick={() => removeTag(tag)} className="hover:text-destructive transition-colors" aria-label={`Remove tag ${tag}`}>
               <X className="w-3 h-3" />
             </button>
           )}
@@ -390,15 +390,15 @@ function createDraft(d: Decision): EditDraft {
 // Main
 
 const REVIEW_OUTCOME_STYLES: Record<NonNullable<DecisionReview["outcome"]>, string> = {
-  good: "bg-emerald-500/12 border-emerald-500/30 text-emerald-300",
-  mixed: "bg-amber-500/12 border-amber-500/30 text-amber-300",
-  bad: "bg-rose-500/12 border-rose-500/30 text-rose-300",
+  good: "bg-success/12 border-success/30 text-success",
+  mixed: "bg-warning/12 border-warning/30 text-warning",
+  bad: "bg-destructive/12 border-destructive/30 text-destructive",
 }
 
 const REVIEW_PROCESS_STYLES: Record<NonNullable<DecisionReview["processQuality"]>, string> = {
-  good: "bg-emerald-500/12 border-emerald-500/30 text-emerald-300",
-  mixed: "bg-amber-500/12 border-amber-500/30 text-amber-300",
-  poor: "bg-rose-500/12 border-rose-500/30 text-rose-300",
+  good: "bg-success/12 border-success/30 text-success",
+  mixed: "bg-warning/12 border-warning/30 text-warning",
+  poor: "bg-destructive/12 border-destructive/30 text-destructive",
 }
 
 const REVIEW_VERDICT_LABEL: Record<NonNullable<DecisionReview["sameAgain"]>, string> = {
@@ -425,7 +425,7 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
           </span>
         )}
         {review.sameAgain && (
-          <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-violet-500/10 border-violet-500/25 text-violet-300">
+          <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-secondary/10 border-secondary/25 text-secondary">
             {REVIEW_VERDICT_LABEL[review.sameAgain]}
           </span>
         )}
@@ -452,7 +452,7 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
         )}
         {review.wrongAssumption && (
           <div>
-            <p className="text-[10px] font-mono text-rose-400/70 uppercase tracking-wider mb-1.5">Wrong assumption</p>
+            <p className="text-[10px] font-mono text-destructive/70 uppercase tracking-wider mb-1.5">Wrong assumption</p>
             <p className="text-sm text-white/60 leading-relaxed">{review.wrongAssumption}</p>
           </div>
         )}
@@ -471,12 +471,138 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
       </div>
 
       {review.lesson && (
-        <div className="rounded-xl border border-violet-500/25 bg-violet-500/[0.06] p-3.5">
-          <p className="text-[10px] font-mono text-violet-300/70 uppercase tracking-wider mb-1.5">Lesson carried forward</p>
+        <div className="rounded-xl border border-secondary/25 bg-secondary/[0.06] p-3.5">
+          <p className="text-[10px] font-mono text-secondary/70 uppercase tracking-wider mb-1.5">Lesson carried forward</p>
           <p className="text-sm text-white/80 leading-relaxed">{review.lesson}</p>
         </div>
       )}
     </div>
+  )
+}
+
+// Execution Trail — the bridge from decided to done
+
+function newStepId(): string {
+  return `step-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+}
+
+function ExecutionTrailSection({
+  steps,
+  onChange,
+}: {
+  steps: ExecutionStep[]
+  onChange: (next: ExecutionStep[]) => void
+}) {
+  const [draft, setDraft] = useState("")
+  const doneCount = steps.filter((s) => s.done).length
+  const pct = steps.length > 0 ? Math.round((doneCount / steps.length) * 100) : 0
+
+  const addStep = () => {
+    const text = draft.trim()
+    if (!text) return
+    onChange([
+      ...steps,
+      { id: newStepId(), text, done: false, createdAt: new Date().toISOString() },
+    ])
+    setDraft("")
+  }
+
+  const toggle = (id: string) =>
+    onChange(
+      steps.map((s) =>
+        s.id === id
+          ? { ...s, done: !s.done, doneAt: !s.done ? new Date().toISOString() : undefined }
+          : s
+      )
+    )
+
+  const remove = (id: string) => onChange(steps.filter((s) => s.id !== id))
+
+  return (
+    <SectionCard title="Execution Trail">
+      {steps.length > 0 && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-white/45">
+              {doneCount} of {steps.length} done
+            </span>
+            <span className="text-[10px] font-mono text-white/35 tabular-nums">{pct}%</span>
+          </div>
+          <div className="h-1 rounded-full bg-white/5 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-success transition-[width] duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      <ul className="space-y-1.5">
+        {steps.map((step) => (
+          <li
+            key={step.id}
+            className="group flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5"
+          >
+            <button
+              type="button"
+              onClick={() => toggle(step.id)}
+              aria-pressed={step.done}
+              aria-label={step.done ? "Mark step not done" : "Mark step done"}
+              className={cn(
+                "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-colors",
+                step.done
+                  ? "border-success/50 bg-success/20 text-success"
+                  : "border-white/20 bg-white/[0.03] hover:border-white/35"
+              )}
+            >
+              {step.done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+            </button>
+            <span
+              className={cn(
+                "min-w-0 flex-1 text-sm leading-relaxed",
+                step.done ? "text-white/35 line-through" : "text-white/70"
+              )}
+            >
+              {step.text}
+            </span>
+            <button
+              type="button"
+              onClick={() => remove(step.id)}
+              className="text-white/20 opacity-0 transition-opacity hover:text-white/50 group-hover:opacity-100"
+              aria-label="Remove step"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-2.5 flex items-center gap-2">
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              addStep()
+            }
+          }}
+          placeholder={steps.length === 0 ? "First concrete step to execute this…" : "Add a step…"}
+          aria-label="New execution step"
+          className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors"
+        />
+        <button
+          type="button"
+          onClick={addStep}
+          disabled={!draft.trim()}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary/10 border border-primary/25 text-primary text-sm font-medium hover:bg-primary/15 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Add
+        </button>
+      </div>
+    </SectionCard>
   )
 }
 
@@ -671,7 +797,7 @@ export default function DecisionDetailPage() {
               </span>
             )}
             {decision.regret && (
-              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-rose-500/10 border-rose-500/25 text-rose-400 flex items-center gap-1">
+              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-destructive/10 border-destructive/25 text-destructive flex items-center gap-1">
                 <HeartCrack className="w-2.5 h-2.5" />
                 Regret
               </span>
@@ -684,11 +810,11 @@ export default function DecisionDetailPage() {
               type="text"
               value={draft.title}
               onChange={(e) => updateDraft("title", e.target.value)}
-              className="w-full text-2xl font-bold text-white leading-tight bg-transparent border-b-2 border-primary/40 focus:border-primary/70 focus:outline-none py-1 transition-colors"
+              className="w-full text-2xl font-semibold tracking-tight text-white leading-tight bg-transparent border-b-2 border-primary/40 focus:border-primary/70 focus:outline-none py-1 transition-colors"
               placeholder="Decision title"
             />
           ) : (
-            <h1 className="text-2xl font-bold text-white leading-tight">{decision.title}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-white leading-tight">{decision.title}</h1>
           )}
           <p className="text-white/45 text-sm mt-1 font-mono">
             Created {formatDate(decision.createdAt)}
@@ -701,12 +827,12 @@ export default function DecisionDetailPage() {
           <AnimatePresence>
             {showCelebration && (
               <motion.div
-                className="absolute inset-0 rounded-full border-2 border-emerald-400"
+                className="absolute inset-0 rounded-full border-2 border-success"
                 initial={{ scale: 1, opacity: 0.8 }}
                 animate={{ scale: 2.2, opacity: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                style={{ boxShadow: "0 0 20px #10b981" }}
+                style={{ boxShadow: "0 0 20px var(--success)" }}
               />
             )}
           </AnimatePresence>
@@ -719,7 +845,7 @@ export default function DecisionDetailPage() {
           <>
             <button
               onClick={saveEdits}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:outline-none"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-success/15 border border-success/30 text-success hover:bg-success/20 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-success/50 focus-visible:outline-none"
             >
               <Save className="w-4 h-4" />
               Save Changes
@@ -736,21 +862,21 @@ export default function DecisionDetailPage() {
           <>
             <button
               onClick={() => setIsReviewOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-200 hover:bg-violet-500/15 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:outline-none"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/10 border border-secondary/30 text-secondary hover:bg-secondary/15 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-secondary/50 focus-visible:outline-none"
             >
               {decision.review?.completedAt ? <Eye className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
               {decision.review?.completedAt ? "Update Review" : "Review this decision"}
             </button>
             <button
               onClick={startEditing}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/25 text-primary hover:bg-cyan-500/15 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/25 text-primary hover:bg-primary/15 transition-all text-sm font-medium focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none"
             >
               <Pencil className="w-4 h-4" />
               Edit
             </button>
             <button
               onClick={handleDelete}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/15 transition-all text-sm focus-visible:ring-2 focus-visible:ring-rose-500/50 focus-visible:outline-none"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive hover:bg-destructive/15 transition-all text-sm focus-visible:ring-2 focus-visible:ring-destructive/50 focus-visible:outline-none"
             >
               <Trash2 className="w-4 h-4" />
               Delete
@@ -776,7 +902,7 @@ export default function DecisionDetailPage() {
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs border transition-all",
               decision.regret
-                ? "bg-rose-500/15 border-rose-500/30 text-rose-400 hover:bg-rose-500/10"
+                ? "bg-destructive/15 border-destructive/30 text-destructive hover:bg-destructive/10"
                 : "bg-white/[0.03] border-white/10 text-white/40 hover:bg-white/[0.06] hover:text-white/60"
             )}
           >
@@ -831,12 +957,12 @@ export default function DecisionDetailPage() {
               initial={{ opacity: 0, scale: 0.96, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
-              className="w-full max-w-md rounded-2xl border border-rose-500/20 bg-[#0a0f14] p-5 shadow-2xl"
+              className="w-full max-w-md rounded-2xl border border-destructive/20 bg-[#0a0f14] p-5 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-xl border border-rose-500/25 bg-rose-500/10 p-2">
-                  <AlertTriangle className="h-4 w-4 text-rose-400" />
+                <div className="mt-0.5 rounded-xl border border-destructive/25 bg-destructive/10 p-2">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
                 </div>
                 <div>
                   <h2 id="delete-decision-title" className="text-base font-semibold text-white">Delete this decision?</h2>
@@ -855,13 +981,13 @@ export default function DecisionDetailPage() {
                 </button>
                 <button
                   onClick={archiveInstead}
-                  className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-2 text-sm text-amber-300 transition-colors hover:bg-amber-500/15"
+                  className="rounded-xl border border-warning/25 bg-warning/10 px-4 py-2 text-sm text-warning transition-colors hover:bg-warning/15"
                 >
                   Archive instead
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="rounded-xl border border-rose-500/30 bg-rose-500/15 px-4 py-2 text-sm font-medium text-rose-300 transition-colors hover:bg-rose-500/20"
+                  className="rounded-xl border border-destructive/30 bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/20"
                 >
                   Delete permanently
                 </button>
@@ -908,13 +1034,13 @@ export default function DecisionDetailPage() {
               className={cn(
                 "rounded-xl border px-3 py-2",
                 signal.earned
-                  ? "border-emerald-500/20 bg-emerald-500/[0.06]"
+                  ? "border-success/20 bg-success/[0.06]"
                   : "border-white/[0.08] bg-black/10"
               )}
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-white/70">{signal.label}</span>
-                <span className={cn("text-[10px] font-mono", signal.earned ? "text-emerald-400" : "text-white/30")}>
+                <span className={cn("text-[10px] font-mono", signal.earned ? "text-success" : "text-white/30")}>
                   {signal.earned ? `+${signal.points}` : `0/${signal.points}`}
                 </span>
               </div>
@@ -1045,7 +1171,7 @@ export default function DecisionDetailPage() {
                   <span className="text-xs text-white/45 w-24 flex-shrink-0">{t.axis}</span>
                   <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-cyan-500"
+                      className="h-full rounded-full bg-primary"
                       style={{ width: `${t.value}%` }}
                     />
                   </div>
@@ -1066,10 +1192,10 @@ export default function DecisionDetailPage() {
               onChange={(e) => updateDraft("preMortem", e.target.value)}
               rows={4}
               placeholder="What could go wrong? Imagine this decision failed..."
-              className="w-full px-4 py-3 bg-white/[0.04] border border-rose-500/20 rounded-xl text-white text-sm font-mono placeholder:text-white/20 focus:outline-none focus:border-rose-500/40 resize-none leading-relaxed transition-all"
+              className="w-full px-4 py-3 bg-white/[0.04] border border-destructive/20 rounded-xl text-white text-sm font-mono placeholder:text-white/20 focus:outline-none focus:border-destructive/40 resize-none leading-relaxed transition-all"
             />
           ) : (
-            <div className="p-3.5 bg-rose-500/[0.04] border border-rose-500/[0.12] rounded-xl">
+            <div className="p-3.5 bg-destructive/[0.04] border border-destructive/[0.12] rounded-xl">
               <pre className="text-white/60 text-sm font-mono whitespace-pre-wrap leading-relaxed">
                 {displayPreMortem}
               </pre>
@@ -1108,12 +1234,12 @@ export default function DecisionDetailPage() {
         <SectionCard title="Constraints">
           <div className="flex flex-wrap gap-2">
             {displayConstraints.map((c) => (
-              <span key={c} className="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono flex items-center gap-1.5">
+              <span key={c} className="px-3 py-1.5 rounded-lg bg-warning/10 border border-warning/20 text-warning text-xs font-mono flex items-center gap-1.5">
                 [{c.toUpperCase()}]
                 {isEditing && (
                   <button
                     onClick={() => updateDraft("constraints", displayConstraints.filter((x) => x !== c))}
-                    className="hover:text-rose-400 transition-colors"
+                    className="hover:text-destructive transition-colors"
                     aria-label={`Remove constraint ${c}`}
                   >
                     <X className="w-3 h-3" />
@@ -1125,16 +1251,22 @@ export default function DecisionDetailPage() {
         </SectionCard>
       )}
 
+      {/* Execution Trail — what turns a decision into action */}
+      <ExecutionTrailSection
+        steps={decision.executionTrail ?? []}
+        onChange={(next) => updateDecision(decision.id, { executionTrail: next })}
+      />
+
       {/* Structured Review */}
       {decision.review?.completedAt ? (
         <SectionCard title="Review">
           <ReviewSummary review={decision.review} />
         </SectionCard>
       ) : decision.revisitAt && now != null && new Date(decision.revisitAt).getTime() <= now ? (
-        <div className="rounded-2xl border border-violet-500/25 bg-violet-500/[0.06] p-5">
+        <div className="rounded-2xl border border-secondary/25 bg-secondary/[0.06] p-5">
           <div className="flex items-start gap-3">
-            <div className="rounded-xl bg-violet-500/15 border border-violet-500/30 p-2">
-              <CheckCircle2 className="w-4 h-4 text-violet-300" />
+            <div className="rounded-xl bg-secondary/15 border border-secondary/30 p-2">
+              <CheckCircle2 className="w-4 h-4 text-secondary" />
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-sm font-semibold text-white">Time to look back honestly</h2>
@@ -1143,7 +1275,7 @@ export default function DecisionDetailPage() {
               </p>
               <button
                 onClick={() => setIsReviewOpen(true)}
-                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-500/15 border border-violet-500/35 text-violet-200 text-sm font-medium hover:bg-violet-500/20 transition-colors"
+                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-secondary/15 border border-secondary/35 text-secondary text-sm font-medium hover:bg-secondary/20 transition-colors"
               >
                 Start review
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -1172,7 +1304,7 @@ export default function DecisionDetailPage() {
           {/* What I got wrong — always available when regret is marked, or if gotWrong has content */}
           {(decision.regret || decision.gotWrong) && (
             <div>
-              <p className="text-xs font-mono text-rose-400/60 uppercase tracking-wider mb-2">What I got wrong</p>
+              <p className="text-xs font-mono text-destructive/60 uppercase tracking-wider mb-2">What I got wrong</p>
               <InlineEditor
                 value={decision.gotWrong}
                 onSave={(text) => {
@@ -1214,8 +1346,8 @@ export default function DecisionDetailPage() {
                 className="flex items-center justify-between p-3 bg-white/[0.03] border border-white/[0.07] rounded-xl"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                    <FlaskConical className="w-4 h-4 text-purple-400" />
+                  <div className="w-8 h-8 rounded-lg bg-secondary/10 border border-secondary/20 flex items-center justify-center">
+                    <FlaskConical className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white">{exp.title}</p>
@@ -1227,8 +1359,8 @@ export default function DecisionDetailPage() {
                 {exp.result.actual !== null && (
                   <span className={`text-sm font-mono ${
                     exp.result.actual >= exp.hypothesis.expected
-                      ? "text-emerald-400"
-                      : "text-rose-400"
+                      ? "text-success"
+                      : "text-destructive"
                   }`}>
                     {exp.result.actual}{exp.hypothesis.unit}
                   </span>

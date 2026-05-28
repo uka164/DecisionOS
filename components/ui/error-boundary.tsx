@@ -41,8 +41,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
     return (
       <div className="min-h-screen bg-[#020408] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white/[0.06] backdrop-blur-2xl border border-white/10 rounded-2xl p-8 text-center shadow-2xl shadow-black/50">
-          <div className="w-14 h-14 mx-auto mb-5 bg-rose-500/20 border border-rose-500/30 rounded-2xl flex items-center justify-center">
-            <AlertTriangle className="w-7 h-7 text-rose-400" />
+          <div className="w-14 h-14 mx-auto mb-5 bg-destructive/20 border border-destructive/30 rounded-2xl flex items-center justify-center">
+            <AlertTriangle className="w-7 h-7 text-destructive" />
           </div>
 
           <h2 className="text-xl font-semibold text-white mb-2">Something went wrong</h2>
@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           </p>
 
           {this.state.error && (
-            <pre className="mb-6 px-4 py-3 bg-black/40 border border-white/5 rounded-xl text-xs text-rose-300/70 font-mono text-left overflow-x-auto whitespace-pre-wrap">
+            <pre className="mb-6 px-4 py-3 bg-black/40 border border-white/5 rounded-xl text-xs text-destructive/70 font-mono text-left overflow-x-auto whitespace-pre-wrap">
               {this.state.error.message}
             </pre>
           )}
@@ -66,7 +66,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             </button>
             <button
               onClick={this.handleClear}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30 transition-colors text-sm font-medium"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-destructive/20 border border-destructive/30 text-destructive hover:bg-destructive/30 transition-colors text-sm font-medium"
             >
               <Trash2 className="w-4 h-4" />
               Clear Local Data

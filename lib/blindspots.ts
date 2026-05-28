@@ -22,6 +22,7 @@ export interface BlindSpotRule {
 export const HIGH_IMPACT_THRESHOLD = 4
 export const HIGH_RISK_SEVERITY = 70
 export const STALE_IN_PROGRESS_MS = 14 * 24 * 60 * 60 * 1000
+export const EXECUTION_STALL_MS = 7 * 24 * 60 * 60 * 1000
 export const REACTIVE_TIME_PCT = 50
 export const REACTIVE_MIN_DECISIONS = 4
 export const ROLLBACK_KEYWORDS = ["rollback", "fallback", "revert", "exit", "undo"] as const
@@ -223,6 +224,29 @@ const unclosedLoop: BlindSpotRule = {
   },
 }
 
+const executionStalled: BlindSpotRule = {
+  id: "execution-stalled",
+  detect: (decisions, now) => {
+    const affected = decisions.filter((d) => {
+      const trail = d.executionTrail ?? []
+      if (trail.length === 0 || trail.some((s) => s.done)) return false
+      const isLive = d.status === "decided" || d.status === "in-progress"
+      const aged = now - new Date(d.updatedAt ?? d.createdAt).getTime() > EXECUTION_STALL_MS
+      return isLive && aged
+    })
+    if (affected.length === 0) return null
+    return {
+      id: "execution-stalled",
+      severity: "warn",
+      title: "Decided, not executed",
+      description: `${affected.length} decision${affected.length === 1 ? " has" : "s have"} execution steps with no progress in over a week.`,
+      why: "A decision that never turns into action is just an opinion. Execution debt is where good decisions quietly die.",
+      suggestion: "Open each and check off the first move — or cut the step honestly if it no longer matters.",
+      affectedIds: affected.map((d) => d.id),
+    }
+  },
+}
+
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export const BLIND_SPOT_RULES: ReadonlyArray<BlindSpotRule> = [
@@ -234,6 +258,7 @@ export const BLIND_SPOT_RULES: ReadonlyArray<BlindSpotRule> = [
   reactivePattern,
   noExitPath,
   unclosedLoop,
+  executionStalled,
 ]
 
 const SEVERITY_ORDER: Record<BlindSpotSeverity, number> = {

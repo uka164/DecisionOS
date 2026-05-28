@@ -34,10 +34,10 @@ const STATUS_ICON: Record<DecisionStatus, React.ElementType> = {
 const STATUS_COLOR: Record<DecisionStatus, string> = {
   draft:         "text-white/40",
   "in-progress": "text-primary",
-  decided:       "text-emerald-400",
+  decided:       "text-success",
   archived:      "text-white/30",
-  voided:        "text-rose-400",
-  superseded:    "text-amber-400",
+  voided:        "text-destructive",
+  superseded:    "text-warning",
 }
 
 const STATUS_ACTION: Record<DecisionStatus, string> = {
@@ -66,13 +66,13 @@ export function LiveFeed() {
 
   return (
     <section>
-      <div className="bg-white/[0.06] backdrop-blur-2xl border border-white/[0.1] rounded-2xl shadow-xl shadow-black/20 ring-1 ring-white/5 overflow-hidden">
+      <div className="overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02]">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
           <div className="flex items-center gap-2">
-            <h2 className="text-sm font-semibold text-white">Live Feed</h2>
+            <h2 className="text-sm font-semibold text-white">System Memory</h2>
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
               <span className="text-[10px] text-white/40">
                 {decisions.length} decision{decisions.length !== 1 ? "s" : ""}
               </span>
@@ -96,7 +96,7 @@ export function LiveFeed() {
               <p className="text-white/35 text-xs mb-3">No decisions yet.</p>
               <button
                 onClick={() => router.push("/app")}
-                className="text-[10px] text-primary hover:text-cyan-300 transition-colors underline underline-offset-2"
+                className="text-[10px] text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
               >
                 Create your first one
               </button>

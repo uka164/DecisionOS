@@ -11,8 +11,8 @@ import { cn } from "@/lib/utils"
 const DEFAULT_VISIBLE = 3
 
 const SEVERITY: Record<SignalSeverity, { dot: string; label: string; labelClass: string }> = {
-  critical: { dot: "bg-destructive", label: "Now", labelClass: "text-destructive/90" },
-  attention: { dot: "bg-warning", label: "Soon", labelClass: "text-warning/90" },
+  critical: { dot: "bg-destructive", label: "Risk", labelClass: "text-destructive/90" },
+  attention: { dot: "bg-warning", label: "Review", labelClass: "text-warning/90" },
   info: { dot: "bg-white/35", label: "Pattern", labelClass: "text-white/45" },
 }
 
@@ -22,23 +22,28 @@ function SignalRow({ signal }: { signal: Signal }) {
     <li className="flex items-start gap-3.5 px-4 py-3.5">
       <span className={cn("mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full", sev.dot)} aria-hidden />
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <span className="text-sm font-medium text-white/90">{signal.title}</span>
-          <span className={cn("font-mono text-[10px] uppercase tracking-wider", sev.labelClass)}>
+          <span className={cn("font-mono text-[10px] uppercase", sev.labelClass)}>
             {sev.label}
           </span>
           {signal.count > 1 && (
-            <span className="ml-auto flex-shrink-0 font-mono text-[11px] tabular-nums text-white/30">
-              {signal.count}
+            <span className="ml-auto flex-shrink-0 font-mono text-[11px] tabular-nums text-white/30" title="Linked decisions">
+              {signal.count} linked
             </span>
           )}
         </div>
         <p className="mt-1 text-[13px] leading-relaxed text-white/55 text-pretty">
-          {signal.detail}
+          {signal.reason}
         </p>
-        {signal.severity === "critical" && signal.suggestion && (
+        {signal.evidence && (
+          <p className="mt-1 text-xs leading-relaxed text-white/35 text-pretty">
+            Evidence: {signal.evidence}
+          </p>
+        )}
+        {signal.severity !== "info" && signal.suggestedAction && (
           <p className="mt-1 text-xs leading-relaxed text-white/40 text-pretty">
-            {signal.suggestion}
+            {signal.suggestedAction}
           </p>
         )}
         {signal.action && (
@@ -73,7 +78,7 @@ export function Signals() {
     return (
       <section aria-label="Signals">
         <SectionLabel />
-        <div className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.015] px-4 py-3.5">
+        <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.015] px-4 py-3.5">
           <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-success/15">
             <Check className="h-3 w-3 text-success" strokeWidth={3} />
           </span>
@@ -91,7 +96,7 @@ export function Signals() {
   return (
     <section aria-label="Signals">
       <SectionLabel count={signals.length} />
-      <ul className="divide-y divide-white/[0.05] overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.015]">
+      <ul className="divide-y divide-white/[0.05] overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.015]">
         {visible.map((s) => (
           <SignalRow key={s.id} signal={s} />
         ))}
@@ -112,7 +117,7 @@ export function Signals() {
 function SectionLabel({ count }: { count?: number }) {
   return (
     <div className="mb-2.5 flex items-baseline gap-2">
-      <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-white/40">Signals</h2>
+      <h2 className="font-mono text-xs uppercase text-white/40">Signals</h2>
       {typeof count === "number" && (
         <span className="font-mono text-xs text-white/25">{count}</span>
       )}

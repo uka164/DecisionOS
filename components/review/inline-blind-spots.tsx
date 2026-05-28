@@ -13,16 +13,16 @@ const SEVERITY_STYLES: Record<
 > = {
   critical: {
     icon: AlertOctagon,
-    iconClass: "text-rose-300",
-    ring: "border-rose-500/30 bg-rose-500/[0.05]",
-    chip: "bg-rose-500/15 border-rose-500/30 text-rose-200",
+    iconClass: "text-destructive",
+    ring: "border-destructive/30 bg-destructive/[0.06]",
+    chip: "bg-destructive/15 border-destructive/30 text-destructive",
     label: "Critical",
   },
   warn: {
     icon: AlertTriangle,
-    iconClass: "text-amber-300",
-    ring: "border-amber-500/30 bg-amber-500/[0.045]",
-    chip: "bg-amber-500/15 border-amber-500/30 text-amber-200",
+    iconClass: "text-warning",
+    ring: "border-warning/30 bg-warning/[0.05]",
+    chip: "bg-warning/15 border-warning/30 text-warning",
     label: "Watch",
   },
   info: {

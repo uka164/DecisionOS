@@ -155,8 +155,8 @@ _To be filled after implementation._
                 >
                   {copied ? (
                     <>
-                      <Check className="w-4 h-4 text-emerald-400" />
-                      <span className="text-emerald-400">Copied!</span>
+                      <Check className="w-4 h-4 text-success" />
+                      <span className="text-success">Copied!</span>
                     </>
                   ) : (
                     <>
@@ -167,7 +167,7 @@ _To be filled after implementation._
                 </button>
                 <button
                   onClick={handleDownload}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 border border-primary/30 text-primary hover:bg-cyan-500/30 transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-colors text-sm"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download .md</span>

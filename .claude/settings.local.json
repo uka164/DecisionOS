@@ -32,7 +32,9 @@
       "Bash(BASE=http://localhost:3000 node scripts/shot-landing.mjs)",
       "Bash(node scripts/shot-landing.mjs)",
       "Bash(node scripts/shot-verify.mjs)",
-      "Bash(npx vitest *)"
+      "Bash(npx vitest *)",
+      "Bash(git rm *)",
+      "Bash(echo \"===LINT EXIT $?===\")"
     ]
   }
 }

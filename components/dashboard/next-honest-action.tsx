@@ -56,7 +56,7 @@ export function NextHonestAction() {
     return (
       <div
         aria-hidden="true"
-        className="h-[132px] rounded-2xl border border-white/[0.06] bg-white/[0.02]"
+        className="h-[132px] rounded-lg border border-white/[0.06] bg-white/[0.02]"
       />
     )
   }
@@ -68,12 +68,12 @@ export function NextHonestAction() {
   return (
     <section
       aria-label="Right now"
-      className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6"
+      className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6"
     >
       <div className="flex items-start gap-4">
         <div
           className={cn(
-            "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl",
+            "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg",
             tone.chip
           )}
         >
@@ -82,11 +82,11 @@ export function NextHonestAction() {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/40">
+            <p className="font-mono text-[10px] uppercase text-white/40">
               Right now
             </p>
             <span className="text-white/15">·</span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-white/45">
+            <span className="font-mono text-[10px] uppercase text-white/45">
               {tone.word}
             </span>
           </div>
@@ -106,7 +106,7 @@ export function NextHonestAction() {
           <button
             onClick={() => router.push(action.cta.href)}
             className={cn(
-              "mt-4 inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2",
+              "mt-4 inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2",
               tone.cta
             )}
           >

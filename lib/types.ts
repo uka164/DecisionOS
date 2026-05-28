@@ -62,6 +62,19 @@ export interface DecisionReview {
   completedAt?: string
 }
 
+/**
+ * A single concrete step in a decision's execution trail — the bridge between
+ * deciding and doing. Lives on the decision so "decided" never silently means
+ * "done".
+ */
+export interface ExecutionStep {
+  id: string
+  text: string
+  done: boolean
+  createdAt: string
+  doneAt?: string
+}
+
 export interface Decision {
   id: string
   title: string
@@ -94,6 +107,7 @@ export interface Decision {
   revisitAt?: string
   gotWrong?: string
   review?: DecisionReview
+  executionTrail?: ExecutionStep[]
 }
 
 export type ExperimentStatus = "active" | "paused" | "concluded"

@@ -23,10 +23,10 @@ function timeAgo(iso: string, now: number): string {
 const STATUS_CHIP: Record<Decision["status"], { label: string; cls: string }> = {
   draft:         { label: "Draft",      cls: "bg-white/5 border-white/15 text-white/50" },
   "in-progress": { label: "Active",     cls: "bg-primary/15 border-primary/25 text-primary" },
-  decided:       { label: "Decided",    cls: "bg-emerald-500/15 border-emerald-500/25 text-emerald-400" },
+  decided:       { label: "Decided",    cls: "bg-success/15 border-success/25 text-success" },
   archived:      { label: "Archived",   cls: "bg-white/5 border-white/10 text-white/35" },
-  voided:        { label: "Voided",     cls: "bg-rose-500/15 border-rose-500/25 text-rose-400" },
-  superseded:    { label: "Superseded", cls: "bg-amber-500/15 border-amber-500/25 text-amber-400" },
+  voided:        { label: "Voided",     cls: "bg-destructive/15 border-destructive/25 text-destructive" },
+  superseded:    { label: "Superseded", cls: "bg-warning/15 border-warning/25 text-warning" },
 }
 
 const OPEN_STATUSES = new Set<Decision["status"]>(["draft", "in-progress"])
@@ -82,7 +82,7 @@ export function RightSidebar() {
   }
 
   return (
-    <aside className="fixed right-0 top-0 h-screen w-80 border-l border-white/10 bg-white/[0.02] backdrop-blur-2xl p-5 space-y-5 hidden lg:block overflow-y-auto z-10">
+    <aside className="fixed right-0 top-0 z-10 hidden h-screen w-80 space-y-5 overflow-y-auto border-l border-white/[0.07] bg-bg-body/72 p-5 backdrop-blur-2xl lg:block">
 
       <div className="flex justify-end -mt-1 -mr-1 mb-1">
         <button
@@ -95,12 +95,12 @@ export function RightSidebar() {
       </div>
 
       {/* Revisit Queue */}
-      <div className="bg-white/[0.06] backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-4 shadow-xl shadow-black/20">
+      <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-4">
         <div className="flex items-center gap-2 mb-4">
-          <CalendarClock className="w-3.5 h-3.5 text-violet-400" />
+          <CalendarClock className="w-3.5 h-3.5 text-warning" />
           <h3 className="text-sm font-semibold text-white flex-1">Revisit Queue</h3>
           {revisitQueue.length > 0 && (
-            <span className="text-[10px] font-mono text-violet-400 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-mono text-warning bg-warning/10 border border-warning/20 px-2 py-0.5 rounded-full">
               {revisitQueue.length} overdue
             </span>
           )}
@@ -120,18 +120,18 @@ export function RightSidebar() {
                 <li key={d.id}>
                   <button
                     onClick={() => router.push(`/decisions/${d.id}?focus=review`)}
-                    className="w-full flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors group text-left"
+                    className="group flex w-full items-start gap-3 rounded-lg p-2.5 text-left transition-colors hover:bg-white/5"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-white/75 truncate group-hover:text-white transition-colors leading-tight mb-0.5">
                         {d.title}
                       </p>
-                      <span className="text-[10px] font-mono text-violet-400/80">
+                      <span className="text-[10px] font-mono text-warning/80">
                         {overdue === 0 ? "Review today" : `${overdue}d overdue · review`}
                       </span>
                     </div>
                     {d.regret && (
-                      <span className="text-[10px] font-mono text-rose-400/80 shrink-0 mt-0.5">Regret</span>
+                      <span className="text-[10px] font-mono text-destructive/80 shrink-0 mt-0.5">Regret</span>
                     )}
                   </button>
                 </li>
@@ -142,10 +142,10 @@ export function RightSidebar() {
       </div>
 
       {/* Open Decisions */}
-      <div className="bg-white/[0.06] backdrop-blur-2xl border border-white/[0.1] rounded-2xl p-4 shadow-xl shadow-black/20">
+      <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-4">
         <div className="flex items-center gap-2 mb-4">
           <Inbox className="w-3.5 h-3.5 text-white/45" />
-          <h3 className="text-sm font-semibold text-white flex-1">Open</h3>
+          <h3 className="flex-1 text-sm font-semibold text-white">Execution Loop</h3>
           {openDecisions.length > 0 && (
             <span className="text-[10px] font-mono text-white/35 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
               {openDecisions.length}

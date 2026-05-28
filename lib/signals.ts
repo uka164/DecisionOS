@@ -20,12 +20,18 @@ export interface Signal {
   severity: SignalSeverity
   /** Short, plain title. */
   title: string
-  /** One calm sentence: the why / the evidence. */
+  /** One calm sentence: the why / the evidence. Kept for older consumers. */
   detail: string
+  /** Why this deserves attention. */
+  reason: string
+  /** The concrete evidence behind the signal. */
+  evidence: string
   /** Optional, quieter line: what to do about it. */
   suggestion?: string
+  suggestedAction?: string
   /** How many decisions this touches (>= 1). Surfaced as quiet context. */
   count: number
+  linkedDecisionId?: string
   action?: { label: string; href: string }
 }
 
@@ -58,6 +64,7 @@ function blindSpotTopic(id: string): string {
     case "reactive-time-pattern":      return "constraint"
     case "no-exit-path":               return "rollback"
     case "unclosed-loop":              return "stale"
+    case "execution-stalled":          return "execution"
     default:                           return id
   }
 }
@@ -96,8 +103,12 @@ export function generateSignals(decisions: Decision[], now: number): Signal[] {
       severity: BLINDSPOT_SEVERITY[bs.severity],
       title: bs.title,
       detail: bs.description,
+      reason: bs.why,
+      evidence: bs.description,
       suggestion: bs.suggestion,
+      suggestedAction: bs.suggestion,
       count: bs.affectedIds.length,
+      linkedDecisionId: firstAffected,
       action: firstAffected
         ? { label: "Open decision", href: `/decisions/${firstAffected}` }
         : undefined,
@@ -115,6 +126,8 @@ export function generateSignals(decisions: Decision[], now: number): Signal[] {
       severity: INSIGHT_SEVERITY[ins.type],
       title: ins.title,
       detail: ins.description,
+      reason: ins.description,
+      evidence: ins.metric,
       count: 1,
       action: ins.action,
     })

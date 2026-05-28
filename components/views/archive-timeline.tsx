@@ -104,7 +104,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
           </p>
           <button
             onClick={() => router.push("/decisions")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-primary text-sm hover:bg-cyan-500/15 transition-all"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm hover:bg-primary/15 transition-all"
           >
             <ArrowRight className="w-4 h-4" />
             Go to Decisions
@@ -121,7 +121,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
         >
           <div className="relative max-w-3xl mx-auto">
             {/* Vertical Timeline Line */}
-            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-500/50 via-purple-500/30 to-transparent" />
+            <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-secondary/30 to-transparent" />
 
             {/* Year Groups */}
             {years.map((year) => (
@@ -132,10 +132,10 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
               >
                 {/* Year Marker */}
                 <div className="sticky top-0 z-10 flex items-center gap-4 mb-6 -ml-2">
-                  <div className="w-20 h-8 bg-purple-500/20 backdrop-blur-xl border border-purple-500/30 rounded-lg flex items-center justify-center">
-                    <span className="text-sm font-mono text-purple-400">{year}</span>
+                  <div className="w-20 h-8 bg-secondary/20 backdrop-blur-xl border border-secondary/30 rounded-lg flex items-center justify-center">
+                    <span className="text-sm font-mono text-secondary">{year}</span>
                   </div>
-                  <div className="h-px flex-1 bg-gradient-to-r from-purple-500/30 to-transparent" />
+                  <div className="h-px flex-1 bg-gradient-to-r from-secondary/30 to-transparent" />
                 </div>
 
                 {/* Decisions for this year */}
@@ -163,9 +163,9 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                           <div
                             className="absolute -left-[52px] w-4 h-4 rounded-full border-2 transition-all"
                             style={{
-                              backgroundColor: hasEchoes ? "#8b5cf6" : "transparent",
-                              borderColor: hasEchoes ? "#8b5cf6" : "rgba(255,255,255,0.2)",
-                              boxShadow: hasEchoes ? "0 0 12px #8b5cf6" : "none",
+                              backgroundColor: hasEchoes ? "var(--secondary)" : "transparent",
+                              borderColor: hasEchoes ? "var(--secondary)" : "rgba(255,255,255,0.2)",
+                              boxShadow: hasEchoes ? "0 0 12px var(--secondary-glow)" : "none",
                             }}
                           />
 
@@ -173,7 +173,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                           {hasEchoes && (
                             <div className="absolute -left-12 top-2 w-48 h-px">
                               <motion.div
-                                className="h-full bg-gradient-to-r from-purple-500 to-cyan-500"
+                                className="h-full bg-gradient-to-r from-secondary to-primary"
                                 animate={{ opacity: [0.3, 0.8, 0.3] }}
                                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                               />
@@ -186,7 +186,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                             onClick={() => setSelectedDecision(decision)}
                             className={`relative w-full p-4 rounded-xl border cursor-pointer text-left transition-all duration-300 ${
                               isVoided
-                                ? "bg-rose-500/5 border-rose-500/20"
+                                ? "bg-destructive/5 border-destructive/20"
                                 : "bg-white/5 border-white/10 hover:border-white/20"
                             }`}
                             style={{
@@ -198,7 +198,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                             {/* VOID Stamp */}
                             {isVoided && (
                               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 pointer-events-none">
-                                <span className="text-4xl font-black text-rose-500/30 tracking-widest">
+                                <span className="text-4xl font-black text-destructive/30 tracking-widest">
                                   VOID
                                 </span>
                               </div>
@@ -220,8 +220,8 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                                         backgroundColor:
                                           i < decision.impact
                                             ? isVoided
-                                              ? "#f43f5e"
-                                              : "#8b5cf6"
+                                              ? "var(--destructive)"
+                                              : "var(--secondary)"
                                             : "rgba(255,255,255,0.1)",
                                       }}
                                     />
@@ -235,8 +235,8 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                               {hasEchoes && (
                                 <div className="mt-3 pt-3 border-t border-white/5">
                                   <div className="flex items-center gap-1.5">
-                                    <Zap className="w-3 h-3 text-purple-400" />
-                                    <span className="text-[10px] text-purple-400 uppercase tracking-wider">
+                                    <Zap className="w-3 h-3 text-secondary" />
+                                    <span className="text-[10px] text-secondary uppercase tracking-wider">
                                       Linked to:
                                     </span>
                                   </div>
@@ -244,7 +244,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                                     {decision.echoTargets?.map((target) => (
                                       <span
                                         key={target}
-                                        className="text-[10px] px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded"
+                                        className="text-[10px] px-1.5 py-0.5 bg-secondary/20 text-secondary rounded"
                                       >
                                         {target}
                                       </span>
@@ -258,9 +258,9 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                                 <span
                                   className={`text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider ${
                                     decision.status === "voided"
-                                      ? "bg-rose-500/20 text-rose-400"
+                                      ? "bg-destructive/20 text-destructive"
                                       : decision.status === "superseded"
-                                      ? "bg-amber-500/20 text-amber-400"
+                                      ? "bg-warning/20 text-warning"
                                       : "bg-white/10 text-white/40"
                                   }`}
                                 >
@@ -355,7 +355,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                 {selectedDecision.status !== "voided" && onRestore && (
                   <button
                     onClick={() => handleRestore(selectedDecision)}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-secondary/20 text-secondary rounded-lg hover:bg-secondary/30 transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                     Restore Decision

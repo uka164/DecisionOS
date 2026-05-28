@@ -20,7 +20,7 @@ export default function ExperimentsPage() {
         {isLoading ? (
           <div className="py-24 text-center text-white/40 text-sm">Loading experiments…</div>
         ) : error ? (
-          <div className="py-24 text-center text-rose-400 text-sm">Error: {error}</div>
+          <div className="py-24 text-center text-destructive text-sm">Error: {error}</div>
         ) : (
           <ExperimentLab experiments={experiments} />
         )}

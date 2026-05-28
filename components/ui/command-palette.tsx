@@ -38,7 +38,7 @@ export function CommandPalette() {
   const commands: CommandItem[] = [
     {
       id: "dashboard",
-      label: "Go to Dashboard",
+      label: "Go to Right Now",
       shortcut: "G D",
       icon: <LayoutDashboard className="w-4 h-4" />,
       category: "navigation",
@@ -46,7 +46,7 @@ export function CommandPalette() {
     },
     {
       id: "decisions",
-      label: "Go to Decisions",
+      label: "Go to Memory",
       shortcut: "G L",
       icon: <Network className="w-4 h-4" />,
       category: "navigation",
@@ -173,7 +173,7 @@ export function CommandPalette() {
             aria-modal="true"
             aria-label="Command palette"
           >
-            <div className="bg-[#0a0f14]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
+            <div className="overflow-hidden rounded-lg border border-white/[0.08] bg-bg-card/95 shadow-2xl shadow-black/50 backdrop-blur-2xl">
               {/* Search Input */}
               <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10">
                 <Search className="w-5 h-5 text-white/40" />
@@ -201,7 +201,7 @@ export function CommandPalette() {
                   <>
                     {navCommands.length > 0 && (
                       <div className="px-2 py-2">
-                        <p className="px-2 py-1 text-[10px] font-semibold text-white/30 uppercase tracking-wider">
+                        <p className="px-2 py-1 text-[10px] font-semibold uppercase text-white/30">
                           Navigation
                         </p>
                         {navCommands.map((cmd) => {
@@ -221,7 +221,7 @@ export function CommandPalette() {
 
                     {actionCommands.length > 0 && (
                       <div className="px-2 py-2">
-                        <p className="px-2 py-1 text-[10px] font-semibold text-white/30 uppercase tracking-wider">
+                        <p className="px-2 py-1 text-[10px] font-semibold uppercase text-white/30">
                           Actions
                         </p>
                         {actionCommands.map((cmd) => {

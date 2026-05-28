@@ -98,16 +98,16 @@ const SAME_AGAIN: { value: ReviewVerdict; label: string; hint: string }[] = [
 
 const TONE_STYLES: Record<string, { active: string; inactive: string }> = {
   emerald: {
-    active: "bg-emerald-500/15 border-emerald-500/40 text-emerald-300",
-    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-emerald-500/[0.07] hover:border-emerald-500/20",
+    active: "bg-success/15 border-success/40 text-success",
+    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-success/[0.07] hover:border-success/20",
   },
   amber: {
-    active: "bg-amber-500/15 border-amber-500/40 text-amber-300",
-    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-amber-500/[0.07] hover:border-amber-500/20",
+    active: "bg-warning/15 border-warning/40 text-warning",
+    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-warning/[0.07] hover:border-warning/20",
   },
   rose: {
-    active: "bg-rose-500/15 border-rose-500/40 text-rose-300",
-    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-rose-500/[0.07] hover:border-rose-500/20",
+    active: "bg-destructive/15 border-destructive/40 text-destructive",
+    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-destructive/[0.07] hover:border-destructive/20",
   },
 }
 
@@ -199,7 +199,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
           >
             <header className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] flex-shrink-0">
               <div className="min-w-0 flex-1 pr-4">
-                <p className="text-[10px] font-mono text-violet-400/70 uppercase tracking-[0.2em]">
+                <p className="text-[10px] font-mono text-primary/70 uppercase tracking-[0.2em]">
                   Review Mode · Step {step}/3
                 </p>
                 <h2 className="text-sm font-semibold text-white truncate mt-0.5">
@@ -228,8 +228,8 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                     key={s.id}
                     className={cn(
                       "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-wider flex-shrink-0 transition-colors",
-                      active && "bg-violet-500/10 border-violet-500/30 text-violet-300",
-                      done && "bg-emerald-500/[0.08] border-emerald-500/20 text-emerald-400/70",
+                      active && "bg-primary/10 border-primary/30 text-primary",
+                      done && "bg-success/[0.08] border-success/20 text-success/70",
                       !active && !done && "bg-white/[0.02] border-white/[0.05] text-white/35"
                     )}
                   >
@@ -271,7 +271,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         onChange={(e) => setDraft((d) => ({ ...d, whatHappened: e.target.value }))}
                         rows={4}
                         placeholder="It shipped late and the migration ran twice. We rolled back on day three."
-                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 resize-none leading-relaxed"
+                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                       />
                     </div>
 
@@ -288,7 +288,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                           }
                           rows={3}
                           placeholder="What did I believe would be true?"
-                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                         />
                       </div>
 
@@ -304,7 +304,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                           }
                           rows={3}
                           placeholder="Effort, risk, second-order effect..."
-                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                         />
                       </div>
 
@@ -320,7 +320,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                           }
                           rows={2}
                           placeholder="Benefit, demand, team capacity..."
-                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                         />
                       </div>
                     </div>
@@ -416,8 +416,8 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                               className={cn(
                                 "px-3 py-2.5 rounded-xl border text-left transition-colors min-h-[60px]",
                                 active
-                                  ? "bg-violet-500/15 border-violet-500/40 text-violet-200"
-                                  : "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-violet-500/[0.07] hover:border-violet-500/20"
+                                  ? "bg-primary/15 border-primary/40 text-primary"
+                                  : "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-primary/[0.07] hover:border-primary/20"
                               )}
                             >
                               <div className="text-sm font-medium">{opt.label}</div>
@@ -435,8 +435,8 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                       className={cn(
                         "w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl border transition-colors text-left",
                         draft.regret
-                          ? "bg-rose-500/12 border-rose-500/30 text-rose-200"
-                          : "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-rose-500/[0.06] hover:border-rose-500/20"
+                          ? "bg-destructive/12 border-destructive/30 text-destructive"
+                          : "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-destructive/[0.06] hover:border-destructive/20"
                       )}
                     >
                       <span className="flex items-center gap-2.5">
@@ -481,7 +481,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         }
                         rows={3}
                         placeholder="I assumed X, but the real shape was Y."
-                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-violet-500/40 resize-none leading-relaxed"
+                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                       />
                     </div>
 
@@ -495,13 +495,13 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         onChange={(e) => setDraft((d) => ({ ...d, lesson: e.target.value }))}
                         rows={3}
                         placeholder="One sentence. The next time I see this pattern, I will…"
-                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-violet-500/25 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-violet-500/50 resize-none leading-relaxed"
+                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-primary/25 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/50 resize-none leading-relaxed"
                       />
                     </div>
 
                     {!canSave && (
-                      <div className="rounded-xl border border-amber-500/25 bg-amber-500/[0.06] px-3.5 py-2.5">
-                        <p className="text-[11px] font-mono text-amber-300/80 uppercase tracking-wider">
+                      <div className="rounded-xl border border-warning/25 bg-warning/[0.06] px-3.5 py-2.5">
+                        <p className="text-[11px] font-mono text-warning/80 uppercase tracking-wider">
                           Still needed
                         </p>
                         <ul className="text-xs text-white/55 mt-1 list-disc list-inside space-y-0.5">
@@ -532,7 +532,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                 <button
                   type="button"
                   onClick={next}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-200 text-[11px] font-mono uppercase tracking-wider hover:bg-violet-500/15 transition-colors min-h-[40px]"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary text-[11px] font-mono uppercase tracking-wider hover:bg-primary/15 transition-colors min-h-[40px]"
                 >
                   Continue <ChevronRight className="w-3.5 h-3.5" />
                 </button>
@@ -544,7 +544,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                   className={cn(
                     "flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-mono uppercase tracking-wider transition-colors min-h-[40px] border",
                     canSave
-                      ? "bg-emerald-500/15 border-emerald-500/35 text-emerald-300 hover:bg-emerald-500/20"
+                      ? "bg-success/15 border-success/35 text-success hover:bg-success/20"
                       : "bg-white/[0.04] border-white/[0.08] text-white/35 cursor-not-allowed"
                   )}
                 >

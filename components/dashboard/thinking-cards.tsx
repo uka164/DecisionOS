@@ -12,11 +12,11 @@ const STALE_MS = 7 * 24 * 60 * 60 * 1000
 
 const STATUS_BADGE: Record<DecisionStatus, { label: string; cls: string }> = {
   draft:         { label: "Draft",      cls: "bg-white/5 border-white/10 text-white/40" },
-  "in-progress": { label: "Active",    cls: "bg-cyan-500/10 border-cyan-500/20 text-primary" },
-  decided:       { label: "Decided",    cls: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" },
+  "in-progress": { label: "Active",     cls: "bg-primary/10 border-primary/20 text-primary" },
+  decided:       { label: "Decided",    cls: "bg-success/10 border-success/20 text-success" },
   archived:      { label: "Archived",   cls: "bg-white/5 border-white/10 text-white/30" },
-  voided:        { label: "Voided",     cls: "bg-rose-500/10 border-rose-500/20 text-rose-400" },
-  superseded:    { label: "Superseded", cls: "bg-amber-500/10 border-amber-500/20 text-amber-400" },
+  voided:        { label: "Voided",     cls: "bg-destructive/10 border-destructive/20 text-destructive" },
+  superseded:    { label: "Superseded", cls: "bg-warning/10 border-warning/20 text-warning" },
 }
 
 function daysAgo(isoDate: string): number {
@@ -43,21 +43,21 @@ const ThinkingCard = memo(function ThinkingCard({ card }: { card: Decision }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "bg-white/[0.06] backdrop-blur-2xl border rounded-2xl p-5 shadow-xl shadow-black/20 ring-1 ring-white/5 transition-[transform,border-color,box-shadow] duration-200 will-change-transform flex flex-col min-h-[260px]",
-        isHovered ? "scale-[1.02] border-white/20 shadow-lg" : "border-white/[0.1]"
+        "flex min-h-[250px] flex-col rounded-lg border bg-white/[0.02] p-5 transition-colors duration-200",
+        isHovered ? "border-white/[0.16] bg-white/[0.04]" : "border-white/[0.08]"
       )}
       style={{ contain: "layout" }}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 pr-3 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className={cn("text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border", statusBadge.cls)}>
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
+            <span className={cn("rounded border px-2 py-0.5 font-mono text-[10px] uppercase", statusBadge.cls)}>
               {statusBadge.label}
             </span>
 
             {/* Regret marker */}
             {card.regret && (
-              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border bg-rose-500/10 border-rose-500/25 text-rose-400 flex items-center gap-1">
+              <span className="flex items-center gap-1 rounded border border-destructive/25 bg-destructive/10 px-2 py-0.5 font-mono text-[10px] uppercase text-destructive">
                 <AlertCircle className="w-2.5 h-2.5" />
                 Regret
               </span>
@@ -65,37 +65,37 @@ const ThinkingCard = memo(function ThinkingCard({ card }: { card: Decision }) {
 
             {/* Stale indicator */}
             {isStale && (
-              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border bg-amber-500/10 border-amber-500/20 text-amber-400">
+              <span className="rounded border border-warning/20 bg-warning/10 px-2 py-0.5 font-mono text-[10px] uppercase text-warning">
                 {staleDays}d no update
               </span>
             )}
 
             {/* Overdue revisit */}
             {isOverdueRevisit && !isStale && (
-              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border bg-violet-500/10 border-violet-500/20 text-violet-400">
+              <span className="rounded border border-warning/20 bg-warning/10 px-2 py-0.5 font-mono text-[10px] uppercase text-warning">
                 Revisit due
               </span>
             )}
 
             {card.id.startsWith("static-") && (
-              <span className="text-[8px] font-mono uppercase tracking-[0.18em] text-white/25 bg-white/[0.04] border border-white/[0.07] px-1.5 py-0.5 rounded">
+              <span className="rounded border border-white/[0.07] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[8px] uppercase text-white/25">
                 Example
               </span>
             )}
           </div>
           <Link
             href={`/decisions/${card.id}`}
-            className="text-base font-medium text-white line-clamp-2 hover:text-cyan-400 transition-colors"
+            className="text-base font-medium text-white line-clamp-2 hover:text-primary transition-colors"
           >
             {card.title}
           </Link>
         </div>
-        <QualityRing score={card.qualityScore} size={48} strokeWidth={3} label="Record" />
+        <QualityRing score={card.qualityScore} size={48} strokeWidth={3} label="Clarity" />
       </div>
 
       {card.rawThinking ? (
-        <div className="border-l-2 border-primary/40 pl-3 mb-3 flex-1" title={card.rawThinking}>
-          <pre className="text-white/70 text-sm font-mono whitespace-pre-wrap line-clamp-3 leading-relaxed">
+        <div className="mb-3 flex-1 border-l border-white/[0.08] pl-3" title={card.rawThinking}>
+          <pre className="line-clamp-3 whitespace-pre-wrap font-sans text-sm leading-relaxed text-white/62">
             {card.rawThinking}
           </pre>
         </div>
@@ -107,15 +107,15 @@ const ThinkingCard = memo(function ThinkingCard({ card }: { card: Decision }) {
 
       {/* What I got wrong preview — only show if regret + gotWrong */}
       {card.regret && card.gotWrong && (
-        <div className="mb-3 p-2.5 rounded-xl bg-rose-500/[0.06] border border-rose-500/15">
-          <p className="text-[10px] font-mono text-rose-400/70 uppercase tracking-wider mb-1">What I got wrong</p>
+        <div className="mb-3 rounded-lg border border-destructive/15 bg-destructive/[0.06] p-2.5">
+          <p className="mb-1 font-mono text-[10px] uppercase text-destructive/70">What I got wrong</p>
           <p className="text-xs text-white/50 line-clamp-2 leading-relaxed">{card.gotWrong}</p>
         </div>
       )}
 
       {topTradeoffs.length > 0 && (
         <div className="flex items-center gap-3 mb-3">
-          <span className="text-[10px] text-white/35 uppercase tracking-wider">Trade-offs</span>
+          <span className="text-[10px] uppercase text-white/35">Trade-offs</span>
           {topTradeoffs.map((t) => (
             <div key={t.axis} className="flex items-center gap-1.5">
               <span className="text-[10px] text-white/40">{t.axis}</span>
@@ -163,7 +163,7 @@ const ThinkingCard = memo(function ThinkingCard({ card }: { card: Decision }) {
 export const ThinkingCards = memo(function ThinkingCards({
   decisions,
   limit,
-  title = "Decision Records",
+  title = "Decision Memory",
 }: {
   decisions: Decision[]
   limit?: number

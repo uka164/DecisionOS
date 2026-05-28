@@ -98,7 +98,7 @@ export function QuickCapture() {
             transition={{ duration: 0.15 }}
             onClick={handleOpen}
             aria-label="Quick capture decision"
-            className="hidden sm:flex fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-primary border border-primary/50 text-primary-foreground shadow-lg shadow-primary/25 items-center justify-center hover:scale-110 hover:shadow-xl hover:shadow-primary/30 transition-transform duration-150 focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none"
+            className="fixed bottom-6 right-6 z-40 hidden h-12 w-12 items-center justify-center rounded-full border border-primary/45 bg-primary text-primary-foreground shadow-[0_10px_30px_-18px_var(--primary-glow)] transition-transform duration-150 hover:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:flex"
           >
             <Plus className="w-5 h-5" />
           </motion.button>
@@ -121,7 +121,7 @@ export function QuickCapture() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.97 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="w-full max-w-lg rounded-2xl bg-[#070c18] border border-white/10 p-5 shadow-2xl"
+              className="w-full max-w-lg rounded-lg border border-white/[0.08] bg-bg-card p-5 shadow-2xl"
               role="dialog"
               aria-modal="true"
               aria-labelledby="quick-capture-title"
@@ -150,15 +150,15 @@ export function QuickCapture() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="What decision are you facing?"
-                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/10 rounded-xl text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors"
+                  className="w-full rounded-lg border border-white/10 bg-white/[0.045] px-4 py-3 text-sm text-white placeholder:text-white/25 transition-colors focus:border-primary/40 focus:outline-none"
                 />
 
                 <textarea
                   value={brainDump}
                   onChange={(e) => setBrainDump(e.target.value)}
-                  placeholder="Brain dump — what's on your mind? (optional)"
+                  placeholder="Capture the signal behind the decision. (optional)"
                   rows={4}
-                  className="w-full px-4 py-3 bg-white/[0.05] border border-white/10 rounded-xl text-white text-sm font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-colors resize-none leading-relaxed"
+                  className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.045] px-4 py-3 text-sm leading-relaxed text-white placeholder:text-white/20 transition-colors focus:border-primary/40 focus:outline-none"
                 />
               </div>
 
@@ -173,7 +173,7 @@ export function QuickCapture() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={close}
-                    className="px-4 py-2 rounded-xl text-sm text-white/50 hover:text-white/70 transition-colors"
+                    className="rounded-lg px-4 py-2 text-sm text-white/50 transition-colors hover:text-white/70"
                   >
                     Cancel
                   </button>
@@ -181,7 +181,7 @@ export function QuickCapture() {
                     onClick={handleCapture}
                     disabled={!title.trim() || saving}
                     className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-all",
+                      "flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all",
                       title.trim()
                         ? "bg-primary/15 border-primary/30 text-primary hover:bg-primary/20"
                         : "bg-white/[0.03] border-white/10 text-white/25 cursor-not-allowed"

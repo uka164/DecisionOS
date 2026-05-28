@@ -10,10 +10,9 @@ import { useNow } from "@/hooks/useNow"
 import { useRevisitNotifications } from "@/hooks/useRevisitNotifications"
 import { LeftSidebar } from "@/components/dashboard/left-sidebar"
 import { RightSidebar } from "@/components/dashboard/right-sidebar"
-import { DashboardStats } from "@/components/dashboard/dashboard-stats"
-import { DecisionInsights } from "@/components/dashboard/decision-insights"
+import { DecisionHealth } from "@/components/dashboard/decision-health"
 import { NextHonestAction } from "@/components/dashboard/next-honest-action"
-import { BlindSpots } from "@/components/dashboard/blind-spots"
+import { Signals } from "@/components/dashboard/signals"
 import { ThinkingCards } from "@/components/dashboard/thinking-cards"
 import { DecisionTimeline } from "@/components/dashboard/decision-timeline"
 import { MobileNav } from "@/components/dashboard/mobile-nav"
@@ -75,9 +74,9 @@ export default function DashboardPage() {
         <div className="p-4 sm:p-6 space-y-5 flex-1 pb-12">
           <header className="flex items-start justify-between mb-2">
             <div>
-              <h1 className="text-2xl font-bold text-white text-balance">Dashboard</h1>
+              <h1 className="text-balance text-2xl font-semibold text-white">Right Now</h1>
               <p className="text-white/50 text-sm mt-1">
-                Your decision journal
+                What needs your attention, and what&apos;s quietly decaying.
               </p>
             </div>
             <div className="hidden sm:block">
@@ -88,12 +87,12 @@ export default function DashboardPage() {
           {isLoading ? (
             <div className="py-12 text-center text-white/40 text-sm">Loading decisions…</div>
           ) : error ? (
-            <div className="py-12 text-center text-rose-400 text-sm">Error: {error}</div>
+            <div className="py-12 text-center text-destructive text-sm">Error: {error}</div>
           ) : (
             <>
               {/* First-time user banner — written for the person who suspects they repeat the same mistake */}
               {isExampleOnly && (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 sm:p-6 max-w-2xl">
+                <div className="max-w-2xl rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
                   <p className="text-xs text-white/40">For when you can already feel the pattern.</p>
                   <h2 className="mt-2 text-xl font-semibold text-white leading-snug text-balance">
                     Write down the decision you're about to make.
@@ -105,7 +104,7 @@ export default function DashboardPage() {
                   </p>
                   <button
                     onClick={open}
-                    className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary text-sm font-medium hover:bg-primary/20 transition-colors focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:outline-none"
+                    className="mt-5 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/[0.12] px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     Log a decision
                     <ArrowRight className="w-4 h-4" />
@@ -116,14 +115,19 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {!isExampleOnly && <NextHonestAction />}
-              <DashboardStats decisions={decisions} />
+              {/* TOP — the one thing that matters now, then a calm health read */}
+              {!isExampleOnly && (
+                <div className="space-y-5">
+                  <NextHonestAction />
+                  <DecisionHealth decisions={decisions} />
+                </div>
+              )}
               {overdueDecisions.length > 0 && (
                 <button
                   onClick={() => router.push(`/decisions/${overdueDecisions[0].id}?focus=review`)}
-                  className="sm:hidden w-full flex items-start gap-3 rounded-xl border border-violet-500/20 bg-violet-500/10 p-3 text-left"
+                  className="flex w-full items-start gap-3 rounded-lg border border-warning/20 bg-warning/10 p-3 text-left sm:hidden"
                 >
-                  <CalendarClock className="w-4 h-4 text-violet-300 mt-0.5 flex-shrink-0" />
+                  <CalendarClock className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
                   <span className="min-w-0">
                     <span className="block text-sm font-medium text-white">
                       {overdueDecisions.length} revisit{overdueDecisions.length !== 1 ? "s" : ""} due
@@ -134,14 +138,17 @@ export default function DashboardPage() {
                   </span>
                 </button>
               )}
-              <BlindSpots />
-              <DecisionInsights />
-              <ThinkingCards decisions={decisions} limit={3} title="Recent Decisions" />
+
+              {/* MIDDLE — the single, deduped attention surface */}
+              <Signals />
+
+              {/* BOTTOM — what you've been thinking about, and the loop over time */}
+              <ThinkingCards decisions={decisions} limit={3} title="Active Memory" />
               <DecisionTimeline decisions={decisions} />
 
               {!isExampleOnly && decisions.length > 0 && inProgressCount > 0 && (
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                  <div className="w-1 h-8 rounded-full bg-primary/40 flex-shrink-0" />
+                <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
+                  <div className="h-8 w-1 flex-shrink-0 rounded-full bg-primary/35" />
                   <p className="text-sm text-white/50 flex-1">
                     {inProgressCount} decision{inProgressCount > 1 ? "s" : ""} still open.
                   </p>

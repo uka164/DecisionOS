@@ -9,8 +9,8 @@ import { LOCAL_PROFILE } from "@/lib/local-profile"
 import { useWizard } from "@/contexts/WizardContext"
 
 const primaryNav = [
-  { icon: LayoutDashboard, label: "Dashboard",  href: "/app",         note: null },
-  { icon: Network,         label: "Decisions",  href: "/decisions",   note: null },
+  { icon: LayoutDashboard, label: "Right Now", href: "/app",       note: null },
+  { icon: Network,         label: "Memory",    href: "/decisions", note: null },
 ]
 
 const secondaryNav = [
@@ -27,12 +27,12 @@ export function MobileNav() {
   return (
     <>
       {/* Mobile Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-bg-body/90 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-4 z-40 lg:hidden">
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-white/[0.07] bg-bg-body/92 px-4 backdrop-blur-xl lg:hidden">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-primary" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/10">
+            <Shield className="h-5 w-5 text-brand" />
           </div>
-          <span className="text-white font-semibold text-sm tracking-tight">DECISIONOS</span>
+          <span className="text-sm font-semibold text-white">DecisionOS</span>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -62,23 +62,22 @@ export function MobileNav() {
 
       {/* Mobile Sidebar */}
       <aside className={cn(
-        "fixed top-0 left-0 h-screen w-72 bg-bg-body/95 backdrop-blur-2xl border-r border-white/10 z-50 flex flex-col transform transition-transform duration-300 ease-in-out lg:hidden",
+        "fixed left-0 top-0 z-50 flex h-screen w-72 transform flex-col border-r border-white/[0.07] bg-bg-body/95 backdrop-blur-2xl transition-transform duration-300 ease-in-out lg:hidden",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-6 border-b border-white/10">
+        <div className="border-b border-white/[0.07] p-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-primary" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/10">
+              <Shield className="h-5 w-5 text-brand" />
             </div>
             <div className="flex flex-col">
-              <span className="text-white font-semibold text-sm tracking-tight">DECISIONOS</span>
-              <span className="text-white/40 text-xs font-mono">v2.0</span>
+              <span className="text-sm font-semibold text-white">DecisionOS</span>
+              <span className="font-mono text-xs text-white/35">local system</span>
             </div>
           </div>
         </div>
 
         <nav className="flex-1 p-4 overflow-y-auto">
-          <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider px-3 mb-2">Journal</p>
           <ul className="space-y-1 mb-4">
             {primaryNav.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
@@ -103,7 +102,7 @@ export function MobileNav() {
           </ul>
 
           <div className="my-3 border-t border-white/[0.06]" />
-          <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider px-3 mb-2">More</p>
+          <p className="mb-2 px-3 font-mono text-[10px] uppercase text-white/25">More</p>
           <ul className="space-y-1">
             {secondaryNav.map((item) => {
               const isActive = pathname === item.href
@@ -122,7 +121,7 @@ export function MobileNav() {
                     <item.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="flex-1">{item.label}</span>
                     {item.note && (
-                      <span className="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400/70">
+                      <span className="rounded border border-warning/20 bg-warning/10 px-1.5 py-0.5 font-mono text-[9px] uppercase text-warning/70">
                         {item.note}
                       </span>
                     )}
@@ -133,10 +132,10 @@ export function MobileNav() {
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-white/10">
+        <div className="border-t border-white/[0.07] p-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.035]">
+              <User className="h-4 w-4 text-white/55" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{LOCAL_PROFILE.name}</p>

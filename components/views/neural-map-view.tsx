@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Search, X, ZoomIn, ZoomOut, Maximize2, ArrowRight, Link2, Network, Plus } from "lucide-react"
 import { useDecisionsStore, useSettingsStore } from "@/stores"
-import type { Decision as StoreDecision, DecisionStatus, AppSettings } from "@/lib/types"
+import type { Decision as StoreDecision, DecisionStatus } from "@/lib/types"
 
 // ─── Internal map types ───────────────────────────────────────────────────────
 
@@ -17,6 +17,7 @@ interface MapNode {
   status: MapStatus
   impact: number
   qualityScore: number
+  tsMs: number // last-activity timestamp, drives recency dimming
   x: number
   y: number
   vx: number
@@ -28,30 +29,22 @@ interface Edge {
   target: string
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-// Static semantic colours — active uses theme accent, others are universal status colours
-const THEME_ACCENT: Record<AppSettings["theme"], string> = {
-  void:     "#06b6d4",
-  midnight: "#818cf8",
-  twilight: "#e879f9",
-  dawn:     "#0369a1",
-}
-
-function getStatusColors(theme: AppSettings["theme"]): Record<MapStatus, string> {
+// ─── Colour + status semantics ─────────────────────────────────────────────────
+// active=primary action, pending=review, resolved=aligned, blocked=risk.
+function getStatusColors(): Record<MapStatus, string> {
   return {
-    active:   THEME_ACCENT[theme],
-    pending:  "#f59e0b",
-    resolved: "#10b981",
-    blocked:  "#f43f5e",
+    active: "#e879f9",
+    pending: "#f59e0b",
+    resolved: "#14b8a6",
+    blocked: "#f43f5e",
   }
 }
 
 const STATUS_LABELS: Record<MapStatus, string> = {
-  active:   "In Progress",
-  pending:  "Awaiting Review",
-  resolved: "Completed",
-  blocked:  "Blocked",
+  active: "Active",
+  pending: "Review",
+  resolved: "Aligned",
+  blocked: "Blocked",
 }
 
 function mapDecisionStatus(s: DecisionStatus): MapStatus {
@@ -61,24 +54,45 @@ function mapDecisionStatus(s: DecisionStatus): MapStatus {
     case "archived":    return "resolved"
     case "voided":      return "blocked"
     case "superseded":  return "blocked"
-    default:            return "pending"   // "draft"
+    default:            return "pending" // "draft"
   }
 }
 
-function initialPosition(index: number, total: number): { x: number; y: number } {
-  const angle  = (2 * Math.PI * index) / Math.max(total, 1)
-  const radius = Math.min(240, 80 + total * 22)
-  return { x: 400 + radius * Math.cos(angle), y: 300 + radius * Math.sin(angle) }
+// Calm, restrained node sizing — small enough to read as a constellation.
+function nodeRadius(impact: number): number {
+  return 6.5 + impact * 2.2
 }
 
-function storeToMapNode(d: StoreDecision, index: number, total: number, existing?: MapNode): MapNode {
-  const pos = existing ?? initialPosition(index, total)
+// Older decisions fade like distant stars (memory topology / decay echo).
+function recencyAlpha(tsMs: number, now: number): number {
+  const days = (now - tsMs) / 86_400_000
+  return Math.max(0.45, 1 - days / 120)
+}
+
+// ─── Layout helpers ─────────────────────────────────────────────────────────
+
+function initialPosition(index: number, total: number, w: number, h: number): { x: number; y: number } {
+  const angle = (2 * Math.PI * index) / Math.max(total, 1)
+  const radius = Math.min(Math.min(w, h) * 0.38, 120 + total * 16)
+  return { x: w / 2 + radius * Math.cos(angle), y: h / 2 + radius * Math.sin(angle) }
+}
+
+function storeToMapNode(
+  d: StoreDecision,
+  index: number,
+  total: number,
+  w: number,
+  h: number,
+  existing?: MapNode
+): MapNode {
+  const pos = existing ?? initialPosition(index, total, w, h)
   return {
     id: d.id,
     title: d.title,
     status: mapDecisionStatus(d.status),
     impact: d.impact,
     qualityScore: d.qualityScore,
+    tsMs: new Date(d.updatedAt ?? d.createdAt).getTime(),
     x: pos.x,
     y: pos.y,
     vx: existing?.vx ?? 0,
@@ -91,16 +105,16 @@ function storeToMapNode(d: StoreDecision, index: number, total: number, existing
 function EmptyMapState({ onCreateClick }: { onCreateClick: () => void }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-      <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+      <div className="w-16 h-16 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
         <Network className="w-8 h-8 text-white/20" />
       </div>
       <div className="text-center">
         <p className="text-white/50 text-sm font-medium mb-1">No decisions in the map</p>
-        <p className="text-white/25 text-xs">Create your first decision to see it visualised here</p>
+        <p className="text-white/25 text-xs">Create your first decision to see it take shape here</p>
       </div>
       <button
         onClick={onCreateClick}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-primary text-sm hover:bg-cyan-500/15 transition-all"
+        className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary transition-colors hover:bg-primary/15"
       >
         <Plus className="w-4 h-4" />
         Create First Decision
@@ -116,52 +130,62 @@ export function NeuralMapView() {
   const storeDecisions = useDecisionsStore((s) => s.decisions)
   const isLoading = useDecisionsStore((s) => s.isLoading)
   const settings = useSettingsStore((s) => s.settings)
-  const STATUS_COLORS = useMemo(() => getStatusColors(settings.theme), [settings.theme])
 
-  const canvasRef    = useRef<HTMLCanvasElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const animationRef = useRef<number | undefined>(undefined)
-  const dashOffsetRef = useRef(0)
+  const rafRef = useRef<number | undefined>(undefined)
 
-  const [nodes,       setNodes]       = useState<MapNode[]>([])
-  const [hoveredNode, setHoveredNode] = useState<string | null>(null)
-  const [selectedNode, setSelectedNode] = useState<MapNode | null>(null)
-  const [tooltipNode,  setTooltipNode]  = useState<{ node: MapNode; x: number; y: number } | null>(null)
-  const [searchQuery,  setSearchQuery]  = useState("")
-  const [zoom,         setZoom]         = useState(1)
-  const [pan,          setPan]          = useState({ x: 0, y: 0 })
-  const [draggedNode,  setDraggedNode]  = useState<string | null>(null)
-  const [dragStart,    setDragStart]    = useState<{ x: number; y: number } | null>(null)
+  // Simulation + view state live in refs so the animation loop never triggers a
+  // React re-render. A single rAF loop both steps the physics and paints.
+  const simRef = useRef<MapNode[]>([])
+  const edgesRef = useRef<Edge[]>([])
+  const viewRef = useRef({ zoom: 1, panX: 0, panY: 0 })
+  const sizeRef = useRef({ w: 800, h: 600, dpr: 1 })
+  const hoverRef = useRef<string | null>(null)
+  const selectedRef = useRef<string | null>(null)
+  const searchRef = useRef("")
+  const colorsRef = useRef(getStatusColors())
+  const reducedMotionRef = useRef(settings.reducedMotion)
+  const dragRef = useRef<{ id: string | null; pan: boolean; moved: boolean; sx: number; sy: number; px: number; py: number }>(
+    { id: null, pan: false, moved: false, sx: 0, sy: 0, px: 0, py: 0 }
+  )
 
-  // ── Sync store decisions → map nodes (preserve positions for existing) ─────
-  useEffect(() => {
-    setNodes((prev) => {
-      const prevMap = new Map(prev.map((n) => [n.id, n]))
-      return storeDecisions.map((d, i) =>
-        storeToMapNode(d, i, storeDecisions.length, prevMap.get(d.id))
-      )
-    })
-  }, [storeDecisions])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [zoomPct, setZoomPct] = useState(100)
+  const [cursor, setCursor] = useState<"grab" | "grabbing" | "pointer">("grab")
+  const cursorRef = useRef<"grab" | "grabbing" | "pointer">("grab")
+  const [nodeCount, setNodeCount] = useState(0)
 
-  // ── Edges derived from echoTargets ───────────────────────────────────────
-  // Supports both direct ID references ("static-d3") and title references ("Auth Migration")
+  // Only re-render when the cursor actually changes (mousemove fires constantly).
+  const applyCursor = useCallback((c: "grab" | "grabbing" | "pointer") => {
+    if (cursorRef.current === c) return
+    cursorRef.current = c
+    setCursor(c)
+  }, [])
+
+  // ── Keep refs in sync with reactive inputs ────────────────────────────────
+  useEffect(() => { selectedRef.current = selectedId }, [selectedId])
+  useEffect(() => { searchRef.current = searchQuery.toLowerCase() }, [searchQuery])
+  useEffect(() => { reducedMotionRef.current = settings.reducedMotion }, [settings.reducedMotion])
+
+  // ── Edges derived from echoTargets (id or title references) ───────────────
   const edges = useMemo<Edge[]>(() => {
-    const idSet     = new Set(storeDecisions.map((d) => d.id))
+    const idSet = new Set(storeDecisions.map((d) => d.id))
     const titleToId = new Map(storeDecisions.map((d) => [d.title, d.id]))
     const result: Edge[] = []
     storeDecisions.forEach((d) => {
       d.echoTargets?.forEach((target) => {
         const targetId = idSet.has(target) ? target : titleToId.get(target)
-        if (targetId && targetId !== d.id) {
-          result.push({ source: d.id, target: targetId })
-        }
+        if (targetId && targetId !== d.id) result.push({ source: d.id, target: targetId })
       })
     })
     return result
   }, [storeDecisions])
 
-  // ── Connected-nodes helper ────────────────────────────────────────────────
-  const getConnectedNodes = useCallback((nodeId: string): Set<string> => {
+  useEffect(() => { edgesRef.current = edges }, [edges])
+
+  const connectedTo = useCallback((nodeId: string): Set<string> => {
     const connected = new Set<string>()
     edges.forEach((e) => {
       if (e.source === nodeId) connected.add(e.target)
@@ -170,309 +194,387 @@ export function NeuralMapView() {
     return connected
   }, [edges])
 
-  const filteredNodes = useMemo(
-    () => nodes.filter((n) => n.title.toLowerCase().includes(searchQuery.toLowerCase())),
-    [nodes, searchQuery]
-  )
-
-  // ── Force simulation ──────────────────────────────────────────────────────
+  // ── Sync store decisions → simulation nodes (preserve existing positions) ──
   useEffect(() => {
-    if (nodes.length === 0) return
+    const { w, h } = sizeRef.current
+    const prev = new Map(simRef.current.map((n) => [n.id, n]))
+    simRef.current = storeDecisions.map((d, i) =>
+      storeToMapNode(d, i, storeDecisions.length, w, h, prev.get(d.id))
+    )
+    setNodeCount(storeDecisions.length)
+    // Drop selection if the decision disappeared
+    if (selectedRef.current && !storeDecisions.some((d) => d.id === selectedRef.current)) {
+      setSelectedId(null)
+    }
+  }, [storeDecisions])
 
-    const simulate = () => {
-      setNodes((prev) => {
-        const next = prev.map((n) => ({ ...n }))
+  // ── DPR-aware canvas sizing (fixes blur + scaling) ────────────────────────
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const container = containerRef.current
+    if (!canvas || !container) return
 
-        for (let i = 0; i < next.length; i++) {
-          const node = next[i]
-          if (draggedNode === node.id) continue
-
-          for (let j = 0; j < next.length; j++) {
-            if (i === j) continue
-            const other = next[j]
-            const dx = node.x - other.x
-            const dy = node.y - other.y
-            const dist = Math.sqrt(dx * dx + dy * dy) || 1
-            const minDist = (12 + node.impact * 4) + (12 + other.impact * 4) + 80
-            if (dist < minDist) {
-              const force = (minDist - dist) * 0.15
-              node.vx += (dx / dist) * force
-              node.vy += (dy / dist) * force
-            } else {
-              const force = 1200 / (dist * dist)
-              node.vx += (dx / dist) * force
-              node.vy += (dy / dist) * force
-            }
-          }
-
-          edges.forEach((e) => {
-            if (e.source === node.id || e.target === node.id) {
-              const otherId = e.source === node.id ? e.target : e.source
-              const other = next.find((n) => n.id === otherId)
-              if (other) {
-                node.vx += (other.x - node.x) * 0.003
-                node.vy += (other.y - node.y) * 0.003
-              }
-            }
-          })
-
-          node.vx += (400 - node.x) * 0.0008
-          node.vy += (300 - node.y) * 0.0008
-          node.vx *= 0.85
-          node.vy *= 0.85
-          node.x += node.vx
-          node.y += node.vy
-          node.x = Math.max(80, Math.min(720, node.x))
-          node.y = Math.max(80, Math.min(520, node.y))
-        }
-
-        return next
-      })
-      animationRef.current = requestAnimationFrame(simulate)
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const rect = container.getBoundingClientRect()
+      const w = Math.max(1, Math.round(rect.width))
+      const h = Math.max(1, Math.round(rect.height))
+      sizeRef.current = { w, h, dpr }
+      canvas.width = Math.round(w * dpr)
+      canvas.height = Math.round(h * dpr)
+      canvas.style.width = `${w}px`
+      canvas.style.height = `${h}px`
     }
 
-    animationRef.current = requestAnimationFrame(simulate)
-    return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current)
-    }
-  }, [draggedNode, edges, nodes.length])
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [])
 
-  // ── Canvas rendering ──────────────────────────────────────────────────────
+  // ── Single animation loop: step physics, then paint ───────────────────────
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // Read CSS var once per effect — avoids layout thrashing on every frame
-    const borderSubtle = getComputedStyle(document.documentElement)
-      .getPropertyValue("--border-subtle").trim() || "rgba(255,255,255,0.08)"
+    const step = () => {
+      const nodes = simRef.current
+      const edges = edgesRef.current
+      const { w, h } = sizeRef.current
+      const dragId = dragRef.current.id
+      const cx = w / 2
+      const cy = h / 2
 
-    const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.save()
-      ctx.translate(pan.x, pan.y)
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i]
+        if (node.id === dragId) continue
+        const rI = nodeRadius(node.impact)
+
+        for (let j = 0; j < nodes.length; j++) {
+          if (i === j) continue
+          const other = nodes[j]
+          const dx = node.x - other.x
+          const dy = node.y - other.y
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1
+          const minDist = rI + nodeRadius(other.impact) + 64
+          if (dist < minDist) {
+            const force = (minDist - dist) * 0.12
+            node.vx += (dx / dist) * force
+            node.vy += (dy / dist) * force
+          } else {
+            const force = 900 / (dist * dist)
+            node.vx += (dx / dist) * force
+            node.vy += (dy / dist) * force
+          }
+        }
+
+        for (const e of edges) {
+          if (e.source === node.id || e.target === node.id) {
+            const otherId = e.source === node.id ? e.target : e.source
+            const other = nodes.find((n) => n.id === otherId)
+            if (other) {
+              node.vx += (other.x - node.x) * 0.0035
+              node.vy += (other.y - node.y) * 0.0035
+            }
+          }
+        }
+
+        node.vx += (cx - node.x) * 0.0009
+        node.vy += (cy - node.y) * 0.0009
+        node.vx *= 0.84
+        node.vy *= 0.84
+        node.x += node.vx
+        node.y += node.vy
+        const m = rI + 8
+        node.x = Math.max(m, Math.min(w - m, node.x))
+        node.y = Math.max(m, Math.min(h - m, node.y))
+      }
+    }
+
+    const draw = () => {
+      const { w, h, dpr } = sizeRef.current
+      const { zoom, panX, panY } = viewRef.current
+      const colors = colorsRef.current
+      const nodes = simRef.current
+      const edges = edgesRef.current
+      const hovered = hoverRef.current
+      const selected = selectedRef.current
+      const query = searchRef.current
+      const focusId = hovered ?? selected
+      const now = Date.now()
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      ctx.clearRect(0, 0, w, h)
+      ctx.translate(panX, panY)
       ctx.scale(zoom, zoom)
 
-      const connectedNodes = hoveredNode ? getConnectedNodes(hoveredNode) : new Set<string>()
+      const connected = focusId
+        ? (() => {
+            const set = new Set<string>()
+            edges.forEach((e) => {
+              if (e.source === focusId) set.add(e.target)
+              if (e.target === focusId) set.add(e.source)
+            })
+            return set
+          })()
+        : null
 
-      // Advance dash animation offset
-      dashOffsetRef.current = (dashOffsetRef.current + 0.3) % 20
+      const matches = (n: MapNode) => query === "" || n.title.toLowerCase().includes(query)
 
-      // Draw edges
-      edges.forEach((edge) => {
+      // Edges
+      for (const edge of edges) {
         const source = nodes.find((n) => n.id === edge.source)
         const target = nodes.find((n) => n.id === edge.target)
-        if (!source || !target) return
-
-        const isHighlighted = hoveredNode === edge.source || hoveredNode === edge.target
+        if (!source || !target) continue
+        const onFocus = focusId === edge.source || focusId === edge.target
         ctx.beginPath()
         ctx.moveTo(source.x, source.y)
         ctx.lineTo(target.x, target.y)
-        if (isHighlighted) {
-          ctx.shadowColor = STATUS_COLORS.active
-          ctx.shadowBlur  = 12
-          ctx.strokeStyle = STATUS_COLORS.active
-          ctx.lineWidth   = 3
+        if (onFocus) {
+          ctx.strokeStyle = colors.active
+          ctx.lineWidth = 1.35
+          ctx.globalAlpha = 0.65
           ctx.setLineDash([])
-        } else if (hoveredNode) {
-          ctx.shadowBlur  = 0
-          ctx.strokeStyle = borderSubtle
-          ctx.lineWidth   = 1
-          ctx.setLineDash([6, 4])
-          ctx.lineDashOffset = dashOffsetRef.current
         } else {
-          ctx.shadowBlur  = 0
-          ctx.strokeStyle = `${STATUS_COLORS.active}40`
-          ctx.lineWidth   = 1.5
-          ctx.setLineDash([8, 6])
-          ctx.lineDashOffset = dashOffsetRef.current
+          ctx.strokeStyle = "rgba(255,255,255,0.08)"
+          ctx.lineWidth = 1
+          ctx.globalAlpha = focusId ? 0.18 : 0.42
+          ctx.setLineDash([])
         }
         ctx.stroke()
         ctx.setLineDash([])
-        ctx.shadowBlur = 0
-      })
+        ctx.globalAlpha = 1
+      }
 
-      // Draw nodes
-      filteredNodes.forEach((node) => {
-        const isHovered   = hoveredNode === node.id
-        const isConnected = connectedNodes.has(node.id)
-        const isDimmed    = !!(hoveredNode && !isHovered && !isConnected)
-        const size        = 14 + node.impact * 5
+      // Nodes
+      for (const node of nodes) {
+        const isFocus = focusId === node.id
+        const isNear = connected?.has(node.id) ?? false
+        const dimmed = (!!focusId && !isFocus && !isNear) || !matches(node)
+        const r = nodeRadius(node.impact)
+        const color = colors[node.status]
+        const recency = recencyAlpha(node.tsMs, now)
 
-        if (isHovered || isConnected) {
-          ctx.beginPath()
-          ctx.arc(node.x, node.y, size + 12, 0, Math.PI * 2)
-          const g = ctx.createRadialGradient(node.x, node.y, size, node.x, node.y, size + 20)
-          g.addColorStop(0, `${STATUS_COLORS[node.status]}50`)
+        // Soft halo for the focused / connected nodes
+        if (isFocus || isNear) {
+          const g = ctx.createRadialGradient(node.x, node.y, r, node.x, node.y, r + 13)
+          g.addColorStop(0, `${color}2f`)
           g.addColorStop(1, "transparent")
+          ctx.beginPath()
+          ctx.arc(node.x, node.y, r + 13, 0, Math.PI * 2)
           ctx.fillStyle = g
           ctx.fill()
         }
 
-        if (isHovered) {
+        // Selection ring
+        if (selected === node.id) {
           ctx.beginPath()
-          ctx.arc(node.x, node.y, size + 6, 0, Math.PI * 2)
-          ctx.strokeStyle = `${STATUS_COLORS[node.status]}80`
-          ctx.lineWidth   = 2
+          ctx.arc(node.x, node.y, r + 5, 0, Math.PI * 2)
+          ctx.strokeStyle = color
+          ctx.lineWidth = 1.5
+          ctx.globalAlpha = 0.9
           ctx.stroke()
+          ctx.globalAlpha = 1
         }
 
         ctx.beginPath()
-        ctx.arc(node.x, node.y, size, 0, Math.PI * 2)
-        if (isDimmed) {
-          ctx.fillStyle = "rgba(255,255,255,0.08)"
-        } else {
-          const g = ctx.createRadialGradient(
-            node.x - size * 0.3, node.y - size * 0.3, 0,
-            node.x, node.y, size
-          )
-          g.addColorStop(0, STATUS_COLORS[node.status])
-          g.addColorStop(1, `${STATUS_COLORS[node.status]}99`)
-          ctx.fillStyle = g
-        }
+        ctx.arc(node.x, node.y, r, 0, Math.PI * 2)
+        ctx.globalAlpha = dimmed ? 0.18 : recency
+        ctx.fillStyle = color
         ctx.fill()
-        ctx.strokeStyle = isDimmed ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.4)"
-        ctx.lineWidth   = isDimmed ? 1 : 2
+        ctx.globalAlpha = 1
+        ctx.lineWidth = 1
+        ctx.strokeStyle = dimmed ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.22)"
         ctx.stroke()
 
-        const labelY    = node.y + size + 20
-        ctx.font        = "bold 12px Inter, sans-serif"
-        const textWidth = ctx.measureText(node.title).width
-        ctx.fillStyle   = isDimmed ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.6)"
-        ctx.beginPath()
-        ctx.roundRect(node.x - textWidth / 2 - 6, labelY - 10, textWidth + 12, 18, 4)
-        ctx.fill()
-        ctx.fillStyle    = isDimmed ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.95)"
-        ctx.textAlign    = "center"
-        ctx.textBaseline = "middle"
-        ctx.fillText(node.title, node.x, labelY)
-      })
+        // Labels — only where they carry meaning (keeps the constellation calm)
+        const showLabel =
+          !dimmed && (isFocus || isNear || selected === node.id || node.impact >= 4 || nodes.length <= 6)
+        if (showLabel) {
+          ctx.font = "500 11px Inter, system-ui, sans-serif"
+          ctx.textAlign = "center"
+          ctx.textBaseline = "middle"
+          const label = node.title.length > 26 ? `${node.title.slice(0, 25)}…` : node.title
+          const tw = ctx.measureText(label).width
+          const ly = node.y + r + 13
+          ctx.fillStyle = "rgba(8,11,18,0.7)"
+          ctx.beginPath()
+          ctx.roundRect(node.x - tw / 2 - 5, ly - 8, tw + 10, 16, 4)
+          ctx.fill()
+          ctx.globalAlpha = isFocus || selected === node.id ? 1 : 0.7
+          ctx.fillStyle = "rgba(255,255,255,0.92)"
+          ctx.fillText(label, node.x, ly)
+          ctx.globalAlpha = 1
+        }
+      }
 
-      ctx.restore()
-      requestAnimationFrame(render)
+      rafRef.current = requestAnimationFrame(loop)
     }
 
-    render()
-  }, [nodes, filteredNodes, hoveredNode, zoom, pan, edges, getConnectedNodes, STATUS_COLORS])
+    const loop = () => {
+      step()
+      draw()
+    }
 
-  // ── Mouse handlers ────────────────────────────────────────────────────────
-  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    rafRef.current = requestAnimationFrame(loop)
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  // ── Pointer interaction ───────────────────────────────────────────────────
+  const worldFromEvent = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current!
     const rect = canvas.getBoundingClientRect()
-    const x = (e.clientX - rect.left - pan.x) / zoom
-    const y = (e.clientY - rect.top  - pan.y) / zoom
+    const sx = e.clientX - rect.left
+    const sy = e.clientY - rect.top
+    const { zoom, panX, panY } = viewRef.current
+    return { sx, sy, x: (sx - panX) / zoom, y: (sy - panY) / zoom }
+  }
 
-    if (draggedNode) {
-      setNodes((prev) => prev.map((n) => n.id === draggedNode ? { ...n, x, y, vx: 0, vy: 0 } : n))
+  const hitTest = (x: number, y: number): MapNode | null => {
+    const query = searchRef.current
+    // iterate in reverse so the topmost (last-drawn) wins
+    for (let i = simRef.current.length - 1; i >= 0; i--) {
+      const n = simRef.current[i]
+      if (query && !n.title.toLowerCase().includes(query)) continue
+      const r = nodeRadius(n.impact)
+      if ((x - n.x) ** 2 + (y - n.y) ** 2 <= (r + 6) ** 2) return n
+    }
+    return null
+  }
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const { sx, sy, x, y } = worldFromEvent(e)
+    const hit = hitTest(x, y)
+    if (hit) {
+      dragRef.current = { id: hit.id, pan: false, moved: false, sx, sy, px: 0, py: 0 }
+    } else {
+      dragRef.current = {
+        id: null, pan: true, moved: false, sx, sy,
+        px: viewRef.current.panX, py: viewRef.current.panY,
+      }
+      applyCursor("grabbing")
+    }
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const { sx, sy, x, y } = worldFromEvent(e)
+    const drag = dragRef.current
+
+    if (drag.id) {
+      const node = simRef.current.find((n) => n.id === drag.id)
+      if (node) { node.x = x; node.y = y; node.vx = 0; node.vy = 0 }
+      drag.moved = true
+      return
+    }
+    if (drag.pan) {
+      viewRef.current.panX = drag.px + (sx - drag.sx)
+      viewRef.current.panY = drag.py + (sy - drag.sy)
+      drag.moved = true
       return
     }
 
-    let found = false
-    for (const node of filteredNodes) {
-      const size = 14 + node.impact * 5
-      const dist = Math.sqrt((x - node.x) ** 2 + (y - node.y) ** 2)
-      if (dist < size + 10) { setHoveredNode(node.id); found = true; break }
+    const hit = hitTest(x, y)
+    hoverRef.current = hit?.id ?? null
+    applyCursor(hit ? "pointer" : "grab")
+  }
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const drag = dragRef.current
+    const { x, y } = worldFromEvent(e)
+    // A click (no drag movement) on a node selects it
+    if (!drag.moved) {
+      const hit = hitTest(x, y)
+      setSelectedId(hit ? hit.id : null)
     }
-    if (!found) setHoveredNode(null)
+    dragRef.current = { id: null, pan: false, moved: false, sx: 0, sy: 0, px: 0, py: 0 }
+    applyCursor(hoverRef.current ? "pointer" : "grab")
   }
 
-  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const x = (e.clientX - rect.left - pan.x) / zoom
-    const y = (e.clientY - rect.top  - pan.y) / zoom
-    if (hoveredNode) { setDraggedNode(hoveredNode); setDragStart({ x, y }) }
+  const handleMouseLeave = () => {
+    hoverRef.current = null
+    dragRef.current = { id: null, pan: false, moved: false, sx: 0, sy: 0, px: 0, py: 0 }
+    applyCursor("grab")
   }
 
-  const handleCanvasMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect    = canvas.getBoundingClientRect()
-    const screenX = e.clientX - rect.left
-    const screenY = e.clientY - rect.top
-    const x       = (screenX - pan.x) / zoom
-    const y       = (screenY - pan.y) / zoom
-
-    if (draggedNode && dragStart) {
-      const dist = Math.sqrt((x - dragStart.x) ** 2 + (y - dragStart.y) ** 2)
-      if (dist < 5) {
-        const node = nodes.find((n) => n.id === draggedNode)
-        if (node) setTooltipNode({ node, x: screenX, y: screenY })
-      }
-    }
-    setDraggedNode(null)
-    setDragStart(null)
+  const setZoom = (next: number) => {
+    const z = Math.max(0.5, Math.min(2.2, next))
+    viewRef.current.zoom = z
+    setZoomPct(Math.round(z * 100))
+  }
+  const resetView = () => {
+    viewRef.current = { zoom: 1, panX: 0, panY: 0 }
+    setZoomPct(100)
   }
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect    = canvas.getBoundingClientRect()
-    const screenX = e.clientX - rect.left
-    const screenY = e.clientY - rect.top
-    if (hoveredNode && !draggedNode) {
-      const node = nodes.find((n) => n.id === hoveredNode)
-      if (node) setTooltipNode({ node, x: screenX, y: screenY })
-    } else if (!hoveredNode) {
-      setTooltipNode(null)
-    }
-  }
+  // ── Selected decision (rich data for the detail panel) ────────────────────
+  const colors = useMemo(() => getStatusColors(), [])
+  const selected = useMemo(
+    () => storeDecisions.find((d) => d.id === selectedId) ?? null,
+    [storeDecisions, selectedId]
+  )
+  const selectedStatus: MapStatus | null = selected ? mapDecisionStatus(selected.status) : null
+  const dependencies = useMemo(
+    () => (selectedId ? Array.from(connectedTo(selectedId)) : []),
+    [selectedId, connectedTo]
+  )
+
+  const formatDate = (iso?: string) =>
+    iso ? new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : null
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div ref={containerRef} className="relative w-full h-full min-h-[600px] overflow-hidden bg-bg-body">
       <canvas
         ref={canvasRef}
-        width={800}
-        height={600}
-        className="w-full h-full cursor-crosshair"
+        className="w-full h-full"
+        style={{ cursor }}
         role="img"
-        aria-label="Decision relationship graph showing connections between decisions"
-        onMouseMove={handleCanvasMouseMove}
-        onMouseDown={handleCanvasMouseDown}
-        onMouseUp={handleCanvasMouseUp}
-        onClick={handleCanvasClick}
-        onMouseLeave={() => setHoveredNode(null)}
+        aria-label="Decision memory map showing how decisions connect"
+        onMouseMove={handleMouseMove}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
       />
 
       {/* Empty / loading state */}
-      {!isLoading && nodes.length === 0 && (
+      {!isLoading && nodeCount === 0 && (
         <EmptyMapState onCreateClick={() => router.push("/app")} />
       )}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       )}
 
-      {/* Legend */}
+      {/* Legend + search */}
       <div className="absolute top-4 left-4 space-y-3">
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-xl p-4 shadow-xl">
-          <h2 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-            <Network className="w-4 h-4 text-primary" />
-            Relationship Map
+        <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-4 backdrop-blur-xl">
+          <h2 className="text-xs font-medium uppercase text-white/45 mb-3 flex items-center gap-2">
+            <Network className="w-3.5 h-3.5 text-primary/70" />
+            Decision Observatory
           </h2>
-          <div className="space-y-2">
-            {(Object.entries(STATUS_COLORS) as [MapStatus, string][]).map(([status, color]) => (
+          <div className="space-y-1.5">
+            {(Object.entries(colors) as [MapStatus, string][]).map(([status, color]) => (
               <div key={status} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}60` }} />
-                <span className="text-xs text-white/60">{STATUS_LABELS[status]}</span>
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                <span className="text-xs text-white/55">{STATUS_LABELS[status]}</span>
               </div>
             ))}
           </div>
-          <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-2">
-            <div className="flex gap-0.5">
+          <div className="mt-3 pt-3 border-t border-white/[0.07] flex items-center gap-2">
+            <div className="flex items-end gap-0.5">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="rounded-full bg-white/20" style={{ width: 6 + i * 3, height: 6 + i * 3 }} />
+                <div key={i} className="rounded-full bg-white/25" style={{ width: 4 + i * 2, height: 4 + i * 2 }} />
               ))}
             </div>
-            <span className="text-[10px] text-white/40 uppercase tracking-wider">= Impact</span>
+            <span className="text-[10px] text-white/35 uppercase">= impact · dimmer = older</span>
           </div>
           <div className="mt-2 text-[10px] text-white/30 font-mono">
-            {nodes.length} decision{nodes.length !== 1 ? "s" : ""}
+            {nodeCount} decision{nodeCount !== 1 ? "s" : ""} · {edges.length} link{edges.length !== 1 ? "s" : ""}
           </div>
         </div>
 
@@ -482,181 +584,118 @@ export function NeuralMapView() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Filter nodes..."
-            aria-label="Filter relationship map nodes"
-            className="w-52 pl-9 pr-3 py-2.5 bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-500/50 transition-colors"
+            placeholder="Filter memory…"
+            aria-label="Filter decision memory nodes"
+            className="w-52 rounded-lg border border-white/[0.08] bg-white/[0.03] py-2.5 pl-9 pr-3 text-sm text-white backdrop-blur-xl transition-colors placeholder:text-white/30 focus:border-primary/50 focus:outline-none"
           />
         </div>
       </div>
 
       {/* Zoom controls */}
       <div className="absolute bottom-4 left-4 flex items-center gap-2">
-        <button onClick={() => setZoom((z) => Math.min(2, z + 0.15))} aria-label="Zoom in"
-          className="p-2.5 bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all">
+        <button onClick={() => setZoom(viewRef.current.zoom + 0.15)} aria-label="Zoom in"
+          className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
           <ZoomIn className="w-4 h-4 text-white/70" />
         </button>
-        <button onClick={() => setZoom((z) => Math.max(0.5, z - 0.15))} aria-label="Zoom out"
-          className="p-2.5 bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all">
+        <button onClick={() => setZoom(viewRef.current.zoom - 0.15)} aria-label="Zoom out"
+          className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
           <ZoomOut className="w-4 h-4 text-white/70" />
         </button>
-        <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }) }} aria-label="Reset view"
-          className="p-2.5 bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all">
+        <button onClick={resetView} aria-label="Reset view"
+          className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
           <Maximize2 className="w-4 h-4 text-white/70" />
         </button>
         <span className="text-xs text-white/40 font-mono ml-2 bg-white/5 px-2 py-1 rounded">
-          {Math.round(zoom * 100)}%
+          {zoomPct}%
         </span>
       </div>
 
-      {/* Mini-map */}
-      <div className="absolute bottom-4 right-4 w-36 h-28 bg-white/[0.06] backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden">
-        <svg width="100%" height="100%" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
-          {edges.map((edge, i) => {
-            const src = nodes.find((n) => n.id === edge.source)
-            const tgt = nodes.find((n) => n.id === edge.target)
-            if (!src || !tgt) return null
-            return <line key={i} x1={src.x} y1={src.y} x2={tgt.x} y2={tgt.y} stroke={STATUS_COLORS.active + "4d"} strokeWidth={6} />
-          })}
-          {nodes.map((node) => (
-            <circle key={node.id} cx={node.x} cy={node.y} r={10} fill={STATUS_COLORS[node.status]} />
-          ))}
-        </svg>
-      </div>
-
-      {/* Tooltip */}
+      {/* Detail panel — opens on node click */}
       <AnimatePresence>
-        {tooltipNode && (
+        {selected && selectedStatus && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            transition={{ duration: 0.15 }}
-            className="absolute z-50 w-64"
-            style={{ left: Math.min(tooltipNode.x, 800 - 280), top: tooltipNode.y + 20 }}
-          >
-            <div className="bg-[#0a0f18]/95 backdrop-blur-2xl border border-white/15 rounded-xl p-4 shadow-2xl shadow-black/50">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="text-white font-semibold text-sm">{tooltipNode.node.title}</h3>
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: STATUS_COLORS[tooltipNode.node.status] }} />
-                    <span className="text-xs font-medium" style={{ color: STATUS_COLORS[tooltipNode.node.status] }}>
-                      {STATUS_LABELS[tooltipNode.node.status]}
-                    </span>
-                  </div>
-                </div>
-                <button onClick={() => setTooltipNode(null)} aria-label="Close tooltip"
-                  className="p-1 hover:bg-white/10 rounded-lg transition-colors">
-                  <X className="w-3.5 h-3.5 text-white/40" />
-                </button>
-              </div>
-
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-white/40 uppercase tracking-wider">Impact</span>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div key={i} className="w-5 h-1.5 rounded-full transition-colors"
-                        style={{ backgroundColor: i <= tooltipNode.node.impact ? STATUS_COLORS[tooltipNode.node.status] : "rgba(255,255,255,0.1)" }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-white/40 uppercase tracking-wider">Quality</span>
-                  <span className="text-xs text-white/70 font-mono">{tooltipNode.node.qualityScore}/100</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-white/40 uppercase tracking-wider">Connections</span>
-                  <span className="text-xs text-white/70 font-mono flex items-center gap-1">
-                    <Link2 className="w-3 h-3" />
-                    {getConnectedNodes(tooltipNode.node.id).size} linked
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <button
-                  onClick={() => { router.push(`/decisions/${tooltipNode.node.id}`); setTooltipNode(null) }}
-                  className="w-full flex items-center justify-center gap-1.5 py-2 bg-primary/20 text-primary text-xs font-medium rounded-lg hover:bg-cyan-500/30 transition-colors"
-                >
-                  View Details
-                  <ArrowRight className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Full Details Panel */}
-      <AnimatePresence>
-        {selectedNode && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="absolute top-4 right-4 w-80 bg-[#0a0f18]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 shadow-2xl"
+            exit={{ opacity: 0, x: 16 }}
+            transition={{ duration: 0.18 }}
+            className="absolute top-4 right-4 w-80 max-w-[calc(100%-2rem)] rounded-lg border border-white/10 bg-bg-card/95 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.34)] backdrop-blur-2xl"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-white font-semibold">{selectedNode.title}</h3>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="min-w-0">
+                <h3 className="text-white font-semibold leading-snug text-balance">{selected.title}</h3>
                 <span className="text-xs px-2 py-0.5 rounded-full mt-1.5 inline-block"
-                  style={{ backgroundColor: `${STATUS_COLORS[selectedNode.status]}20`, color: STATUS_COLORS[selectedNode.status] }}>
-                  {STATUS_LABELS[selectedNode.status]}
+                  style={{ backgroundColor: `${colors[selectedStatus]}20`, color: colors[selectedStatus] }}>
+                  {STATUS_LABELS[selectedStatus]}
                 </span>
               </div>
-              <button onClick={() => setSelectedNode(null)} aria-label="Close panel"
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+              <button onClick={() => setSelectedId(null)} aria-label="Close panel"
+                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0">
                 <X className="w-4 h-4 text-white/40" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Impact Score</p>
+                <p className="text-[10px] font-medium uppercase text-white/40 mb-2">Impact</p>
                 <div className="flex gap-1.5">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex-1 h-3 rounded-full transition-colors"
-                      style={{ backgroundColor: i <= selectedNode.impact ? STATUS_COLORS[selectedNode.status] : "rgba(255,255,255,0.1)" }} />
+                    <div key={i} className="flex-1 h-2.5 rounded-full"
+                      style={{ backgroundColor: i <= selected.impact ? colors[selectedStatus] : "rgba(255,255,255,0.08)" }} />
                   ))}
                 </div>
-                <p className="text-xs text-white/50 mt-1 font-mono">
-                  {selectedNode.impact}/5 · Quality {selectedNode.qualityScore}/100
+                <p className="text-xs text-white/45 mt-1.5 font-mono">
+                  {selected.impact}/5 · clarity {selected.qualityScore}/100
                 </p>
               </div>
 
+              {selected.revisitAt && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-medium uppercase text-white/40">Revisit</span>
+                  <span className="text-xs text-white/65 font-mono">{formatDate(selected.revisitAt)}</span>
+                </div>
+              )}
+
+              {selected.executionTrail && selected.executionTrail.length > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-medium uppercase text-white/40">Execution</span>
+                  <span className="text-xs text-white/65 font-mono">
+                    {selected.executionTrail.filter((s) => s.done).length}/{selected.executionTrail.length} done
+                  </span>
+                </div>
+              )}
+
               <div>
-                <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Dependencies</p>
+                <p className="text-[10px] font-medium uppercase text-white/40 mb-2 flex items-center gap-1.5">
+                  <Link2 className="w-3 h-3" />
+                  Connected ({dependencies.length})
+                </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {Array.from(getConnectedNodes(selectedNode.id)).map((id) => {
-                    const node = nodes.find((n) => n.id === id)
-                    if (!node) return null
+                  {dependencies.map((id) => {
+                    const dep = storeDecisions.find((d) => d.id === id)
+                    if (!dep) return null
                     return (
-                      <span key={id} className="text-xs px-2 py-1 rounded-md bg-white/5 text-white/70 border border-white/10">
-                        {node.title}
-                      </span>
+                      <button
+                        key={id}
+                        onClick={() => setSelectedId(id)}
+                        className="text-xs px-2 py-1 rounded-md bg-white/5 text-white/65 border border-white/10 hover:border-white/25 hover:text-white/85 transition-colors max-w-[140px] truncate"
+                      >
+                        {dep.title}
+                      </button>
                     )
                   })}
-                  {getConnectedNodes(selectedNode.id).size === 0 && (
-                    <span className="text-xs text-white/30">No dependencies</span>
+                  {dependencies.length === 0 && (
+                    <span className="text-xs text-white/30">No connections yet</span>
                   )}
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/10 flex gap-2">
-                <button
-                  onClick={() => router.push(`/decisions/${selectedNode.id}`)}
-                  className="flex-1 py-2.5 bg-primary/20 text-primary text-sm font-medium rounded-xl hover:bg-cyan-500/30 transition-colors"
-                >
-                  Open Decision
-                </button>
-                <button
-                  onClick={() => setSelectedNode(null)}
-                  className="flex-1 py-2.5 bg-white/5 text-white/60 text-sm font-medium rounded-xl hover:bg-white/10 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
+              <button
+                onClick={() => router.push(`/decisions/${selected.id}`)}
+                className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/15 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+              >
+                Open Decision
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </motion.div>
         )}

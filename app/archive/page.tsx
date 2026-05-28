@@ -25,7 +25,7 @@ export default function ArchivePage() {
         {isLoading ? (
           <div className="py-24 text-center text-white/40 text-sm">Loading archive…</div>
         ) : error ? (
-          <div className="py-24 text-center text-rose-400 text-sm">Error: {error}</div>
+          <div className="py-24 text-center text-destructive text-sm">Error: {error}</div>
         ) : (
           <ArchiveTimeline storeDecisions={decisions} onRestore={handleRestore} />
         )}

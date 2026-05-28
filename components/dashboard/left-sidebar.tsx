@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils"
 import { LOCAL_PROFILE } from "@/lib/local-profile"
 
 const primaryNav = [
-  { icon: LayoutDashboard, label: "Dashboard",   href: "/app" },
-  { icon: Network,         label: "Decisions",   href: "/decisions" },
+  { icon: LayoutDashboard, label: "Right Now", href: "/app" },
+  { icon: Network,         label: "Memory",    href: "/decisions" },
 ]
 
 const secondaryNav = [
@@ -21,23 +21,22 @@ export function LeftSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-white/10 bg-white/[0.02] backdrop-blur-2xl flex flex-col z-30">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-64 flex-col border-r border-white/[0.07] bg-bg-body/72 backdrop-blur-2xl">
       {/* Brand */}
-      <div className="p-6 border-b border-white/10">
+      <div className="border-b border-white/[0.07] p-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Shield className="w-5 h-5 text-primary" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/10">
+            <Shield className="h-5 w-5 text-brand" />
           </div>
           <div className="flex flex-col">
-            <span className="text-white font-semibold text-sm tracking-tight">DECISIONOS</span>
-            <span className="text-white/40 text-xs font-mono">v2.0</span>
+            <span className="text-sm font-semibold text-white">DecisionOS</span>
+            <span className="font-mono text-xs text-white/35">local system</span>
           </div>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 flex flex-col gap-1 overflow-y-auto">
-        <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider px-3 mb-1">Journal</p>
         {primaryNav.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
           return (
@@ -59,7 +58,7 @@ export function LeftSidebar() {
 
         <div className="my-3 border-t border-white/[0.06]" />
 
-        <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider px-3 mb-1">More</p>
+        <p className="mb-1 px-3 font-mono text-[10px] uppercase text-white/25">More</p>
         {secondaryNav.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -76,7 +75,7 @@ export function LeftSidebar() {
               <item.icon className="w-4 h-4 flex-shrink-0" />
               <span className="flex-1">{item.label}</span>
               {item.note && (
-                <span className="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400/70">
+                <span className="rounded border border-warning/20 bg-warning/10 px-1.5 py-0.5 font-mono text-[9px] uppercase text-warning/70">
                   {item.note}
                 </span>
               )}
@@ -86,21 +85,21 @@ export function LeftSidebar() {
       </nav>
 
       {/* Tip */}
-      <div className="mx-4 mb-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+      <div className="mx-4 mb-3 rounded-lg border border-white/[0.06] bg-white/[0.018] p-3">
         <div className="flex items-start gap-2">
           <BookOpen className="w-3.5 h-3.5 text-white/30 mt-0.5 flex-shrink-0" />
           <p className="text-[11px] text-white/35 leading-relaxed">
-            Press <kbd className="font-mono bg-white/10 px-1 py-0.5 rounded text-white/50">⌘K</kbd> to search or{" "}
-            <kbd className="font-mono bg-white/10 px-1 py-0.5 rounded text-white/50">+</kbd> to capture a decision quickly.
+            Press <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-white/50">Cmd K</kbd> to search or{" "}
+            <kbd className="rounded bg-white/10 px-1 py-0.5 font-mono text-white/50">+</kbd> to capture a decision quickly.
           </p>
         </div>
       </div>
 
       {/* Profile footer */}
-      <div className="p-4 border-t border-white/10">
+      <div className="border-t border-white/[0.07] p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.035]">
+            <User className="h-4 w-4 text-white/55" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">{LOCAL_PROFILE.name}</p>

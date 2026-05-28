@@ -67,7 +67,7 @@ function HardwareToggle({
       {/* LED Indicator */}
       <div
         className={`w-2 h-2 rounded-full transition-all duration-300 ${
-          enabled ? "bg-emerald-500 shadow-[0_0_8px_#10b981]" : "bg-rose-500/50"
+          enabled ? "bg-success shadow-[0_0_8px_#10b981]" : "bg-destructive/50"
         }`}
       />
 
@@ -135,12 +135,12 @@ function DangerButton({ onConfirm }: { onConfirm: () => void }) {
         if (e.key === " " || e.key === "Enter") startHold()
       }}
       onKeyUp={endHold}
-      className="relative w-full py-4 rounded-xl border-2 border-rose-500/50 bg-rose-500/10 overflow-hidden group"
+      className="relative w-full py-4 rounded-xl border-2 border-destructive/50 bg-destructive/10 overflow-hidden group"
       whileTap={{ scale: 0.98 }}
     >
       {/* Progress Fill */}
       <motion.div
-        className="absolute inset-0 bg-rose-500/30"
+        className="absolute inset-0 bg-destructive/30"
         style={{ width: `${progress}%` }}
       />
 
@@ -154,15 +154,15 @@ function DangerButton({ onConfirm }: { onConfirm: () => void }) {
       />
 
       <div className="relative flex items-center justify-center gap-3">
-        <AlertTriangle className="w-5 h-5 text-rose-400" />
-        <span className="text-sm font-medium text-rose-400">
+        <AlertTriangle className="w-5 h-5 text-destructive" />
+        <span className="text-sm font-medium text-destructive">
           {progress > 0
             ? `Hold to confirm... ${Math.round(progress)}%`
             : "Reset Local Data"}
         </span>
       </div>
 
-      <p className="relative text-[10px] text-rose-400/60 mt-1">
+      <p className="relative text-[10px] text-destructive/60 mt-1">
         Hold to confirm permanent reset
       </p>
     </motion.button>
@@ -261,13 +261,13 @@ export function ControlDeckSettings({
         {/* Module 1: Identity */}
         <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <User className="w-4 h-4 text-cyan-400" />
+            <User className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-white">Identity</h3>
           </div>
 
           {/* Avatar */}
           <div className="flex items-center gap-4 p-3 bg-white/5 rounded-xl">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
               <User className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -280,7 +280,7 @@ export function ControlDeckSettings({
         {/* Module 2: Appearance */}
         <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Palette className="w-4 h-4 text-amber-400" />
+            <Palette className="w-4 h-4 text-warning" />
             <h3 className="text-sm font-semibold text-white">Appearance</h3>
           </div>
 
@@ -294,7 +294,7 @@ export function ControlDeckSettings({
                   onClick={() => onUpdateSettings?.({ theme: t.id as AppSettings["theme"] })}
                   className={`relative p-2 rounded-lg border transition-all ${
                     theme === t.id
-                      ? "border-cyan-500 bg-cyan-500/10 shadow-[0_0_10px_rgba(6,182,212,0.15)]"
+                      ? "border-primary bg-primary/10 shadow-[0_0_10px_rgba(6,182,212,0.15)]"
                       : "border-white/10 hover:border-white/20"
                   }`}
                 >
@@ -309,7 +309,7 @@ export function ControlDeckSettings({
                   </div>
                   <span className="text-[10px] text-white/60">{t.label}</span>
                   {theme === t.id && (
-                    <Check className="absolute top-1 right-1 w-3 h-3 text-cyan-400" />
+                    <Check className="absolute top-1 right-1 w-3 h-3 text-primary" />
                   )}
                 </button>
               ))}
@@ -328,7 +328,7 @@ export function ControlDeckSettings({
               max="100"
               value={animationIntensity}
               onChange={(e) => onUpdateSettings?.({ animationIntensity: parseInt(e.target.value) })}
-              className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-cyan-500 [&::-webkit-slider-thumb]:shadow-[0_0_8px_#06b6d4]"
+              className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-[0_0_8px_#06b6d4]"
             />
           </div>
 
@@ -341,7 +341,7 @@ export function ControlDeckSettings({
         {/* Module 3: Local Storage - real data only */}
         <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <HardDrive className="w-4 h-4 text-emerald-400" />
+            <HardDrive className="w-4 h-4 text-success" />
             <h3 className="text-sm font-semibold text-white">Local Storage</h3>
           </div>
 
@@ -359,7 +359,7 @@ export function ControlDeckSettings({
         {/* Module: Notifications */}
         <div className="bg-[#0a0f14] border border-white/10 rounded-2xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <Bell className="w-4 h-4 text-violet-400" />
+            <Bell className="w-4 h-4 text-secondary" />
             <h3 className="text-sm font-semibold text-white">Notifications</h3>
           </div>
 
@@ -374,7 +374,7 @@ export function ControlDeckSettings({
               className={cn(
                 "w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl border transition-colors text-left",
                 notifyRevisits
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                  ? "border-success/30 bg-success/10 text-success"
                   : "border-white/10 bg-white/[0.025] text-white/70 hover:bg-white/[0.05]"
               )}
             >
@@ -385,13 +385,13 @@ export function ControlDeckSettings({
                 aria-hidden="true"
                 className={cn(
                   "relative w-10 h-5 rounded-full border transition-colors flex-shrink-0",
-                  notifyRevisits ? "bg-emerald-500/30 border-emerald-500/45" : "bg-white/[0.05] border-white/15"
+                  notifyRevisits ? "bg-success/30 border-success/45" : "bg-white/[0.05] border-white/15"
                 )}
               >
                 <span
                   className={cn(
                     "absolute top-0.5 w-4 h-4 rounded-full transition-transform",
-                    notifyRevisits ? "translate-x-5 bg-emerald-300" : "translate-x-0.5 bg-white/45"
+                    notifyRevisits ? "translate-x-5 bg-success" : "translate-x-0.5 bg-white/45"
                   )}
                 />
               </span>
@@ -400,10 +400,10 @@ export function ControlDeckSettings({
         </div>
 
         {/* Module 4: Danger Zone */}
-        <div className="bg-[#0a0f14] border border-rose-500/20 rounded-2xl p-5 md:col-span-2">
+        <div className="bg-[#0a0f14] border border-destructive/20 rounded-2xl p-5 md:col-span-2">
           <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
-            <h3 className="text-sm font-semibold text-rose-400">Danger Zone</h3>
+            <AlertTriangle className="w-4 h-4 text-destructive" />
+            <h3 className="text-sm font-semibold text-destructive">Danger Zone</h3>
           </div>
 
           <div className="flex gap-3 mb-3">
@@ -465,8 +465,8 @@ export function ControlDeckSettings({
               className="w-full max-w-md bg-[#0a0f14] border border-white/10 rounded-2xl p-6 shadow-2xl"
             >
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
-                  <Database className="w-4 h-4 text-cyan-400" />
+                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Database className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white">Import Data</h3>
@@ -482,10 +482,10 @@ export function ControlDeckSettings({
                 <button
                   onClick={() => handleImport("merge")}
                   disabled={isImporting}
-                  className="w-full flex items-start gap-3 p-3.5 rounded-xl border border-white/10 bg-white/5 hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all text-left group disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full flex items-start gap-3 p-3.5 rounded-xl border border-white/10 bg-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all text-left group disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <div className="w-5 h-5 rounded-full border border-white/20 group-hover:border-cyan-500/40 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-5 h-5 rounded-full border border-white/20 group-hover:border-primary/40 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors">
+                    <div className="w-2 h-2 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">Add new only</p>
@@ -496,10 +496,10 @@ export function ControlDeckSettings({
                 <button
                   onClick={() => handleImport("overwrite")}
                   disabled={isImporting}
-                  className="w-full flex items-start gap-3 p-3.5 rounded-xl border border-white/10 bg-white/5 hover:border-amber-500/30 hover:bg-amber-500/5 transition-all text-left group disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full flex items-start gap-3 p-3.5 rounded-xl border border-white/10 bg-white/5 hover:border-warning/30 hover:bg-warning/5 transition-all text-left group disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <div className="w-5 h-5 rounded-full border border-white/20 group-hover:border-amber-500/40 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-5 h-5 rounded-full border border-white/20 group-hover:border-warning/40 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors">
+                    <div className="w-2 h-2 rounded-full bg-warning opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">Overwrite on conflict</p>
@@ -519,7 +519,7 @@ export function ControlDeckSettings({
               {isImporting && (
                 <div className="flex items-center justify-center gap-2 mt-3 text-xs text-white/40">
                   <motion.div
-                    className="w-3.5 h-3.5 border border-cyan-500/40 border-t-cyan-500 rounded-full"
+                    className="w-3.5 h-3.5 border border-primary/40 border-t-primary rounded-full"
                     animate={{ rotate: 360 }}
                     transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
                   />
@@ -538,7 +538,7 @@ export function ControlDeckSettings({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-6 right-6 px-4 py-3 bg-rose-500 text-white rounded-lg shadow-lg flex items-center gap-2"
+            className="fixed bottom-6 right-6 px-4 py-3 bg-destructive text-white rounded-lg shadow-lg flex items-center gap-2"
             onAnimationComplete={() => {
               setTimeout(() => setNotice(null), 2000)
             }}

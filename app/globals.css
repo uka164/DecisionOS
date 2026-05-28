@@ -9,7 +9,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 /*
- * VOID — Navy-black base, Cyan primary, Purple secondary.
+ * VOID — Navy-black base, magenta action, violet brand.
  * The default. Maximum depth, engineering-tool feel.
  */
 :root,
@@ -27,23 +27,24 @@
   --foreground: #ffffff;
 
   /* Accent colours */
-  --primary: #06b6d4;
-  /* cyan-500  */
-  --primary-glow: rgba(6, 182, 212, 0.18);
+  --brand: #8b5cf6;
+  --primary: #e879f9;
+  /* magenta action */
+  --primary-glow: rgba(232, 121, 249, 0.18);
   --secondary: #8b5cf6;
   /* violet-500 — brand accent, used sparingly */
-  --secondary-glow: rgba(139, 92, 246, 0.13);
-  --accent-glow: rgba(6, 182, 212, 0.18);
+  --secondary-glow: rgba(139, 92, 246, 0.11);
+  --accent-glow: rgba(232, 121, 249, 0.16);
   /* alias for primary glow */
-  --accent-primary-alpha: rgba(6, 182, 212, 0.3);
+  --accent-primary-alpha: rgba(232, 121, 249, 0.24);
   /* neural-background node color */
 
   /* Borders */
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(6, 182, 212, 0.22);
+  --border-accent: rgba(232, 121, 249, 0.22);
 
   /* Mesh gradient layers — kept faint so most surfaces read as calm neutral */
-  --mesh-1: rgba(6, 182, 212, 0.05);
+  --mesh-1: rgba(232, 121, 249, 0.04);
   --mesh-2: rgba(139, 92, 246, 0.03);
 
   /* Existing tokens — kept for components not yet migrated */
@@ -57,22 +58,24 @@
   --muted-foreground: rgba(255, 255, 255, 0.5);
   --accent: #8b5cf6;
   --accent-foreground: #ffffff;
+  /* Semantic roles — color only carries meaning, never decoration.
+     destructive = risk/blocked · warning = review/attention · success = aligned/complete (teal) */
   --destructive: #f43f5e;
   --destructive-foreground: #ffffff;
-  --success: #10b981;
+  --success: #14b8a6;
   --warning: #f59e0b;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.08);
-  --ring: #06b6d4;
+  --ring: #e879f9;
   --radius: 1rem;
 
   /* Animation speed multiplier */
-  --primary-rgb: 6, 182, 212;
+  --primary-rgb: 232, 121, 249;
   --anim-speed: 1;
 }
 
 /*
- * MIDNIGHT — Deep-blue base, Indigo primary, Violet secondary.
+ * MIDNIGHT — deep-blue base, magenta action, violet brand.
  * Calm, focused, analytical. Blue monochrome depth.
  */
 [data-theme="midnight"] {
@@ -82,29 +85,30 @@
 
   --background: #070b18;
 
-  --primary: #818cf8;
-  /* indigo-400 — softer than 500 */
-  --primary-glow: rgba(129, 140, 248, 0.18);
-  --secondary: #a78bfa;
+  --brand: #8b5cf6;
+  --primary: #e879f9;
+  /* magenta action */
+  --primary-glow: rgba(232, 121, 249, 0.16);
+  --secondary: #8b5cf6;
   /* violet-400 — brand accent, used sparingly */
-  --secondary-glow: rgba(167, 139, 250, 0.13);
-  --accent-glow: rgba(129, 140, 248, 0.18);
-  --accent-primary-alpha: rgba(129, 140, 248, 0.3);
+  --secondary-glow: rgba(139, 92, 246, 0.11);
+  --accent-glow: rgba(232, 121, 249, 0.16);
+  --accent-primary-alpha: rgba(232, 121, 249, 0.24);
   /* neural-background node color */
 
   --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-accent: rgba(129, 140, 248, 0.30);
+  --border-accent: rgba(232, 121, 249, 0.22);
 
-  --mesh-1: rgba(129, 140, 248, 0.05);
-  --mesh-2: rgba(167, 139, 250, 0.035);
+  --mesh-1: rgba(232, 121, 249, 0.04);
+  --mesh-2: rgba(139, 92, 246, 0.03);
 
-  --primary-rgb: 129, 140, 248;
-  --ring: #818cf8;
+  --primary-rgb: 232, 121, 249;
+  --ring: #e879f9;
   --border: rgba(255, 255, 255, 0.07);
 }
 
 /*
- * TWILIGHT — Deep violet-black base, Fuchsia/Pink primary, Orange secondary.
+ * TWILIGHT — deep violet-black base, magenta action, violet brand.
  * Rich and warm. Base is VIOLET not red — accents provide the warmth.
  * This avoids the "red filter" problem.
  */
@@ -117,12 +121,13 @@
 
   --background: #0e0819;
 
+  --brand: #8b5cf6;
   --primary: #e879f9;
   /* fuchsia-400 */
   --primary-glow: rgba(232, 121, 249, 0.18);
-  --secondary: #fb923c;
-  /* orange-400 */
-  --secondary-glow: rgba(251, 146, 60, 0.13);
+  --secondary: #8b5cf6;
+  /* violet brand */
+  --secondary-glow: rgba(139, 92, 246, 0.11);
   --accent-glow: rgba(232, 121, 249, 0.18);
   --accent-primary-alpha: rgba(232, 121, 249, 0.3);
   /* neural-background node color */
@@ -131,7 +136,7 @@
   --border-accent: rgba(232, 121, 249, 0.30);
 
   --mesh-1: rgba(232, 121, 249, 0.05);
-  --mesh-2: rgba(251, 146, 60, 0.035);
+  --mesh-2: rgba(139, 92, 246, 0.03);
 
   --primary-rgb: 232, 121, 249;
   --ring: #e879f9;
@@ -139,7 +144,7 @@
 }
 
 /*
- * DAWN — Warm white base, Blue primary, Teal secondary.
+ * DAWN — warm white base, grounded magenta action, violet brand.
  * Light mode. Overrides --color-white so all text-white/* utilities
  * resolve to near-black, making the component palette work on a light canvas.
  */
@@ -153,20 +158,21 @@
   --background: #f4f6f8;
   --foreground: #0f172a;
 
-  --primary: #0369a1;
-  /* sky-700 — reads clearly on white */
-  --primary-glow: rgba(3, 105, 161, 0.25);
-  --secondary: #0d9488;
-  /* teal-600 */
-  --secondary-glow: rgba(13, 148, 136, 0.25);
-  --accent-glow: rgba(3, 105, 161, 0.25);
-  --accent-primary-alpha: rgba(3, 105, 161, 0.3);
+  --brand: #7c3aed;
+  --primary: #be185d;
+  /* grounded magenta action */
+  --primary-glow: rgba(190, 24, 93, 0.16);
+  --secondary: #7c3aed;
+  /* violet brand */
+  --secondary-glow: rgba(124, 58, 237, 0.12);
+  --accent-glow: rgba(190, 24, 93, 0.16);
+  --accent-primary-alpha: rgba(190, 24, 93, 0.2);
 
   --border-subtle: rgba(15, 23, 42, 0.1);
-  --border-accent: rgba(3, 105, 161, 0.3);
+  --border-accent: rgba(190, 24, 93, 0.22);
 
-  --mesh-1: rgba(3, 105, 161, 0.06);
-  --mesh-2: rgba(13, 148, 136, 0.05);
+  --mesh-1: rgba(190, 24, 93, 0.035);
+  --mesh-2: rgba(124, 58, 237, 0.025);
 
   /* Override the white/black axis so Tailwind's text-white/*, bg-white/*,
      border-white/* utilities flip to dark-on-light automatically. */
@@ -186,13 +192,13 @@
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --success: #059669;
+  --success: #0f766e;
   --warning: #d97706;
   --border: rgba(15, 23, 42, 0.1);
   --input: rgba(15, 23, 42, 0.08);
-  --ring: #0369a1;
+  --ring: #be185d;
 
-  --primary-rgb: 3, 105, 161;
+  --primary-rgb: 190, 24, 93;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -208,6 +214,7 @@
   --color-bg-surface: var(--bg-surface);
 
   /* Theme accent tokens — use text-primary, bg-primary/10, border-primary/30 */
+  --color-brand: var(--brand);
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 
@@ -254,9 +261,9 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Headings carry hierarchy through weight + tracking, not color or glow */
+  /* Headings carry hierarchy through weight and scale, not color or glow. */
   h1, h2, h3 {
-    letter-spacing: -0.011em;
+    letter-spacing: 0;
   }
 
   ::selection {
