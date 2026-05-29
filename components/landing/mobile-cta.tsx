@@ -6,7 +6,7 @@ import { CTAButton } from "./cta-button"
 
 export function MobileCTA() {
   const [pastHero, setPastHero] = useState(false)
-  const [requestInView, setRequestInView] = useState(false)
+  const [endInView, setEndInView] = useState(false)
 
   useLayoutEffect(() => {
     const onScroll = () =>
@@ -16,18 +16,30 @@ export function MobileCTA() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  // Hide once the closing zone (final CTA or footer — both carry their own CTA)
+  // is on screen, so the bar never floats over content that already invites action.
   useLayoutEffect(() => {
-    const target = document.getElementById("request")
-    if (!target) return
+    const targets = ["request", "site-footer"]
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null)
+    if (targets.length === 0) return
+
+    const onScreen = new Set<Element>()
     const observer = new IntersectionObserver(
-      ([entry]) => setRequestInView(entry.isIntersecting),
-      { rootMargin: "0px 0px -40% 0px" }
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) onScreen.add(entry.target)
+          else onScreen.delete(entry.target)
+        }
+        setEndInView(onScreen.size > 0)
+      },
+      { rootMargin: "0px 0px -25% 0px" }
     )
-    observer.observe(target)
+    targets.forEach((t) => observer.observe(t))
     return () => observer.disconnect()
   }, [])
 
-  const visible = pastHero && !requestInView
+  const visible = pastHero && !endInView
 
   return (
     <AnimatePresence>

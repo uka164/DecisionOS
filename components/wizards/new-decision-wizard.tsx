@@ -407,7 +407,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                   </div>
                   {step === 4 && (
                     <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/[0.05]">
-                      <div className="text-xs text-white/45">Decision clarity</div>
+                      <div className="text-xs text-white/45">Record completeness</div>
                       <LiveQualityRing score={quality} />
                       {nextQualitySignal && (
                         <p className="max-w-[140px] text-center text-[11px] leading-snug text-white/35">
@@ -985,7 +985,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                   </button>
                 ) : <div />}
                 <div className="flex items-center gap-3">
-                  {step === 4 && <div className="sm:hidden text-xs text-white/45">{quality}% reflected</div>}
+                  {step === 4 && <div className="sm:hidden text-xs text-white/45">{quality}% complete</div>}
                   {step < 4 && (
                     <button onClick={() => canProceed() && setStep((s) => s + 1)} disabled={!canProceed()}
                       className={cn(

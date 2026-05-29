@@ -34,7 +34,15 @@
       "Bash(node scripts/shot-verify.mjs)",
       "Bash(npx vitest *)",
       "Bash(git rm *)",
-      "Bash(echo \"===LINT EXIT $?===\")"
+      "Bash(echo \"===LINT EXIT $?===\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(ls components/dashboard/)",
+      "Bash(ls components/views/)",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(node scripts/shot-rhythm.mjs)",
+      "Bash(node scripts/shot-refactor.mjs)",
+      "Bash(node scripts/shot-fixes.mjs)",
+      "Bash(node scripts/shot-coldstart.mjs)"
     ]
   }
 }

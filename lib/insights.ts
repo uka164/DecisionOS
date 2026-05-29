@@ -13,7 +13,7 @@ export interface Insight {
 
 // ─── Threshold constants ──────────────────────────────────────────────────────
 
-const MIN_DECISIONS = 5
+const MIN_DECISIONS = 3
 const HIGH_IMPACT_THRESHOLD = 4
 const ROLLBACK_OMISSION_PCT = 40
 const HIGH_RISK_SEVERITY = 70
@@ -89,8 +89,8 @@ function checkRiskQualityBlindspot(decisions: Decision[]): Insight | null {
   return {
     id: "risk-quality-blindspot",
     type: "info",
-    title: "High risk, low quality",
-    description: `${count} decisions carry high-severity risks but scored below ${LOW_QUALITY_SCORE} on quality. Documentation may need strengthening.`,
+    title: "High risk, thin record",
+    description: `${count} decisions carry high-severity risks but their record is under ${LOW_QUALITY_SCORE}% complete. The reasoning may need strengthening.`,
     metric: `${count} decisions`,
     action: { label: "Open decisions", href: "/decisions" },
   }

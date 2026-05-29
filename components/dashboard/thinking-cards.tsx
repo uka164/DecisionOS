@@ -90,7 +90,7 @@ const ThinkingCard = memo(function ThinkingCard({ card }: { card: Decision }) {
             {card.title}
           </Link>
         </div>
-        <QualityRing score={card.qualityScore} size={48} strokeWidth={3} label="Clarity" />
+        <QualityRing score={card.qualityScore} size={48} strokeWidth={3} label="Completeness" />
       </div>
 
       {card.rawThinking ? (

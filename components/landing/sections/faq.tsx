@@ -25,8 +25,8 @@ const FAQS = [
     a: "No. It gives your thinking structure. You still decide, and the app keeps the audit trail honest enough to learn from later.",
   },
   {
-    q: "How does it improve decision quality over time?",
-    a: "Past decisions become evidence. You see repeated assumptions, neglected risks, and the difference between a bad outcome and a bad process.",
+    q: "Is any of this AI?",
+    a: "No. DecisionOS runs a set of plain, deterministic checks over what you write — no model, no black box, and nothing leaves your browser. You can read exactly what each signal looks for.",
   },
   {
     q: "How do I get started?",
@@ -43,7 +43,7 @@ export function FAQ() {
         <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           {/* heading column */}
           <Reveal>
-            <Eyebrow index="12">FAQ</Eyebrow>
+            <Eyebrow index="06">FAQ</Eyebrow>
             <Heading className="mt-5 text-3xl leading-[1.1] sm:text-4xl">
               Questions, answered.
             </Heading>

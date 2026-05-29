@@ -1,14 +1,6 @@
 "use client"
 
-import {
-  Inbox,
-  LayoutList,
-  GitCompare,
-  Gauge,
-  Users,
-  Workflow,
-  Archive,
-} from "lucide-react"
+import { Inbox, GitCompare, Flag, RefreshCw } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 import {
   Container,
@@ -22,38 +14,35 @@ import {
 import { CTAButton } from "../cta-button"
 
 const STEPS = [
-  { icon: Inbox, title: "Capture", line: "Pull in messy inputs from anywhere." },
-  { icon: LayoutList, title: "Structure", line: "Turn them into a clear decision brief." },
-  { icon: GitCompare, title: "Reason", line: "Lay out options, trade-offs, assumptions." },
-  { icon: Gauge, title: "Prioritize", line: "Score by weighted, explainable criteria." },
-  { icon: Users, title: "Align", line: "Assign owners and surface dependencies." },
-  { icon: Workflow, title: "Execute", line: "Track the decision as it becomes work." },
-  { icon: Archive, title: "Remember", line: "Preserve the reasoning as reusable memory." },
+  { icon: Inbox, title: "Capture", line: "Pull in the messy inputs and frame the decision." },
+  { icon: GitCompare, title: "Compare", line: "Lay out the options and weigh the trade-offs." },
+  { icon: Flag, title: "Commit", line: "Make the call with owners and a rationale you can audit." },
+  { icon: RefreshCw, title: "Revisit", line: "Come back on a set date and write what you got wrong." },
 ]
 
 export function HowItWorks() {
   const reduce = useReducedMotion()
 
   return (
-    <Section id="how" className="border-y border-white/[0.05] bg-white/[0.012]">
+    <Section id="how">
       <Container>
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-2xl text-center">
           <Reveal>
-            <Eyebrow index="03">How it works</Eyebrow>
+            <Eyebrow index="03" className="justify-center">
+              How it works
+            </Eyebrow>
             <Heading className="mt-5 text-3xl leading-[1.12] sm:text-4xl lg:text-[2.85rem]">
-              From scattered signal to aligned action.
+              Four steps from scattered signal to aligned action.
             </Heading>
             <p className="mt-5 text-pretty text-base leading-relaxed text-white/55">
-              Seven steps move a decision from noise to durable knowledge —
-              capture messy inputs, convert them into structured decision paths,
-              and keep the reasoning long after the work ships.
+              Capture the decision, compare the paths, commit with a clear
+              rationale, and revisit it when reality answers back.
             </p>
           </Reveal>
         </div>
 
         {/* desktop horizontal flow */}
-        <div className="mt-16 hidden lg:block">
-          {/* connector */}
+        <div className="mt-14 hidden lg:block">
           <div className="relative mb-8 h-px">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/12 to-transparent" />
             {!reduce && (
@@ -64,24 +53,18 @@ export function HowItWorks() {
               />
             )}
           </div>
-          <Stagger className="grid grid-cols-7 gap-3">
+          <Stagger className="grid grid-cols-4 gap-4">
             {STEPS.map((step, i) => {
               const Icon = step.icon
               return (
                 <StaggerItem key={step.title}>
                   <div className="group flex flex-col items-center text-center">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-lg border border-white/[0.08] bg-bg-card/60 text-white/50 backdrop-blur-md transition-all duration-500 group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/[0.08] bg-bg-card/60 text-white/50 backdrop-blur-md transition-all duration-500 group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <span className="mt-3 font-mono text-[10px] text-white/30">
-                      0{i + 1}
-                    </span>
-                    <h3 className="mt-1 text-sm font-semibold text-white">
-                      {step.title}
-                    </h3>
-                    <p className="mt-1.5 text-xs leading-relaxed text-white/45">
-                      {step.line}
-                    </p>
+                    <span className="mt-3 font-mono text-[10px] text-white/30">0{i + 1}</span>
+                    <h3 className="mt-1 text-base font-semibold text-white">{step.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-white/45">{step.line}</p>
                   </div>
                 </StaggerItem>
               )
@@ -102,16 +85,10 @@ export function HowItWorks() {
                   </span>
                   <div className="pt-0.5">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-mono text-[10px] text-white/30">
-                        0{i + 1}
-                      </span>
-                      <h3 className="text-sm font-semibold text-white">
-                        {step.title}
-                      </h3>
+                      <span className="font-mono text-[10px] text-white/30">0{i + 1}</span>
+                      <h3 className="text-sm font-semibold text-white">{step.title}</h3>
                     </div>
-                    <p className="mt-1 text-sm leading-relaxed text-white/50">
-                      {step.line}
-                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-white/50">{step.line}</p>
                   </div>
                 </div>
               </StaggerItem>
@@ -119,9 +96,9 @@ export function HowItWorks() {
           })}
         </Stagger>
 
-        <Reveal delay={0.1} className="mt-14">
-          <CTAButton href="#product" variant="secondary" icon="play">
-            Watch the flow
+        <Reveal delay={0.1} className="mt-14 flex justify-center">
+          <CTAButton href="#system" variant="secondary" icon="arrow">
+            Explore the system
           </CTAButton>
         </Reveal>
       </Container>

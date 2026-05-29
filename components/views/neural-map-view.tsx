@@ -644,7 +644,7 @@ export function NeuralMapView() {
                   ))}
                 </div>
                 <p className="text-xs text-white/45 mt-1.5 font-mono">
-                  {selected.impact}/5 · clarity {selected.qualityScore}/100
+                  {selected.impact}/5 · record {selected.qualityScore}% complete
                 </p>
               </div>
 

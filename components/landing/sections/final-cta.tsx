@@ -36,7 +36,7 @@ export function FinalCTA() {
       <Container className="relative">
         <div className="mx-auto max-w-2xl text-center">
           <Reveal>
-            <Eyebrow index="13" className="justify-center">
+            <Eyebrow index="07" className="justify-center">
               Get started
             </Eyebrow>
             <Heading

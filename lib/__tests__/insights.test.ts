@@ -23,8 +23,8 @@ function makeDecision(overrides: Partial<Decision> = {}): Decision {
 }
 
 describe("generateInsights", () => {
-  it("waits for five decisions before producing prompts", () => {
-    const decisions = Array.from({ length: 4 }, (_, i) => makeDecision({ id: `user-test-${i}` }))
+  it("waits for three decisions before producing prompts", () => {
+    const decisions = Array.from({ length: 2 }, (_, i) => makeDecision({ id: `user-test-${i}` }))
 
     expect(generateInsights(decisions, Date.now())).toBeNull()
   })

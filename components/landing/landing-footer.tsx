@@ -6,18 +6,16 @@ const COLUMNS = [
   {
     title: "Product",
     links: [
-      { label: "The system", href: "#system" },
+      { label: "The product", href: "#product" },
       { label: "How it works", href: "#how" },
-      { label: "Context memory", href: "#memory" },
-      { label: "Prioritization", href: "#prioritize" },
+      { label: "Core system", href: "#system" },
     ],
   },
   {
     title: "Explore",
     links: [
-      { label: "Use cases", href: "#use-cases" },
-      { label: "Trust & control", href: "#trust" },
-      { label: "Comparison", href: "#compare" },
+      { label: "Why it matters", href: "#decay" },
+      { label: "Where it fits", href: "#compare" },
       { label: "FAQ", href: "#faq" },
     ],
   },
@@ -25,14 +23,14 @@ const COLUMNS = [
     title: "Start",
     links: [
       { label: "Open the app", href: "/app" },
-      { label: "How it works", href: "#how" },
+      { label: "Watch walkthrough", href: "#how" },
     ],
   },
 ]
 
 export function LandingFooter() {
   return (
-    <footer className="relative border-t border-white/[0.06] py-16">
+    <footer id="site-footer" className="relative border-t border-white/[0.06] py-16">
       <Container>
         <div className="grid gap-12 lg:grid-cols-[1.5fr_2fr]">
           <div>

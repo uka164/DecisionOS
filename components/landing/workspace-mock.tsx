@@ -8,15 +8,15 @@ import { EASE_OUT } from "./primitives"
 
 const LAYERS = [
   { icon: Brain, label: "Reasoning", color: "var(--primary)" },
-  { icon: Network, label: "Context", color: "var(--secondary)" },
+  { icon: Network, label: "Context", color: "var(--primary)" },
   { icon: Gauge, label: "Priority", color: "var(--primary)" },
-  { icon: GitBranch, label: "Execution", color: "var(--secondary)" },
+  { icon: GitBranch, label: "Execution", color: "var(--primary)" },
 ]
 
 const OWNERS = [
-  { name: "Platform", status: "On track", tone: "text-emerald-400", dot: "bg-emerald-400" },
-  { name: "Data", status: "At risk", tone: "text-amber-400", dot: "bg-amber-400" },
-  { name: "Security", status: "Review", tone: "text-sky-300", dot: "bg-sky-300" },
+  { name: "Platform", status: "On track", tone: "text-success", dot: "bg-success" },
+  { name: "Data", status: "At risk", tone: "text-warning", dot: "bg-warning" },
+  { name: "Security", status: "Review", tone: "text-white/55", dot: "bg-white/40" },
 ]
 
 /**
@@ -61,7 +61,7 @@ export function WorkspaceMock({ className }: { className?: string }) {
         </div>
         <div className="ml-auto hidden items-center gap-1.5 sm:flex">
           <span className="h-1.5 w-1.5 rounded-full bg-primary/80" />
-          <span className="font-mono text-[11px] text-white/35">live</span>
+          <span className="font-mono text-[11px] text-white/35">example</span>
         </div>
       </div>
 

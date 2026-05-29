@@ -15,7 +15,7 @@ export function QualityRing({
   score,
   size = 80,
   strokeWidth = 6,
-  label = "Thinking Quality",
+  label = "Completeness",
   showScore = false,
 }: QualityRingProps) {
   const [mounted, setMounted] = useState(false)
@@ -30,9 +30,9 @@ export function QualityRing({
   const offset = circumference - (progress / 100) * circumference
 
   const getColor = () => {
-    if (score < 50) return { stroke: "#6366f1", glow: "rgba(99, 102, 241, 0.4)" }
-    if (score < 80) return { stroke: "#818cf8", glow: "rgba(129, 140, 248, 0.4)" }
-    return { stroke: "#06b6d4", glow: "rgba(6, 182, 212, 0.4)" }
+    if (score < 50) return { stroke: "var(--warning)", glow: "color-mix(in srgb, var(--warning) 45%, transparent)" }
+    if (score < 80) return { stroke: "var(--primary)", glow: "var(--primary-glow)" }
+    return { stroke: "var(--success)", glow: "color-mix(in srgb, var(--success) 45%, transparent)" }
   }
 
   const colors = getColor()
@@ -98,7 +98,7 @@ export function QualityRing({
         )}
       </div>
 
-      <span className="text-[10px] text-white/40 uppercase tracking-wider">
+      <span className="text-[10px] text-white/55 uppercase tracking-wider">
         {label}
       </span>
     </div>

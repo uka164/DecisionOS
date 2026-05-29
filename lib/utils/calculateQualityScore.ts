@@ -94,11 +94,16 @@ export function getQualityBreakdownFromDecision(decision: Partial<Decision>) {
     decision.guidingPrinciple,
   ].filter((text) => text?.trim()).join("\n")
 
+  // The structured `review` is the current source of truth; legacy `retrospective`
+  // is kept as a fallback. Either one satisfies the "closed the loop" signal.
+  const closedLoop =
+    decision.retrospective ?? decision.review?.lesson ?? decision.review?.whatHappened
+
   return getQualityBreakdown({
     options: decision.options,
     preMortem: decision.preMortem,
     riskLevel: decision.riskLevel,
-    retrospective: decision.retrospective,
+    retrospective: closedLoop,
     title: decision.title,
     rawThinking: reflectionText,
     constraints: decision.constraints,

@@ -26,10 +26,10 @@ const BASE_DECISIONS = Array.from({ length: 5 }, () => makeDecision())
 const NOW = Date.now()
 
 describe("generateInsights", () => {
-  it("returns null when fewer than 5 decisions", () => {
+  it("returns null when fewer than 3 decisions", () => {
     expect(generateInsights([], NOW)).toBeNull()
     expect(generateInsights([makeDecision()], NOW)).toBeNull()
-    expect(generateInsights(Array.from({ length: 4 }, () => makeDecision()), NOW)).toBeNull()
+    expect(generateInsights(Array.from({ length: 2 }, () => makeDecision()), NOW)).toBeNull()
   })
 
   it("returns an array (possibly empty) for 5+ decisions", () => {

@@ -8,9 +8,9 @@ import { CTAButton } from "./cta-button"
 import { Logo } from "./logo"
 
 const NAV_LINKS = [
-  { label: "System", href: "#system" },
+  { label: "Product", href: "#product" },
   { label: "How it works", href: "#how" },
-  { label: "Memory", href: "#memory" },
+  { label: "System", href: "#system" },
   { label: "Compare", href: "#compare" },
   { label: "FAQ", href: "#faq" },
 ]

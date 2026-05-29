@@ -135,7 +135,7 @@ export const Section = forwardRef<
     <section
       ref={ref}
       id={id}
-      className={cn("relative scroll-mt-24 py-20 sm:py-28 lg:py-36", className)}
+      className={cn("relative scroll-mt-24 py-16 sm:py-24 lg:py-28", className)}
     >
       {children}
     </section>
@@ -155,7 +155,7 @@ export function Eyebrow({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 font-mono text-[11px] uppercase text-white/45",
+        "flex items-center gap-3 font-mono text-[11px] uppercase text-white/60",
         className
       )}
     >
