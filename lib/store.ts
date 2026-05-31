@@ -109,6 +109,29 @@ const decisionSchema = z.object({
     processQuality: z.enum(["good", "mixed", "poor"]).optional(),
     completedAt: z.string().optional(),
   }).optional(),
+  aiCritique: z.object({
+    model: z.string(),
+    createdAt: z.string(),
+    verdict: z.string(),
+    reasoningConfidence: z.number(),
+    strongestCounter: z.string(),
+    unstatedAssumptions: z.array(z.string()),
+    blindSpots: z.array(z.object({
+      title: z.string(),
+      detail: z.string(),
+      severity: z.enum(["low", "medium", "high"]),
+    })),
+    steelmanAlternative: z.string(),
+    decisiveQuestion: z.string(),
+    sourceChars: z.number(),
+  }).optional(),
+  comments: z.array(z.object({
+    id: z.string().min(1),
+    author: z.string(),
+    text: z.string(),
+    createdAt: z.string(),
+    answersDecisiveQuestion: z.boolean().optional(),
+  })).optional(),
 })
 
 const experimentSchema = z.object({
@@ -168,6 +191,7 @@ function normalizeSettings(settings?: Partial<AppSettings>): AppSettings {
     animationIntensity: settings?.animationIntensity ?? DEFAULT_SETTINGS.animationIntensity,
     ambientMotion: settings?.ambientMotion ?? DEFAULT_SETTINGS.ambientMotion,
     notifyRevisits: settings?.notifyRevisits ?? DEFAULT_SETTINGS.notifyRevisits,
+    displayName: typeof settings?.displayName === "string" ? settings.displayName : undefined,
   }
 }
 

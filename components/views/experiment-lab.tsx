@@ -2,13 +2,14 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { EASE_SIGNATURE } from "@/lib/motion"
 import { Play, Pause, ChevronLeft, ChevronRight, ChevronDown, Sparkles, AlertTriangle, CheckCircle, Clock, FlaskConical, ArrowRight, Plus, X } from "lucide-react"
 import { useExperimentsStore, useDecisionsStore } from "@/stores"
 import type { Experiment } from "@/lib/types"
 
 
 const STATUS_CONFIG = {
-  active: { color: "#06b6d4", icon: Play, label: "Active" },
+  active: { color: "#e879f9", icon: Play, label: "Active" },
   paused: { color: "#f59e0b", icon: Pause, label: "Paused" },
   concluded: { color: "#10b981", icon: CheckCircle, label: "Concluded" },
 }
@@ -70,7 +71,7 @@ function TugOfWarBar({
     )
   }
 
-  const deviation = ((actual - expected) / expected) * 100
+  const deviation = expected !== 0 ? ((actual - expected) / expected) * 100 : 0
   const isSuccess =
     metricType === "higher" ? actual >= expected : actual <= expected
 
@@ -97,8 +98,8 @@ function TugOfWarBar({
       />
 
       {/* Labels */}
-      <span className="absolute -top-5 text-[9px] text-success font-mono">+</span>
-      <span className="absolute -bottom-5 text-[9px] text-destructive font-mono">−</span>
+      <span className="absolute -top-5 text-[11px] text-success font-mono">+</span>
+      <span className="absolute -bottom-5 text-[11px] text-destructive font-mono">−</span>
     </div>
   )
 }
@@ -113,10 +114,10 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
     return (
       <div className="relative w-full h-full min-h-[600px] flex flex-col items-center justify-center text-center px-6">
         <div className="w-14 h-14 mb-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-          <FlaskConical className="w-6 h-6 text-white/20" />
+          <FlaskConical className="w-6 h-6 text-white/55" />
         </div>
         <p className="text-white/50 text-base mb-1">No experiments yet</p>
-        <p className="text-white/30 text-sm max-w-sm mb-5">
+        <p className="text-white/55 text-sm max-w-sm mb-5">
           Track real-world outcomes for your decisions. Link an experiment to a
           decision to validate whether it worked.
         </p>
@@ -135,13 +136,14 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
   const experiment = experiments[safeIndex]
   const statusConfig = STATUS_CONFIG[experiment.status]
 
-  const deviation = experiment?.result.actual
-    ? Math.round(
-        ((experiment.result.actual - experiment.hypothesis.expected) /
-          experiment.hypothesis.expected) *
-          100
-      )
-    : null
+  const deviation =
+    experiment.result.actual !== null && experiment.hypothesis.expected !== 0
+      ? Math.round(
+          ((experiment.result.actual - experiment.hypothesis.expected) /
+            experiment.hypothesis.expected) *
+            100
+        )
+      : null
 
   const isSuccess =
     experiment.result.actual !== null &&
@@ -163,7 +165,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-white/40">
+              <span className="text-xs font-mono text-white/55">
                 EXP-{String(experiment.number).padStart(2, "0")}
               </span>
               <div
@@ -216,7 +218,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
 
             {/* Terminal-style Input */}
             <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4 border border-white/5">
-              <div className="flex items-center gap-2 text-white/40 mb-2">
+              <div className="flex items-center gap-2 text-white/55 mb-2">
                 <span className="text-secondary">$</span>
                 <span>expected_outcome</span>
               </div>
@@ -233,7 +235,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
 
             {/* Rationale */}
             <div className="flex-1">
-              <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Rationale</p>
+              <p className="text-xs text-white/55 uppercase tracking-wider mb-2">Rationale</p>
               <p className="text-sm text-white/70 leading-relaxed">
                 {experiment.hypothesis.rationale}
               </p>
@@ -241,12 +243,12 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
 
             {/* Expected Value Display */}
             <div className="mt-4 pt-4 border-t border-white/10">
-              <p className="text-xs text-white/40 mb-2">Target</p>
+              <p className="text-xs text-white/55 mb-2">Target</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-mono font-bold text-secondary">
                   {experiment.hypothesis.expected}
                 </span>
-                <span className="text-lg text-white/40">{experiment.hypothesis.unit}</span>
+                <span className="text-lg text-white/55">{experiment.hypothesis.unit}</span>
               </div>
             </div>
           </div>
@@ -269,7 +271,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                 <Clock className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-white">Reality</h3>
               </div>
-              <span className="text-xs text-white/40 font-mono">
+              <span className="text-xs text-white/55 font-mono">
                 {experiment.result.startDate}
                 {experiment.result.endDate && ` → ${experiment.result.endDate}`}
               </span>
@@ -295,7 +297,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                     >
                       {experiment.result.actual}
                     </span>
-                    <span className="text-lg text-white/40">
+                    <span className="text-lg text-white/55">
                       {experiment.hypothesis.unit}
                     </span>
                   </div>
@@ -310,15 +312,16 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                         isSuccess ? "text-success" : "text-destructive"
                       }`}
                     >
-                      {deviation! > 0 ? "+" : ""}
-                      {deviation}% from hypothesis
+                      {deviation !== null
+                        ? `${deviation > 0 ? "+" : ""}${deviation}% from hypothesis`
+                        : "vs hypothesis"}
                     </span>
                   </div>
                 </div>
               ) : (
                 <div className="text-center">
                   <div className="w-12 h-12 mx-auto mb-3 border-2 border-warning/30 border-t-warning rounded-full animate-spin" />
-                  <p className="text-sm text-white/40">Collecting data...</p>
+                  <p className="text-sm text-white/55">Collecting data...</p>
                 </div>
               )}
             </div>
@@ -352,9 +355,9 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
       </div>
 
       {/* Footer - Confidence Interval */}
-      <div className="px-6 py-4 border-t border-white/10 bg-white/[0.02]">
+      <div className="px-6 py-4 border-t border-white/10 bg-surface-1">
         <div className="flex items-center gap-4">
-          <span className="text-xs text-white/40 uppercase tracking-wider">
+          <span className="text-xs text-white/55 uppercase tracking-wider">
             Confidence Interval
           </span>
           <div className="flex-1 max-w-md">
@@ -366,7 +369,7 @@ export function ExperimentLab({ experiments: experimentsProp }: { experiments?: 
                 }}
                 initial={{ width: 0 }}
                 animate={{ width: `${experiment.confidenceInterval}%` }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.6, ease: EASE_SIGNATURE }}
               />
             </div>
           </div>
@@ -412,11 +415,11 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
       >
         <Clock className="w-4 h-4 text-secondary" />
         <h3 className="text-sm font-semibold text-white">Observations</h3>
-        <span className="text-[10px] text-white/30 font-mono">
+        <span className="text-[11px] text-white/55 font-mono">
           {entries.length > 0 ? `(${entries.length})` : ""}
         </span>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-white/30 transition-transform ml-auto ${
+          className={`w-3.5 h-3.5 text-white/55 transition-transform ml-auto ${
             expanded ? "rotate-180" : ""
           }`}
         />
@@ -431,7 +434,7 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
               onKeyDown={handleKeyDown}
               placeholder="Log an observation… (Ctrl+Enter to save)"
               rows={2}
-              className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-lg text-sm text-white placeholder:text-white/20 font-mono resize-none focus:outline-none focus:border-primary/40 transition-colors"
+              className="flex-1 px-3 py-2 bg-surface-2 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/45 font-mono resize-none focus:outline-none focus:border-primary/40 transition-colors"
             />
             <button
               onClick={addEntry}
@@ -447,12 +450,12 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
               {entries.map((entry, i) => (
                 <div
                   key={`${entry.timestamp}-${i}`}
-                  className="flex items-start gap-2 p-2 bg-white/[0.03] border border-white/[0.06] rounded-lg"
+                  className="flex items-start gap-2 p-2 bg-surface-1 border border-hairline rounded-lg"
                 >
                   <div className="w-1.5 h-1.5 rounded-full bg-secondary/50 mt-1.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-white/60 font-mono whitespace-pre-wrap">{entry.text}</p>
-                    <p className="text-[10px] text-white/25 font-mono mt-1">
+                    <p className="text-[11px] text-white/55 font-mono mt-1">
                       {new Date(entry.timestamp).toLocaleString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -465,7 +468,7 @@ function ObservationLog({ experimentId }: { experimentId: string }) {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-white/20 text-center py-4">
+            <p className="text-xs text-white/55 text-center py-4">
               No observations yet. Log notes as you track this experiment.
             </p>
           )}
@@ -530,80 +533,81 @@ function CreateExperimentModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={requestClose} />
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 12 }}
-        className="relative w-full max-w-lg bg-[#0a0f18] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.32, ease: EASE_SIGNATURE }}
+        className="relative w-full max-w-lg bg-bg-card border border-hairline rounded-2xl shadow-2xl overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="new-experiment-title"
       >
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-hairline">
           <div className="flex items-center gap-2">
             <FlaskConical className="w-4 h-4 text-secondary" />
             <span id="new-experiment-title" className="text-sm font-semibold text-white">New Experiment</span>
           </div>
           <button onClick={requestClose} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Close">
-            <X className="w-4 h-4 text-white/40" />
+            <X className="w-4 h-4 text-white/55" />
           </button>
         </div>
 
         <div className="p-5 space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="experiment-title" className="text-[11px] font-mono text-white/40 uppercase tracking-wider">Title</label>
+            <label htmlFor="experiment-title" className="text-[11px] font-mono text-white/55 uppercase tracking-wider">Title</label>
             <input
               id="experiment-title" type="text" value={title} onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., React Query Migration"
-              className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm font-mono placeholder:text-white/15 focus:outline-none focus:border-primary/35 transition-all"
+              className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/35 transition-all"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label htmlFor="experiment-metric" className="text-[11px] font-mono text-white/40 uppercase tracking-wider">Target Metric</label>
+              <label htmlFor="experiment-metric" className="text-[11px] font-mono text-white/55 uppercase tracking-wider">Target Metric</label>
               <input
                 id="experiment-metric" type="text" value={metric} onChange={(e) => setMetric(e.target.value)}
                 placeholder="e.g., API Call Reduction"
-                className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm font-mono placeholder:text-white/15 focus:outline-none focus:border-primary/35 transition-all"
+                className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/35 transition-all"
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
-                <label htmlFor="experiment-expected" className="text-[11px] font-mono text-white/40 uppercase tracking-wider">Expected</label>
+                <label htmlFor="experiment-expected" className="text-[11px] font-mono text-white/55 uppercase tracking-wider">Expected</label>
                 <input
                   id="experiment-expected" type="number" value={expected} onChange={(e) => setExpected(e.target.value)}
                   placeholder="40"
-                  className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm font-mono placeholder:text-white/15 focus:outline-none focus:border-primary/35 transition-all"
+                  className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/35 transition-all"
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="experiment-unit" className="text-[11px] font-mono text-white/40 uppercase tracking-wider">Unit</label>
+                <label htmlFor="experiment-unit" className="text-[11px] font-mono text-white/55 uppercase tracking-wider">Unit</label>
                 <input
                   id="experiment-unit" type="text" value={unit} onChange={(e) => setUnit(e.target.value)}
                   placeholder="%"
-                  className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm font-mono placeholder:text-white/15 focus:outline-none focus:border-primary/35 transition-all"
+                  className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/35 transition-all"
                 />
               </div>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="experiment-rationale" className="text-[11px] font-mono text-white/40 uppercase tracking-wider">Rationale</label>
+            <label htmlFor="experiment-rationale" className="text-[11px] font-mono text-white/55 uppercase tracking-wider">Rationale</label>
             <textarea
               id="experiment-rationale"
               value={rationale} onChange={(e) => setRationale(e.target.value)} rows={2}
               placeholder="Why do you expect this outcome?"
-              className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm font-mono placeholder:text-white/15 focus:outline-none focus:border-primary/35 transition-all resize-none"
+              className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/35 transition-all resize-none"
             />
           </div>
 
           {decisions.length > 0 && (
             <div className="space-y-1.5">
-              <label htmlFor="experiment-decision" className="text-[11px] font-mono text-white/40 uppercase tracking-wider">Linked Decision (optional)</label>
+              <label htmlFor="experiment-decision" className="text-[11px] font-mono text-white/55 uppercase tracking-wider">Linked Decision (optional)</label>
               <select
                 id="experiment-decision"
                 value={linkedDecision} onChange={(e) => setLinkedDecision(e.target.value)}
-                className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm font-mono focus:outline-none focus:border-primary/35 transition-all appearance-none"
+                className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm font-mono focus:outline-none focus:border-primary/35 transition-all appearance-none"
               >
                 <option value="" className="bg-[#0a0f18]">None</option>
                 {decisions.map((d) => (
@@ -614,8 +618,8 @@ function CreateExperimentModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        <div className="flex justify-end gap-2 px-5 py-3 border-t border-white/[0.06]">
-          <button onClick={requestClose} className="px-4 py-2 text-white/40 text-sm hover:text-white/60 transition-colors">
+        <div className="flex justify-end gap-2 px-5 py-3 border-t border-hairline">
+          <button onClick={requestClose} className="px-4 py-2 text-white/55 text-sm hover:text-white/60 transition-colors">
             Cancel
           </button>
           <button
@@ -623,7 +627,7 @@ function CreateExperimentModal({ onClose }: { onClose: () => void }) {
             className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition-all ${
               canSubmit
                 ? "bg-primary/15 border border-primary/30 text-primary hover:bg-primary/25"
-                : "bg-white/[0.04] border border-white/[0.06] text-white/30 cursor-not-allowed"
+                : "bg-surface-2 border border-hairline text-white/55 cursor-not-allowed"
             }`}
           >
             <FlaskConical className="w-4 h-4" />

@@ -14,6 +14,9 @@ node_modules
 .next/
 .DS_Store
 
+# Durable local server store (DecisionOS sync) — runtime data, not source
+.data/
+
 # Visual regression — only baseline/ is committed; current/ and diff/ are ephemeral
 __screenshots__/current/
 __screenshots__/diff/

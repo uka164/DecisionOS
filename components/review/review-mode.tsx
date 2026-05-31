@@ -99,15 +99,15 @@ const SAME_AGAIN: { value: ReviewVerdict; label: string; hint: string }[] = [
 const TONE_STYLES: Record<string, { active: string; inactive: string }> = {
   emerald: {
     active: "bg-success/15 border-success/40 text-success",
-    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-success/[0.07] hover:border-success/20",
+    inactive: "bg-surface-1 border-hairline text-white/55 hover:bg-success/[0.07] hover:border-success/20",
   },
   amber: {
     active: "bg-warning/15 border-warning/40 text-warning",
-    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-warning/[0.07] hover:border-warning/20",
+    inactive: "bg-surface-1 border-hairline text-white/55 hover:bg-warning/[0.07] hover:border-warning/20",
   },
   rose: {
     active: "bg-destructive/15 border-destructive/40 text-destructive",
-    inactive: "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-destructive/[0.07] hover:border-destructive/20",
+    inactive: "bg-surface-1 border-hairline text-white/55 hover:bg-destructive/[0.07] hover:border-destructive/20",
   },
 }
 
@@ -197,9 +197,9 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
             className="relative w-full sm:max-w-[640px] flex flex-col bg-bg-surface sm:rounded-2xl border border-white/10 shadow-2xl"
             style={{ maxHeight: "100vh" }}
           >
-            <header className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06] flex-shrink-0">
+            <header className="flex items-center justify-between px-5 py-3.5 border-b border-hairline flex-shrink-0">
               <div className="min-w-0 flex-1 pr-4">
-                <p className="text-[10px] font-mono text-primary/70 uppercase tracking-[0.2em]">
+                <p className="text-[11px] font-mono text-primary/70 uppercase tracking-[0.2em]">
                   Review Mode · Step {step}/3
                 </p>
                 <h2 className="text-sm font-semibold text-white truncate mt-0.5">
@@ -208,7 +208,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-white/5 text-white/55 hover:text-white/70 transition-colors"
                 aria-label="Close review"
               >
                 <X className="w-4 h-4" />
@@ -217,7 +217,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
 
             <nav
               aria-label="Review steps"
-              className="flex items-center gap-1.5 px-5 py-3 border-b border-white/[0.06] flex-shrink-0 overflow-x-auto scrollbar-none"
+              className="flex items-center gap-1.5 px-5 py-3 border-b border-hairline flex-shrink-0 overflow-x-auto scrollbar-none"
             >
               {STEPS.map((s) => {
                 const Icon = s.icon
@@ -227,10 +227,10 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                   <div
                     key={s.id}
                     className={cn(
-                      "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-wider flex-shrink-0 transition-colors",
+                      "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[11px] font-mono uppercase tracking-wider flex-shrink-0 transition-colors",
                       active && "bg-primary/10 border-primary/30 text-primary",
                       done && "bg-success/[0.08] border-success/20 text-success/70",
-                      !active && !done && "bg-white/[0.02] border-white/[0.05] text-white/35"
+                      !active && !done && "bg-surface-1 border-white/[0.05] text-white/55"
                     )}
                   >
                     <Icon className="w-3 h-3" />
@@ -256,7 +256,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                       <h3 id="review-step-reality" className="text-base font-semibold text-white">
                         What actually happened?
                       </h3>
-                      <p className="text-xs text-white/45 mt-1 leading-relaxed">
+                      <p className="text-xs text-white/55 mt-1 leading-relaxed">
                         Plain language. The boring truth, not the LinkedIn version.
                       </p>
                     </div>
@@ -271,7 +271,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         onChange={(e) => setDraft((d) => ({ ...d, whatHappened: e.target.value }))}
                         rows={4}
                         placeholder="It shipped late and the migration ran twice. We rolled back on day three."
-                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
+                        className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                       />
                     </div>
 
@@ -288,7 +288,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                           }
                           rows={3}
                           placeholder="What did I believe would be true?"
-                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                         />
                       </div>
 
@@ -304,7 +304,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                           }
                           rows={3}
                           placeholder="Effort, risk, second-order effect..."
-                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                         />
                       </div>
 
@@ -320,7 +320,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                           }
                           rows={2}
                           placeholder="Benefit, demand, team capacity..."
-                          className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
+                          className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                         />
                       </div>
                     </div>
@@ -341,7 +341,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                       <h3 id="review-step-judgement" className="text-base font-semibold text-white">
                         Judge the outcome and the process separately.
                       </h3>
-                      <p className="text-xs text-white/45 mt-1 leading-relaxed">
+                      <p className="text-xs text-white/55 mt-1 leading-relaxed">
                         A good decision can have a bad outcome. A bad decision can get lucky. Both matter.
                       </p>
                     </div>
@@ -417,7 +417,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                                 "px-3 py-2.5 rounded-xl border text-left transition-colors min-h-[60px]",
                                 active
                                   ? "bg-primary/15 border-primary/40 text-primary"
-                                  : "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-primary/[0.07] hover:border-primary/20"
+                                  : "bg-surface-1 border-hairline text-white/55 hover:bg-primary/[0.07] hover:border-primary/20"
                               )}
                             >
                               <div className="text-sm font-medium">{opt.label}</div>
@@ -436,7 +436,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         "w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl border transition-colors text-left",
                         draft.regret
                           ? "bg-destructive/12 border-destructive/30 text-destructive"
-                          : "bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-destructive/[0.06] hover:border-destructive/20"
+                          : "bg-surface-1 border-hairline text-white/55 hover:bg-destructive/[0.06] hover:border-destructive/20"
                       )}
                     >
                       <span className="flex items-center gap-2.5">
@@ -464,7 +464,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                       <h3 id="review-step-lesson" className="text-base font-semibold text-white">
                         What do you carry forward?
                       </h3>
-                      <p className="text-xs text-white/45 mt-1 leading-relaxed">
+                      <p className="text-xs text-white/55 mt-1 leading-relaxed">
                         If you skip this step, the loop never closes.
                       </p>
                     </div>
@@ -481,7 +481,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         }
                         rows={3}
                         placeholder="I assumed X, but the real shape was Y."
-                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
+                        className="w-full px-3 py-2.5 bg-surface-2 border border-hairline rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed"
                       />
                     </div>
 
@@ -495,7 +495,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                         onChange={(e) => setDraft((d) => ({ ...d, lesson: e.target.value }))}
                         rows={3}
                         placeholder="One sentence. The next time I see this pattern, I will…"
-                        className="w-full px-3 py-2.5 bg-white/[0.04] border border-primary/25 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/50 resize-none leading-relaxed"
+                        className="w-full px-3 py-2.5 bg-surface-2 border border-primary/25 rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/50 resize-none leading-relaxed"
                       />
                     </div>
 
@@ -516,7 +516,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
               </AnimatePresence>
             </div>
 
-            <footer className="flex items-center justify-between gap-2 px-5 py-3.5 border-t border-white/[0.06] bg-white/[0.01] flex-shrink-0">
+            <footer className="flex items-center justify-between gap-2 px-5 py-3.5 border-t border-hairline bg-white/[0.01] flex-shrink-0">
               {step > 1 ? (
                 <button
                   type="button"
@@ -545,7 +545,7 @@ export function ReviewMode({ isOpen, decision, onClose, onSave }: ReviewModeProp
                     "flex items-center gap-1.5 px-4 py-2 rounded-xl text-[11px] font-mono uppercase tracking-wider transition-colors min-h-[40px] border",
                     canSave
                       ? "bg-success/15 border-success/35 text-success hover:bg-success/20"
-                      : "bg-white/[0.04] border-white/[0.08] text-white/35 cursor-not-allowed"
+                      : "bg-surface-2 border-hairline text-white/55 cursor-not-allowed"
                   )}
                 >
                   <Check className="w-3.5 h-3.5" /> Save Review

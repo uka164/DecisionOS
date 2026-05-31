@@ -18,7 +18,7 @@ const VARIANTS: Record<Variant, string> = {
   primary:
     "bg-primary text-primary-foreground shadow-[0_8px_26px_-12px_var(--primary-glow)] hover:shadow-[0_12px_34px_-14px_var(--primary-glow)] hover:-translate-y-px",
   secondary:
-    "border border-white/[0.14] bg-white/[0.025] text-white backdrop-blur-md hover:border-white/[0.24] hover:bg-white/[0.05]",
+    "border border-hairline-strong bg-surface-1 text-white backdrop-blur-md hover:border-white/[0.24] hover:bg-surface-2",
   ghost: "text-white/70 hover:text-white",
 }
 

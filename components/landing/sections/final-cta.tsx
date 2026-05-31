@@ -83,7 +83,7 @@ export function FinalCTA() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     aria-label="Email"
-                    className="h-12 flex-1 rounded-full border border-white/12 bg-white/[0.03] px-5 text-sm text-white placeholder:text-white/35 backdrop-blur-md transition-colors focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    className="h-12 flex-1 rounded-full border border-white/12 bg-surface-1 px-5 text-sm text-white placeholder:text-white/35 backdrop-blur-md transition-colors focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                   />
                   <button
                     type="submit"
@@ -101,7 +101,7 @@ export function FinalCTA() {
                 Watch walkthrough
               </CTAButton>
             </div>
-            <p className="mt-6 text-xs text-white/30">
+            <p className="mt-6 text-xs text-white/55">
               Private beta. No spam. Local-first by design.
             </p>
           </Reveal>

@@ -98,7 +98,7 @@ export function QualityRing({
         )}
       </div>
 
-      <span className="text-[10px] text-white/55 uppercase tracking-wider">
+      <span className="text-[11px] text-white/55 uppercase tracking-wider">
         {label}
       </span>
     </div>

@@ -126,7 +126,7 @@ _To be filled after implementation._
                     >
                       Export as RFC
                     </h2>
-                    <p className="text-xs text-white/40">
+                    <p className="text-xs text-white/55">
                       Ready for team review
                     </p>
                   </div>

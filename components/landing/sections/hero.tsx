@@ -49,7 +49,7 @@ export function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: EASE_OUT }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.025] px-3.5 py-1.5 backdrop-blur-md"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-surface-1 px-3.5 py-1.5 backdrop-blur-md"
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-35" />
@@ -117,7 +117,7 @@ export function Hero() {
                     "radial-gradient(60% 60% at 60% 40%, var(--primary-glow), transparent 70%)",
                 }}
               />
-              <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-bg-card/60 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04]">
+              <div className="relative overflow-hidden rounded-2xl border border-hairline bg-bg-card/60 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04]">
                 <div className="relative aspect-[16/11] w-full sm:aspect-[16/10] lg:aspect-[5/6] xl:aspect-[16/14]">
                   <Image
                     src="/visuals/intelligence.jpg"

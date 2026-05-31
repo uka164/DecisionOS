@@ -49,7 +49,7 @@ export function MobileCTA() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ duration: 0.35 }}
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-bg-body/85 px-4 py-3 backdrop-blur-xl md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-hairline bg-bg-body/85 px-4 py-3 backdrop-blur-xl md:hidden"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
         >
           <CTAButton href="/app" variant="primary" size="lg" className="w-full">

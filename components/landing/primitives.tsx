@@ -201,10 +201,10 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.025] backdrop-blur-xl",
+        "relative overflow-hidden rounded-lg border border-hairline bg-surface-1 backdrop-blur-xl",
         "shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset]",
         interactive &&
-          "transition-colors duration-500 hover:border-white/[0.16] hover:bg-white/[0.04]",
+          "transition-colors duration-500 hover:border-hairline-strong hover:bg-surface-2",
         className
       )}
     >

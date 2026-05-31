@@ -40,7 +40,7 @@ export function LandingNav() {
         className={cn(
           "transition-all duration-500",
           scrolled
-            ? "border-b border-white/[0.06] bg-bg-body/70 backdrop-blur-xl"
+            ? "border-b border-hairline bg-bg-body/70 backdrop-blur-xl"
             : "border-b border-transparent bg-transparent"
         )}
       >
@@ -80,7 +80,7 @@ export function LandingNav() {
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/[0.06] md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-surface-3 md:hidden"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
           >
@@ -107,7 +107,7 @@ export function LandingNav() {
                   initial={false}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.05 + i * 0.05 }}
-                  className="border-b border-white/[0.06] py-4 text-lg text-white/80"
+                  className="border-b border-hairline py-4 text-lg text-white/80"
                 >
                   {link.label}
                 </motion.a>

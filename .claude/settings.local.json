@@ -42,7 +42,32 @@
       "Bash(node scripts/shot-rhythm.mjs)",
       "Bash(node scripts/shot-refactor.mjs)",
       "Bash(node scripts/shot-fixes.mjs)",
-      "Bash(node scripts/shot-coldstart.mjs)"
+      "Bash(node scripts/shot-coldstart.mjs)",
+      "Bash(Select-String -NotMatch \"node_modules\")",
+      "Bash(Measure-Object)",
+      "Bash(Select-Object -ExpandProperty Count)",
+      "Bash(node scripts/_readability-sweep.mjs)",
+      "Bash(node -e \"console.log\\(require\\('@anthropic-ai/sdk/package.json'\\).version\\)\")",
+      "Bash(npm ls *)",
+      "Bash(node scripts/_surface-sweep.mjs)",
+      "Bash(curl -s -o /dev/null http://localhost:3000/api/critique)",
+      "Bash(break)",
+      "Bash(curl -s http://localhost:3000/api/critique)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -X POST http://localhost:3000/api/critique -H \"Content-Type: application/json\" -d '{\"payload\":{\"title\":\"t\",\"status\":\"draft\",\"impact\":4,\"riskLevel\":null,\"rawThinking\":\"We should rewrite the auth layer because the current one is a mess and slows every new feature. I think the risk is low.\",\"options\":[],\"tradeoffs\":[],\"constraints\":[],\"risks\":[]},\"model\":\"opus\"}')",
+      "Bash(curl -s -o /dev/null http://localhost:3000/api/store)",
+      "Bash(curl -s http://localhost:3000/api/store)",
+      "Bash(curl -s -X PUT http://localhost:3000/api/store -H \"Content-Type: application/json\" -d '{\"decisions\":[{\"id\":\"user-1\",\"title\":\"Durable test decision\"}],\"experiments\":[],\"hiddenStaticDecisionIds\":[]}')",
+      "Bash(node -e \"try{const s=require\\('node:sqlite'\\);console.log\\('node:sqlite OK ->', typeof s.DatabaseSync\\)}catch\\(e\\){console.log\\('NO node:sqlite ->', e.message\\)}\")",
+      "Bash(curl -s -X PUT http://localhost:3000/api/store -H \"Content-Type: application/json\" -d '{\"decisions\":[{\"id\":\"user-x\",\"title\":\"SQLite durability check\"}],\"experiments\":[]}')",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -X PUT http://localhost:3000/api/store -H \"Content-Type: application/json\" -d '{\"decisions\":[{\"id\":\"user-sqlite\",\"title\":\"Real SQLite row\"}],\"experiments\":[]}')",
+      "Bash(curl -s \"http://localhost:3000/api/store\")",
+      "Bash(curl -s -X PUT http://localhost:3000/api/store -H \"Content-Type: application/json\" -d '{\"decisions\":[{\"id\":\"smoke-1\",\"title\":\"Smoke test decision\",\"status\":\"decided\"}],\"experiments\":[],\"hiddenStaticDecisionIds\":[]}')",
+      "Bash(curl -s -X PUT http://localhost:3000/api/store -H \"Content-Type: application/json\" -d '{\"decisions\":[],\"experiments\":[],\"hiddenStaticDecisionIds\":[]}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/__shutdown)",
+      "Bash(grep -nA8 \"interface RemoteSnapshot\" lib/types.ts)",
+      "Bash(taskkill /PID 6664 /F)",
+      "Bash(curl -s -o /dev/null -w \"port3000 after kill: %{http_code}\\\\n\" --max-time 3 http://localhost:3000/api/store)"
     ]
   }
 }

@@ -148,7 +148,7 @@ export function TradeoffRadar({ data = defaultData, size = 200 }: TradeoffRadarP
           const pos = getLabelPosition(i)
           return (
             <text key={i} x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="middle"
-              className="fill-white/50 text-[10px] font-mono uppercase tracking-wider">
+              className="fill-white/50 text-[11px] font-mono uppercase tracking-wider">
               {d.axis}
             </text>
           )

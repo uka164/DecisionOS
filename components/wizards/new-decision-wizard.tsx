@@ -104,7 +104,7 @@ function LiveQualityRing({ score }: { score: number }) {
         </div>
       </div>
       <div className="text-center leading-tight">
-        <div className="font-mono text-[11px] text-white/40">Clarity</div>
+        <div className="font-mono text-[11px] text-white/55">Clarity</div>
         <div className="font-mono text-[11px]" style={{ color }}>{label}</div>
       </div>
     </div>
@@ -321,16 +321,16 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
             exit={{ opacity: 0, scale: 0.97, y: 12 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-[900px]" style={{ maxHeight: "90vh" }}
           >
-            <div className="relative flex flex-col overflow-hidden rounded-lg border border-white/[0.08] bg-bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.36)]" style={{ maxHeight: "90vh" }}>
+            <div className="relative flex flex-col overflow-hidden rounded-lg border border-hairline bg-bg-surface shadow-[0_24px_80px_rgba(0,0,0,0.36)]" style={{ maxHeight: "90vh" }}>
 
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] flex-shrink-0">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-hairline flex-shrink-0">
                 <div className="min-w-0">
                   <h2 className="text-sm font-semibold text-white truncate">New Decision</h2>
-                  <p className="text-xs text-white/40 mt-0.5">Step {step} of 4</p>
+                  <p className="text-xs text-white/55 mt-0.5">Step {step} of 4</p>
                 </div>
                 <button onClick={requestClose} aria-label="Close wizard"
-                  className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white/70 transition-colors">
+                  className="p-1.5 rounded-lg hover:bg-white/5 text-white/55 hover:text-white/70 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -339,26 +339,26 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
               <div className="flex flex-1 min-h-0">
 
                 {/* Left nav panel */}
-                <div className="hidden sm:flex w-[200px] flex-shrink-0 flex-col gap-4 border-r border-white/[0.06] p-4">
+                <div className="hidden sm:flex w-[200px] flex-shrink-0 flex-col gap-4 border-r border-hairline p-4">
                   <nav className="flex flex-col gap-0.5" aria-label="Wizard steps">
                     {STEPS.map((s) => {
                       const done = step > s.id, active = step === s.id, Icon = s.icon
                       return (
                         <div key={s.id} className={cn(
                           "relative flex items-start gap-2.5 px-2 py-2 rounded-lg transition-colors",
-                          active && "bg-white/[0.04]"
+                          active && "bg-surface-2"
                         )}>
                           <div className={cn(
                             "w-[22px] h-[22px] rounded-full border flex items-center justify-center flex-shrink-0 mt-0.5",
                             done && "border-success/35 bg-success/10",
                             active && "border-primary/50 bg-primary/10",
-                            !done && !active && "border-white/10 bg-white/[0.02]"
+                            !done && !active && "border-white/10 bg-surface-1"
                           )}>
                             <Icon className={cn(
                               "w-2.5 h-2.5",
                               done && "text-success",
                               active && "text-primary",
-                              !done && !active && "text-white/40"
+                              !done && !active && "text-white/55"
                             )} />
                           </div>
                           <div className="min-w-0 pt-0.5">
@@ -374,7 +374,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                     })}
                   </nav>
                   <div className="border-t border-white/[0.05] pt-4">
-                    <div className="mb-2 text-[10px] font-medium uppercase text-white/30">
+                    <div className="mb-2 text-[11px] font-medium uppercase text-white/55">
                       Ritual path
                     </div>
                     <div className="space-y-1.5">
@@ -393,9 +393,9 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             <span
                               className={cn(
                                 "text-[11px] leading-none",
-                                state === "done" && "text-white/45",
+                                state === "done" && "text-white/55",
                                 state === "active" && "text-white/75",
-                                state === "pending" && "text-white/25"
+                                state === "pending" && "text-white/55"
                               )}
                             >
                               {label}
@@ -407,10 +407,10 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                   </div>
                   {step === 4 && (
                     <div className="flex flex-col items-center gap-2 pt-2 border-t border-white/[0.05]">
-                      <div className="text-xs text-white/45">Record completeness</div>
+                      <div className="text-xs text-white/55">Record completeness</div>
                       <LiveQualityRing score={quality} />
                       {nextQualitySignal && (
-                        <p className="max-w-[140px] text-center text-[11px] leading-snug text-white/35">
+                        <p className="max-w-[140px] text-center text-[11px] leading-snug text-white/55">
                           Next: {nextQualitySignal.label}
                         </p>
                       )}
@@ -434,7 +434,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                       >
                         <div>
                           <h2 className="text-xl font-semibold text-white">Start from where you are</h2>
-                          <p className="text-white/45 text-sm mt-1">Pick a template or start blank.</p>
+                          <p className="text-white/55 text-sm mt-1">Pick a template or start blank.</p>
                         </div>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                           {DECISION_TEMPLATES.map((tpl) => (
@@ -454,12 +454,12 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                 }
                                 setShowTemplatePicker(false)
                               }}
-                              className="flex flex-col items-start gap-1 rounded-lg border border-white/[0.08] bg-white/[0.025] p-3.5 text-left transition-colors hover:border-primary/25 hover:bg-white/[0.05] group"
+                              className="flex flex-col items-start gap-1 rounded-lg border border-hairline bg-surface-1 p-3.5 text-left transition-colors hover:border-primary/25 hover:bg-surface-2 group"
                             >
                               <span className="text-sm font-medium text-white group-hover:text-primary transition-colors">
                                 {tpl.name}
                               </span>
-                              <span className="text-xs text-white/45 leading-snug">
+                              <span className="text-xs text-white/55 leading-snug">
                                 {tpl.tagline}
                               </span>
                             </button>
@@ -478,7 +478,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium flex-shrink-0",
                           active && "bg-primary/10 border-primary/25 text-primary",
                           done && !active && "bg-success/[0.08] border-success/15 text-success/60",
-                          !active && !done && "bg-white/[0.02] border-white/[0.05] text-white/45"
+                          !active && !done && "bg-surface-1 border-white/[0.05] text-white/55"
                         )}>
                           <Icon className="w-3 h-3" />{s.sublabel}
                         </div>
@@ -495,7 +495,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18 }} className="space-y-6">
                           <div>
                             <h2 className="text-xl font-semibold text-white">Define the decision</h2>
-                            <p className="text-white/45 text-sm mt-1">Name what's being decided and what triggered it.</p>
+                            <p className="text-white/55 text-sm mt-1">Name what's being decided and what triggered it.</p>
                           </div>
                           <div className="space-y-2">
                             <label htmlFor="decision-name" className="block text-sm font-medium text-white/70">
@@ -504,7 +504,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             <input id="decision-name" name="decision-title" type="text" value={data.name}
                               onChange={(e) => setData({ ...data, name: e.target.value })}
                               placeholder="e.g., Rewrite auth, or patch it again?"
-                              className="w-full rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-base text-white transition-colors placeholder:text-white/25 focus:border-primary/40 focus:bg-white/[0.055] focus:outline-none" />
+                              className="w-full rounded-lg border border-hairline bg-surface-2 px-4 py-3 text-base text-white transition-colors placeholder:text-white/45 focus:border-primary/40 focus:bg-white/[0.055] focus:outline-none" />
                             {data.name.length > 0 && data.name.length <= 5 && (
                               <p className="text-xs text-warning/70">A few more characters — make the decision name specific.</p>
                             )}
@@ -516,12 +516,12 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             <textarea id="decision-context" name="decision-context" value={data.context} rows={6}
                               onChange={(e) => setData({ ...data, context: e.target.value })}
                               placeholder="Describe the situation, constraints, and what triggered this. Plain language."
-                              className="w-full resize-none rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-sm leading-relaxed text-white transition-colors placeholder:text-white/25 focus:border-primary/40 focus:outline-none" />
+                              className="w-full resize-none rounded-lg border border-hairline bg-surface-2 px-4 py-3 text-sm leading-relaxed text-white transition-colors placeholder:text-white/45 focus:border-primary/40 focus:outline-none" />
                           </div>
-                          <div className="space-y-3 rounded-lg border border-white/[0.07] bg-white/[0.02] p-4">
+                          <div className="space-y-3 rounded-lg border border-hairline bg-surface-1 p-4">
                             <div>
                               <h3 className="text-sm font-semibold text-white">Human frame</h3>
-                              <p className="mt-1 text-xs text-white/45 leading-relaxed">
+                              <p className="mt-1 text-xs text-white/55 leading-relaxed">
                                 The part spreadsheets hide: values, people affected, and the rule you don't want to betray.
                               </p>
                             </div>
@@ -537,7 +537,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                   onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center" })}
                                   onChange={(e) => setData({ ...data, valuesAtStake: e.target.value })}
                                   placeholder="What value could be compromised?"
-                                  className="w-full px-3 py-2 bg-white/[0.035] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/30 resize-none leading-relaxed"
+                                  className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/30 resize-none leading-relaxed"
                                 />
                               </div>
                               <div className="space-y-1.5">
@@ -551,7 +551,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                   onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center" })}
                                   onChange={(e) => setData({ ...data, humanCost: e.target.value })}
                                   placeholder="Who pays if this is wrong?"
-                                  className="w-full px-3 py-2 bg-white/[0.035] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/30 resize-none leading-relaxed"
+                                  className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/30 resize-none leading-relaxed"
                                 />
                               </div>
                               <div className="space-y-1.5">
@@ -565,7 +565,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                   onFocus={(e) => e.currentTarget.scrollIntoView({ block: "center" })}
                                   onChange={(e) => setData({ ...data, guidingPrinciple: e.target.value })}
                                   placeholder="What rule should still hold?"
-                                  className="w-full px-3 py-2 bg-white/[0.035] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/30 resize-none leading-relaxed"
+                                  className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/30 resize-none leading-relaxed"
                                 />
                               </div>
                             </div>
@@ -579,16 +579,16 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18 }} className="space-y-5">
                           <div>
                             <h2 className="text-xl font-semibold text-white">Compare viable paths</h2>
-                            <p className="text-white/45 text-sm mt-1">Make the trade-off explicit. Even "do nothing" counts when it's honest.</p>
+                            <p className="text-white/55 text-sm mt-1">Make the trade-off explicit. Even "do nothing" counts when it's honest.</p>
                           </div>
 
                           {/* Option cards */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {/* Option A */}
                             <div className={cn(
-                              "rounded-lg p-4 border bg-white/[0.025] transition-colors",
+                              "rounded-lg p-4 border bg-surface-1 transition-colors",
                               focusedPath === "A" && "border-primary/30 bg-primary/[0.04]",
-                              focusedPath !== "A" && "border-white/[0.07]"
+                              focusedPath !== "A" && "border-hairline"
                             )}>
                               <div className="flex items-center gap-2 mb-3">
                                 <span className="text-xs font-semibold text-primary">Option A</span>
@@ -596,17 +596,17 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                               <input type="text" value={data.pathA.title} onFocus={() => setFocusedPath("A")} onBlur={() => setFocusedPath(null)}
                                 onChange={(e) => setData({ ...data, pathA: { ...data.pathA, title: e.target.value } })}
                                 placeholder="Option name" aria-label="Option A title"
-                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors mb-2.5" />
+                                className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-colors mb-2.5" />
                               <textarea value={data.pathA.description} rows={3} onFocus={() => setFocusedPath("A")} onBlur={() => setFocusedPath(null)}
                                 onChange={(e) => setData({ ...data, pathA: { ...data.pathA, description: e.target.value } })}
                                 placeholder="Describe this approach..." aria-label="Option A description"
-                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors resize-none" />
+                                className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-colors resize-none" />
                             </div>
                             {/* Option B */}
                             <div className={cn(
-                              "rounded-lg p-4 border bg-white/[0.025] transition-colors",
+                              "rounded-lg p-4 border bg-surface-1 transition-colors",
                               focusedPath === "B" && "border-brand/30 bg-brand/[0.04]",
-                              focusedPath !== "B" && "border-white/[0.07]"
+                              focusedPath !== "B" && "border-hairline"
                             )}>
                               <div className="flex items-center gap-2 mb-3">
                                 <span className="text-xs font-semibold text-brand">Option B</span>
@@ -614,11 +614,11 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                               <input type="text" value={data.pathB.title} onFocus={() => setFocusedPath("B")} onBlur={() => setFocusedPath(null)}
                                 onChange={(e) => setData({ ...data, pathB: { ...data.pathB, title: e.target.value } })}
                                 placeholder="Option name" aria-label="Option B title"
-                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-brand/40 transition-colors mb-2.5" />
+                                className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-brand/40 transition-colors mb-2.5" />
                               <textarea value={data.pathB.description} rows={3} onFocus={() => setFocusedPath("B")} onBlur={() => setFocusedPath(null)}
                                 onChange={(e) => setData({ ...data, pathB: { ...data.pathB, description: e.target.value } })}
                                 placeholder="Describe this approach..." aria-label="Option B description"
-                                className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-brand/40 transition-colors resize-none" />
+                                className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-brand/40 transition-colors resize-none" />
                             </div>
                           </div>
 
@@ -632,7 +632,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                     "px-3 py-1.5 rounded-lg text-xs transition-colors border min-h-[34px]",
                                     data.constraints.includes(c)
                                       ? "bg-warning/10 border-warning/30 text-warning"
-                                      : "bg-white/[0.025] border-white/[0.07] text-white/50 hover:bg-white/[0.05] hover:text-white/70"
+                                      : "bg-surface-1 border-hairline text-white/50 hover:bg-surface-2 hover:text-white/70"
                                   )}>
                                   {c}
                                 </button>
@@ -651,7 +651,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                     "flex-1 py-2 rounded-lg border text-sm font-medium transition-colors",
                                     data.impact === val
                                       ? "bg-success/10 border-success/30 text-success"
-                                      : "bg-white/[0.025] border-white/[0.07] text-white/50 hover:bg-white/[0.05] hover:text-white/70"
+                                      : "bg-surface-1 border-hairline text-white/50 hover:bg-surface-2 hover:text-white/70"
                                   )}>
                                   {val}
                                 </button>
@@ -697,22 +697,22 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                             </div>
                             <div>
                               <h2 className="text-xl font-semibold text-white">Pre-mortem</h2>
-                              <p className="text-white/45 text-sm mt-0.5">Imagine it failed. What killed it?</p>
+                              <p className="text-white/55 text-sm mt-0.5">Imagine it failed. What killed it?</p>
                             </div>
                           </div>
 
                           <div className="space-y-2.5">
                             <AnimatePresence initial={false}>
                               {data.risks.map((risk, i) => {
-                                const borderColor = risk.severity >= 80 ? "border-destructive/35" : risk.severity >= 60 ? "border-destructive/20" : risk.severity >= 35 ? "border-warning/20" : "border-white/[0.07]"
+                                const borderColor = risk.severity >= 80 ? "border-destructive/35" : risk.severity >= 60 ? "border-destructive/20" : risk.severity >= 35 ? "border-warning/20" : "border-hairline"
                                 return (
                                   <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.15 }}>
-                                    <div className={cn("rounded-lg p-4 border bg-white/[0.025]", borderColor)}>
+                                    <div className={cn("rounded-lg p-4 border bg-surface-1", borderColor)}>
                                       <div className="flex items-start gap-3">
                                         <div className="flex-1 space-y-3">
                                           <input type="text" value={risk.text} onChange={(e) => updateRisk(i, "text", e.target.value)}
                                             placeholder="Describe the failure mode..." aria-label={`Risk ${i + 1} description`}
-                                            className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-destructive/40 transition-colors" />
+                                            className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-destructive/40 transition-colors" />
                                           <div className="flex items-center gap-3">
                                             <span className="text-xs text-white/55 flex-shrink-0">Severity</span>
                                             <SeverityBar value={risk.severity} />
@@ -723,8 +723,8 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                           </div>
                                         </div>
                                         <button onClick={() => removeRisk(i)} aria-label={`Remove risk ${i + 1}`}
-                                          className="p-1.5 hover:bg-white/[0.07] rounded-lg transition-colors flex-shrink-0">
-                                          <Trash2 className="w-3.5 h-3.5 text-white/45" />
+                                          className="p-1.5 hover:bg-surface-3 rounded-lg transition-colors flex-shrink-0">
+                                          <Trash2 className="w-3.5 h-3.5 text-white/55" />
                                         </button>
                                       </div>
                                     </div>
@@ -735,7 +735,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
 
                             {!data.skipRisks && (
                               <button onClick={addRisk}
-                                className="w-full py-3 border border-dashed border-white/[0.09] rounded-lg text-white/50 text-sm hover:bg-white/[0.02] hover:border-white/[0.18] hover:text-white/70 transition-colors flex items-center justify-center gap-2 min-h-[44px]">
+                                className="w-full py-3 border border-dashed border-hairline rounded-lg text-white/50 text-sm hover:bg-surface-1 hover:border-white/[0.18] hover:text-white/70 transition-colors flex items-center justify-center gap-2 min-h-[44px]">
                                 <Plus className="w-3.5 h-3.5" />Add risk
                               </button>
                             )}
@@ -747,12 +747,12 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                 aria-pressed={data.skipRisks}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
                                   data.skipRisks
-                                    ? "bg-white/[0.04] border-white/[0.12] text-white/55"
-                                    : "bg-white/[0.015] border-white/[0.06] text-white/45 hover:border-white/[0.1] hover:text-white/55"
+                                    ? "bg-surface-2 border-hairline-strong text-white/55"
+                                    : "bg-white/[0.015] border-hairline text-white/55 hover:border-hairline hover:text-white/55"
                                 }`}
                               >
                                 <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ${
-                                  data.skipRisks ? "bg-white/15 border-white/25" : "bg-white/[0.04] border-white/[0.12]"
+                                  data.skipRisks ? "bg-white/15 border-white/25" : "bg-surface-2 border-hairline-strong"
                                 }`}>
                                   {data.skipRisks && <Check className="w-2.5 h-2.5 text-white/70" />}
                                 </div>
@@ -765,10 +765,10 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           <AnimatePresence>
                             {data.risks.length > 0 && (
                               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
-                                className="flex items-center justify-between p-4 bg-white/[0.025] border border-white/[0.07] rounded-lg">
+                                className="flex items-center justify-between p-4 bg-surface-1 border border-hairline rounded-lg">
                                 <div>
                                   <div className="text-sm text-white/75 font-medium">Accept these risks?</div>
-                                  <div className="text-xs text-white/45 mt-0.5">Required before you can record the decision.</div>
+                                  <div className="text-xs text-white/55 mt-0.5">Required before you can record the decision.</div>
                                 </div>
                                 <button onClick={() => setData((p) => ({ ...p, acceptRisk: !p.acceptRisk }))}
                                   aria-label="Toggle risk acceptance" aria-pressed={data.acceptRisk}
@@ -794,18 +794,18 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           <div className="flex items-start justify-between gap-4">
                             <div>
                               <h2 className="text-xl font-semibold text-white">Review your decision</h2>
-                              <p className="text-white/45 text-sm mt-0.5">Check the record before saving.</p>
+                              <p className="text-white/55 text-sm mt-0.5">Check the record before saving.</p>
                             </div>
                             <div className="sm:hidden flex-shrink-0"><LiveQualityRing score={quality} /></div>
                           </div>
 
                           <div className="grid grid-cols-2 gap-2">
-                            <div className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3.5">
-                              <div className="text-xs text-white/45 mb-1.5">Title</div>
+                            <div className="rounded-lg border border-hairline bg-surface-1 p-3.5">
+                              <div className="text-xs text-white/55 mb-1.5">Title</div>
                               <div className="text-sm font-medium text-white truncate">{data.name || "—"}</div>
                             </div>
-                            <div className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3.5">
-                              <div className="text-xs text-white/45 mb-1.5">Impact</div>
+                            <div className="rounded-lg border border-hairline bg-surface-1 p-3.5">
+                              <div className="text-xs text-white/55 mb-1.5">Impact</div>
                               <div className="text-sm font-medium text-success">
                                 {data.impact}/5 — {IMPACT_LABELS[data.impact]}
                               </div>
@@ -821,24 +821,24 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           </div>
 
                           {hasHumanFrame && (
-                            <div className="rounded-lg border border-white/[0.07] bg-white/[0.025] p-3.5">
+                            <div className="rounded-lg border border-hairline bg-surface-1 p-3.5">
                               <div className="text-sm font-medium text-white/70 mb-3">Human frame</div>
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {data.valuesAtStake.trim() && (
                                   <div>
-                                    <div className="text-xs text-white/40">Values</div>
+                                    <div className="text-xs text-white/55">Values</div>
                                     <p className="mt-1 text-sm leading-relaxed text-white/65">{data.valuesAtStake}</p>
                                   </div>
                                 )}
                                 {data.humanCost.trim() && (
                                   <div>
-                                    <div className="text-xs text-white/40">Human cost</div>
+                                    <div className="text-xs text-white/55">Human cost</div>
                                     <p className="mt-1 text-sm leading-relaxed text-white/65">{data.humanCost}</p>
                                   </div>
                                 )}
                                 {data.guidingPrinciple.trim() && (
                                   <div>
-                                    <div className="text-xs text-white/40">Principle</div>
+                                    <div className="text-xs text-white/55">Principle</div>
                                     <p className="mt-1 text-sm leading-relaxed text-white/65">{data.guidingPrinciple}</p>
                                   </div>
                                 )}
@@ -888,12 +888,12 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           )}
 
                           {/* Revisit schedule — pre-commit to looking back */}
-                          <div className="space-y-2.5 rounded-lg border border-white/[0.07] bg-white/[0.02] p-3.5">
+                          <div className="space-y-2.5 rounded-lg border border-hairline bg-surface-1 p-3.5">
                             <div className="flex items-center gap-2">
                               <Calendar className="w-3.5 h-3.5 text-warning/70" />
                               <h3 className="text-sm font-medium text-white/80">Schedule an honest revisit</h3>
                             </div>
-                            <p className="text-xs leading-relaxed text-white/45">
+                            <p className="text-xs leading-relaxed text-white/55">
                               Pre-commit to a date. When it arrives, the system asks what your reasoning got wrong — not just whether it worked.
                             </p>
                             <div className="flex flex-wrap items-center gap-2">
@@ -907,7 +907,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                       revisitAt: new Date(Date.now() + days * 86400000).toISOString().slice(0, 10),
                                     }))
                                   }
-                                  className="px-3 py-1.5 rounded-lg text-xs border bg-white/[0.025] border-white/[0.07] text-white/55 hover:bg-white/[0.05] hover:text-white/75 transition-colors min-h-[34px]"
+                                  className="px-3 py-1.5 rounded-lg text-xs border bg-surface-1 border-hairline text-white/55 hover:bg-surface-2 hover:text-white/75 transition-colors min-h-[34px]"
                                 >
                                   +{days} days
                                 </button>
@@ -917,13 +917,13 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                                 value={data.revisitAt}
                                 onChange={(e) => setData((p) => ({ ...p, revisitAt: e.target.value }))}
                                 aria-label="Revisit date"
-                                className="px-3 py-1.5 rounded-lg text-xs bg-white/[0.04] border border-white/[0.08] text-white/70 focus:outline-none focus:border-primary/40 transition-colors"
+                                className="px-3 py-1.5 rounded-lg text-xs bg-surface-2 border border-hairline text-white/70 focus:outline-none focus:border-primary/40 transition-colors"
                               />
                               {data.revisitAt && (
                                 <button
                                   type="button"
                                   onClick={() => setData((p) => ({ ...p, revisitAt: "" }))}
-                                  className="text-white/30 hover:text-white/60 transition-colors"
+                                  className="text-white/55 hover:text-white/60 transition-colors"
                                   aria-label="Clear revisit date"
                                 >
                                   <X className="w-3.5 h-3.5" />
@@ -933,11 +933,11 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                           </div>
 
                           {/* First move — bridge the decision into execution */}
-                          <div className="space-y-2 rounded-lg border border-white/[0.07] bg-white/[0.02] p-3.5">
+                          <div className="space-y-2 rounded-lg border border-hairline bg-surface-1 p-3.5">
                             <div className="flex items-center gap-2">
                               <Target className="w-3.5 h-3.5 text-primary/70" />
                               <h3 className="text-sm font-medium text-white/80">
-                                First move <span className="font-normal text-white/35">· optional</span>
+                                First move <span className="font-normal text-white/55">· optional</span>
                               </h3>
                             </div>
                             <input
@@ -946,7 +946,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                               onChange={(e) => setData((p) => ({ ...p, firstMove: e.target.value }))}
                               placeholder="The first concrete action that turns this into execution."
                               aria-label="First execution step"
-                              className="w-full px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors"
+                              className="w-full px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-colors"
                             />
                           </div>
 
@@ -956,7 +956,7 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                               "w-full py-3.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-colors border",
                               (data.acceptRisk || data.skipRisks) && !isSubmitting
                                 ? "bg-primary text-bg-body hover:opacity-90 border-primary cursor-pointer"
-                                : "bg-white/[0.04] text-white/45 cursor-not-allowed border-white/[0.07]"
+                                : "bg-surface-2 text-white/55 cursor-not-allowed border-hairline"
                             )}>
                             {isSubmitting ? (
                               <>
@@ -985,14 +985,14 @@ export function NewDecisionWizard({ isOpen, onClose, onSubmit }: WizardProps) {
                   </button>
                 ) : <div />}
                 <div className="flex items-center gap-3">
-                  {step === 4 && <div className="sm:hidden text-xs text-white/45">{quality}% complete</div>}
+                  {step === 4 && <div className="sm:hidden text-xs text-white/55">{quality}% complete</div>}
                   {step < 4 && (
                     <button onClick={() => canProceed() && setStep((s) => s + 1)} disabled={!canProceed()}
                       className={cn(
                         "flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[40px] border",
                         canProceed()
                           ? "bg-primary/10 border-primary/30 text-primary hover:bg-primary/15"
-                          : "bg-white/[0.025] border-white/[0.06] text-white/45 cursor-not-allowed"
+                          : "bg-surface-1 border-hairline text-white/55 cursor-not-allowed"
                       )}>
                       {proceedLabels[step - 1]}<ChevronRight className="w-3.5 h-3.5" />
                     </button>

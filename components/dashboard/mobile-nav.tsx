@@ -3,9 +3,10 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, Shield, LayoutDashboard, Network, Archive, FlaskConical, Settings, User, Plus } from "lucide-react"
+import { Menu, X, Shield, LayoutDashboard, Network, Archive, FlaskConical, Settings, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { LOCAL_PROFILE } from "@/lib/local-profile"
+import { useDisplayName, getInitials } from "@/lib/identity"
+import { SyncStatusBadge } from "@/components/dashboard/sync-status"
 import { useWizard } from "@/contexts/WizardContext"
 
 const primaryNav = [
@@ -22,12 +23,13 @@ const secondaryNav = [
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
-  const { open } = useWizard()
+  const { openCapture } = useWizard()
+  const displayName = useDisplayName()
 
   return (
     <>
       {/* Mobile Header */}
-      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-white/[0.07] bg-bg-body/92 px-4 backdrop-blur-xl lg:hidden">
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-hairline bg-bg-body/92 px-4 backdrop-blur-xl lg:hidden">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/10">
             <Shield className="h-5 w-5 text-brand" />
@@ -36,7 +38,7 @@ export function MobileNav() {
         </div>
         <div className="flex items-center gap-1">
           <button
-            onClick={open}
+            onClick={openCapture}
             className="p-2 rounded-lg text-primary hover:bg-primary/10 transition-colors"
             aria-label="Log decision"
           >
@@ -62,17 +64,17 @@ export function MobileNav() {
 
       {/* Mobile Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-0 z-50 flex h-screen w-72 transform flex-col border-r border-white/[0.07] bg-bg-body/95 backdrop-blur-2xl transition-transform duration-300 ease-in-out lg:hidden",
+        "fixed left-0 top-0 z-50 flex h-screen w-72 transform flex-col border-r border-hairline bg-bg-body/95 backdrop-blur-2xl transition-transform duration-300 ease-in-out lg:hidden",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="border-b border-white/[0.07] p-6">
+        <div className="border-b border-hairline p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/10">
               <Shield className="h-5 w-5 text-brand" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-white">DecisionOS</span>
-              <span className="font-mono text-xs text-white/35">local system</span>
+              <span className="font-mono text-xs text-white/55">local system</span>
             </div>
           </div>
         </div>
@@ -101,8 +103,8 @@ export function MobileNav() {
             })}
           </ul>
 
-          <div className="my-3 border-t border-white/[0.06]" />
-          <p className="mb-2 px-3 font-mono text-[10px] uppercase text-white/25">More</p>
+          <div className="my-3 border-t border-hairline" />
+          <p className="mb-2 px-3 font-mono text-[11px] uppercase text-white/55">More</p>
           <ul className="space-y-1">
             {secondaryNav.map((item) => {
               const isActive = pathname === item.href
@@ -121,7 +123,7 @@ export function MobileNav() {
                     <item.icon className="w-4 h-4 flex-shrink-0" />
                     <span className="flex-1">{item.label}</span>
                     {item.note && (
-                      <span className="rounded border border-warning/20 bg-warning/10 px-1.5 py-0.5 font-mono text-[9px] uppercase text-warning/70">
+                      <span className="rounded border border-warning/20 bg-warning/10 px-1.5 py-0.5 font-mono text-[11px] uppercase text-warning/70">
                         {item.note}
                       </span>
                     )}
@@ -132,17 +134,17 @@ export function MobileNav() {
           </ul>
         </nav>
 
-        <div className="border-t border-white/[0.07] p-4">
+        <div className="border-t border-hairline p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.035]">
-              <User className="h-4 w-4 text-white/55" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border border-secondary/30 bg-secondary/15 text-[11px] font-semibold text-secondary">
+              {getInitials(displayName)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{LOCAL_PROFILE.name}</p>
-              <p className="text-xs text-white/40">{LOCAL_PROFILE.role}</p>
+              <p className="text-sm font-medium text-white truncate">{displayName}</p>
+              <SyncStatusBadge />
             </div>
             <Link href="/settings" onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-white/5 transition-colors" aria-label="Settings">
-              <Settings className="w-4 h-4 text-white/40" />
+              <Settings className="w-4 h-4 text-white/55" />
             </Link>
           </div>
         </div>

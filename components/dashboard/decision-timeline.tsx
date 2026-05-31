@@ -53,7 +53,7 @@ function deriveEvents(decisions: Decision[]): TimelineEvent[] {
       events.push({
         id: `${d.id}-archived`,
         icon: Archive,
-        iconColor: "text-white/40",
+        iconColor: "text-white/55",
         label: d.status === "voided" ? "Voided" : "Archived",
         title: d.title,
         time: d.createdAt,
@@ -90,7 +90,7 @@ function deriveEvents(decisions: Decision[]): TimelineEvent[] {
       events.push({
         id: `${d.id}-experiment`,
         icon: GitBranch,
-        iconColor: "text-white/45",
+        iconColor: "text-white/55",
         label: "Experiment linked",
         title: d.title,
         time: d.createdAt,
@@ -113,7 +113,7 @@ export const DecisionTimeline = memo(function DecisionTimeline({ decisions }: { 
   return (
     <section>
       <h2 className="mb-4 text-lg font-semibold text-white">Learning Loop</h2>
-      <div className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5">
+      <div className="rounded-lg border border-hairline bg-surface-1 p-5">
         <div className="relative">
           {/* Vertical line */}
           <div className="absolute left-[11px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/40 via-white/10 to-transparent" />
@@ -124,14 +124,14 @@ export const DecisionTimeline = memo(function DecisionTimeline({ decisions }: { 
               return (
                 <div key={event.id} className="flex items-start gap-3 relative">
                   {/* Dot */}
-                  <div className="w-[23px] h-[23px] rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center flex-shrink-0 z-10">
+                  <div className="w-[23px] h-[23px] rounded-full bg-surface-3 border border-white/10 flex items-center justify-center flex-shrink-0 z-10">
                     <Icon className={`w-3 h-3 ${event.iconColor}`} />
                   </div>
                   {/* Content */}
                   <div className="flex-1 min-w-0 pt-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs uppercase text-white/40">{event.label}</span>
-                      <span className="text-[10px] text-white/25 font-mono">{event.relativeTime}</span>
+                      <span className="font-mono text-xs uppercase text-white/55">{event.label}</span>
+                      <span className="text-[11px] text-white/55 font-mono">{event.relativeTime}</span>
                     </div>
                     <p className="text-sm text-white/60 truncate">{event.title}</p>
                   </div>

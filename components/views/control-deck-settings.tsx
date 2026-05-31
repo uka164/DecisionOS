@@ -13,10 +13,13 @@ import {
   Check,
   Bell,
 } from "lucide-react"
-import { LOCAL_PROFILE } from "@/lib/local-profile"
+import { getInitials } from "@/lib/identity"
+import { SyncStatusBadge } from "@/components/dashboard/sync-status"
 import { requestRevisitNotificationPermission } from "@/hooks/useRevisitNotifications"
 import { cn } from "@/lib/utils"
 
+// A flat switch in the app's own language — no LED glow, gradient knob, or
+// track lines. State reads from the track tint (primary = on) and the knob.
 function HardwareToggle({
   enabled,
   onToggle,
@@ -28,50 +31,30 @@ function HardwareToggle({
 }) {
   return (
     <button
+      type="button"
+      role="switch"
+      aria-checked={enabled}
+      aria-label={label}
       onClick={onToggle}
-      className="flex items-center gap-3 group"
+      className="group flex items-center gap-3"
     >
-      {/* Physical Switch */}
-      <div className="relative w-14 h-7 rounded-full bg-[#0a0f14] border border-white/10 shadow-inner overflow-hidden">
-        {/* LED Glow */}
-        <div
-          className="absolute inset-0 transition-opacity duration-300"
-          style={{
-            background: enabled
-              ? "radial-gradient(circle at 75% 50%, #10b981 0%, transparent 70%)"
-              : "radial-gradient(circle at 25% 50%, #f43f5e 0%, transparent 70%)",
-            opacity: 0.3,
-          }}
+      <span
+        className={cn(
+          "relative h-6 w-11 flex-shrink-0 rounded-full border transition-colors",
+          enabled ? "border-primary/40 bg-primary/25" : "border-hairline-strong bg-surface-2"
+        )}
+      >
+        <motion.span
+          aria-hidden
+          animate={{ x: enabled ? 22 : 2 }}
+          transition={{ type: "spring", stiffness: 500, damping: 32 }}
+          className={cn(
+            "absolute top-1 h-4 w-4 rounded-full transition-colors",
+            enabled ? "bg-primary" : "bg-white/55"
+          )}
         />
-
-        {/* Track Lines */}
-        <div className="absolute inset-y-2 left-2 right-2 flex justify-between">
-          <div className="w-px h-full bg-white/10" />
-          <div className="w-px h-full bg-white/10" />
-          <div className="w-px h-full bg-white/10" />
-        </div>
-
-        {/* Knob */}
-        <motion.div
-          animate={{ x: enabled ? 28 : 2 }}
-          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-          className="absolute top-1 w-5 h-5 rounded-full bg-gradient-to-b from-white/20 to-white/5 border border-white/20 shadow-lg"
-          style={{
-            boxShadow: enabled
-              ? "0 0 8px #10b981, inset 0 1px 0 rgba(255,255,255,0.3)"
-              : "0 0 8px #f43f5e40, inset 0 1px 0 rgba(255,255,255,0.3)",
-          }}
-        />
-      </div>
-
-      {/* LED Indicator */}
-      <div
-        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-          enabled ? "bg-success shadow-[0_0_8px_#10b981]" : "bg-destructive/50"
-        }`}
-      />
-
-      <span className="text-sm text-white/60 group-hover:text-white/80 transition-colors">
+      </span>
+      <span className="text-sm text-white/65 transition-colors group-hover:text-white/85">
         {label}
       </span>
     </button>
@@ -132,7 +115,10 @@ function DangerButton({ onConfirm }: { onConfirm: () => void }) {
       onTouchEnd={endHold}
       onTouchCancel={endHold}
       onKeyDown={(e) => {
-        if (e.key === " " || e.key === "Enter") startHold()
+        if ((e.key === " " || e.key === "Enter") && !e.repeat) {
+          e.preventDefault()
+          startHold()
+        }
       }}
       onKeyUp={endHold}
       className="relative w-full py-4 rounded-xl border-2 border-destructive/50 bg-destructive/10 overflow-hidden group"
@@ -144,15 +130,6 @@ function DangerButton({ onConfirm }: { onConfirm: () => void }) {
         style={{ width: `${progress}%` }}
       />
 
-      {/* Glass Break Pattern */}
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23fff' stroke-width='0.5'/%3E%3C/svg%3E")`,
-          backgroundSize: "30px 30px",
-        }}
-      />
-
       <div className="relative flex items-center justify-center gap-3">
         <AlertTriangle className="w-5 h-5 text-destructive" />
         <span className="text-sm font-medium text-destructive">
@@ -162,7 +139,7 @@ function DangerButton({ onConfirm }: { onConfirm: () => void }) {
         </span>
       </div>
 
-      <p className="relative text-[10px] text-destructive/60 mt-1">
+      <p className="relative text-[11px] text-destructive/60 mt-1">
         Hold to confirm permanent reset
       </p>
     </motion.button>
@@ -213,6 +190,7 @@ export function ControlDeckSettings({
   const animationIntensity = settings?.animationIntensity ?? 70
   const ambientMotion    = settings?.ambientMotion ?? false
   const notifyRevisits   = settings?.notifyRevisits ?? false
+  const displayName      = settings?.displayName ?? ""
   const theme: AppSettings["theme"] = settings?.theme ?? "void"
 
   const toggle = (key: keyof Pick<AppSettings, "reducedMotion" | "ambientMotion">) => {
@@ -241,11 +219,12 @@ export function ControlDeckSettings({
     }
   }
 
+  // Swatches mirror each theme's real tokens: [background, primary, secondary].
   const themes: { id: AppSettings["theme"]; label: string; colors: string[] }[] = [
-    { id: "void",     label: "Void",     colors: ["#020408", "#06b6d4", "#8b5cf6"] },
-    { id: "midnight", label: "Midnight", colors: ["#080c1a", "#3b82f6", "#a855f7"] },
-    { id: "twilight", label: "Twilight", colors: ["#16040e", "#e94560", "#ff9a3c"] },
-    { id: "dawn",     label: "Dawn",     colors: ["#f4f6f8", "#0369a1", "#0d9488"] },
+    { id: "void",     label: "Void",     colors: ["#020408", "#e879f9", "#6366f1"] },
+    { id: "midnight", label: "Midnight", colors: ["#070b18", "#e879f9", "#6366f1"] },
+    { id: "twilight", label: "Twilight", colors: ["#0e0819", "#e879f9", "#6366f1"] },
+    { id: "dawn",     label: "Dawn",     colors: ["#f4f6f8", "#be185d", "#4f46e5"] },
   ]
 
   return (
@@ -253,7 +232,7 @@ export function ControlDeckSettings({
       {/* Header */}
       <div className="px-6 py-4 border-b border-white/10">
         <h2 className="text-xl font-semibold text-white">Control Deck</h2>
-        <p className="text-sm text-white/40">System configuration and preferences</p>
+        <p className="text-sm text-white/55">System configuration and preferences</p>
       </div>
 
       {/* Modular Grid */}
@@ -265,15 +244,29 @@ export function ControlDeckSettings({
             <h3 className="text-sm font-semibold text-white">Identity</h3>
           </div>
 
-          {/* Avatar */}
-          <div className="flex items-center gap-4 p-3 bg-white/5 rounded-xl">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <User className="w-6 h-6 text-white" />
+          {/* Editable display name */}
+          <div className="flex items-center gap-4 p-3 bg-surface-2 rounded-xl">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-secondary/30 bg-secondary/20 text-sm font-semibold text-secondary">
+              {getInitials(displayName || "You")}
             </div>
-            <div>
-              <p className="text-sm font-medium text-white">{LOCAL_PROFILE.name}</p>
-              <p className="text-xs text-white/40">{LOCAL_PROFILE.detail}</p>
+            <div className="min-w-0 flex-1">
+              <label htmlFor="display-name" className="label-eyebrow">Display name</label>
+              <input
+                id="display-name"
+                type="text"
+                value={displayName}
+                onChange={(e) => onUpdateSettings?.({ displayName: e.target.value })}
+                placeholder="You"
+                className="mt-1 w-full border-b border-hairline bg-transparent pb-1 text-sm font-medium text-white transition-colors placeholder:text-white/45 focus:border-secondary/40 focus:outline-none"
+              />
+              <p className="mt-2 text-xs text-white/55">Shown on your comments. Stays on this device.</p>
             </div>
+          </div>
+
+          {/* Storage / sync state */}
+          <div className="mt-4 flex items-center justify-between border-t border-hairline pt-3">
+            <span className="text-xs text-white/55">Storage</span>
+            <SyncStatusBadge />
           </div>
         </div>
 
@@ -286,7 +279,7 @@ export function ControlDeckSettings({
 
           {/* Theme Selector */}
           <div className="space-y-3 mb-4">
-            <span className="text-xs text-white/40">Theme</span>
+            <span className="text-xs text-white/55">Theme</span>
             <div className="grid grid-cols-3 gap-2">
               {themes.map((t) => (
                 <button
@@ -294,7 +287,7 @@ export function ControlDeckSettings({
                   onClick={() => onUpdateSettings?.({ theme: t.id as AppSettings["theme"] })}
                   className={`relative p-2 rounded-lg border transition-all ${
                     theme === t.id
-                      ? "border-primary bg-primary/10 shadow-[0_0_10px_rgba(6,182,212,0.15)]"
+                      ? "border-primary bg-primary/10 shadow-[0_0_10px_rgba(232,121,249,0.15)]"
                       : "border-white/10 hover:border-white/20"
                   }`}
                 >
@@ -307,7 +300,7 @@ export function ControlDeckSettings({
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] text-white/60">{t.label}</span>
+                  <span className="text-[11px] text-white/60">{t.label}</span>
                   {theme === t.id && (
                     <Check className="absolute top-1 right-1 w-3 h-3 text-primary" />
                   )}
@@ -319,7 +312,7 @@ export function ControlDeckSettings({
           {/* Animation Intensity */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-white/40">Animation Intensity</span>
+              <span className="text-xs text-white/55">Animation Intensity</span>
               <span className="text-xs font-mono text-white/60">{animationIntensity}%</span>
             </div>
             <input
@@ -328,7 +321,7 @@ export function ControlDeckSettings({
               max="100"
               value={animationIntensity}
               onChange={(e) => onUpdateSettings?.({ animationIntensity: parseInt(e.target.value) })}
-              className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-[0_0_8px_#06b6d4]"
+              className="w-full h-2 bg-white/5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-[0_0_8px_#e879f9]"
             />
           </div>
 
@@ -348,7 +341,7 @@ export function ControlDeckSettings({
           <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
             <HardDrive className="w-5 h-5 text-primary" />
             <div>
-              <p className="text-xs text-white/40">Decisions stored locally</p>
+              <p className="text-xs text-white/55">Decisions stored locally</p>
               <p className="text-lg font-mono font-semibold text-white">
                 {decisionCount != null ? decisionCount.toLocaleString() : "-"}
               </p>
@@ -364,7 +357,7 @@ export function ControlDeckSettings({
           </div>
 
           <div className="space-y-3">
-            <p className="text-xs text-white/45 leading-relaxed">
+            <p className="text-xs text-white/55 leading-relaxed">
               Browser nudge when a revisit is due. Only fires while this tab is open — there's no background process.
             </p>
             <button
@@ -375,7 +368,7 @@ export function ControlDeckSettings({
                 "w-full flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl border transition-colors text-left",
                 notifyRevisits
                   ? "border-success/30 bg-success/10 text-success"
-                  : "border-white/10 bg-white/[0.025] text-white/70 hover:bg-white/[0.05]"
+                  : "border-white/10 bg-surface-1 text-white/70 hover:bg-surface-2"
               )}
             >
               <span className="text-sm font-medium">
@@ -385,7 +378,7 @@ export function ControlDeckSettings({
                 aria-hidden="true"
                 className={cn(
                   "relative w-10 h-5 rounded-full border transition-colors flex-shrink-0",
-                  notifyRevisits ? "bg-success/30 border-success/45" : "bg-white/[0.05] border-white/15"
+                  notifyRevisits ? "bg-success/30 border-success/45" : "bg-surface-2 border-white/15"
                 )}
               >
                 <span
@@ -470,7 +463,7 @@ export function ControlDeckSettings({
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white">Import Data</h3>
-                  <p className="text-xs text-white/40 font-mono truncate max-w-[260px]">{pendingFile.name}</p>
+                  <p className="text-xs text-white/55 font-mono truncate max-w-[260px]">{pendingFile.name}</p>
                 </div>
               </div>
 
@@ -489,7 +482,7 @@ export function ControlDeckSettings({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">Add new only</p>
-                    <p className="text-xs text-white/35 mt-0.5">Existing records are preserved. Only new IDs are imported.</p>
+                    <p className="text-xs text-white/55 mt-0.5">Existing records are preserved. Only new IDs are imported.</p>
                   </div>
                 </button>
 
@@ -503,7 +496,7 @@ export function ControlDeckSettings({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">Overwrite on conflict</p>
-                    <p className="text-xs text-white/35 mt-0.5">Imported version replaces existing when IDs match.</p>
+                    <p className="text-xs text-white/55 mt-0.5">Imported version replaces existing when IDs match.</p>
                   </div>
                 </button>
               </div>
@@ -511,13 +504,13 @@ export function ControlDeckSettings({
               <button
                 onClick={() => setPendingFile(null)}
                 disabled={isImporting}
-                className="w-full py-2.5 text-sm text-white/40 hover:text-white/60 transition-colors disabled:cursor-not-allowed"
+                className="w-full py-2.5 text-sm text-white/55 hover:text-white/60 transition-colors disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
 
               {isImporting && (
-                <div className="flex items-center justify-center gap-2 mt-3 text-xs text-white/40">
+                <div className="flex items-center justify-center gap-2 mt-3 text-xs text-white/55">
                   <motion.div
                     className="w-3.5 h-3.5 border border-primary/40 border-t-primary rounded-full"
                     animate={{ rotate: 360 }}

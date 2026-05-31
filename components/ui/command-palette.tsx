@@ -33,7 +33,7 @@ export function CommandPalette() {
   const wizard = useWizard()
 
   const navigate = (href: string) => { setOpen(false); router.push(href) }
-  const openWizard = () => { setOpen(false); wizard.open() }
+  const newDecision = () => { setOpen(false); wizard.openCapture() }
 
   const commands: CommandItem[] = [
     {
@@ -90,7 +90,7 @@ export function CommandPalette() {
       shortcut: "N",
       icon: <PlusCircle className="w-4 h-4" />,
       category: "actions",
-      action: openWizard,
+      action: newDecision,
     },
   ]
 
@@ -173,10 +173,10 @@ export function CommandPalette() {
             aria-modal="true"
             aria-label="Command palette"
           >
-            <div className="overflow-hidden rounded-lg border border-white/[0.08] bg-bg-card/95 shadow-2xl shadow-black/50 backdrop-blur-2xl">
+            <div className="overflow-hidden rounded-lg border border-hairline bg-bg-card/95 shadow-2xl shadow-black/50 backdrop-blur-2xl">
               {/* Search Input */}
               <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10">
-                <Search className="w-5 h-5 text-white/40" />
+                <Search className="w-5 h-5 text-white/55" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -186,7 +186,7 @@ export function CommandPalette() {
                   className="flex-1 bg-transparent text-white placeholder:text-white/40 outline-none text-sm"
                   aria-label="Search commands"
                 />
-                <kbd className="px-2 py-1 text-[10px] font-mono text-white/40 bg-white/5 rounded border border-white/10">
+                <kbd className="px-2 py-1 text-[11px] font-mono text-white/55 bg-white/5 rounded border border-white/10">
                   ESC
                 </kbd>
               </div>
@@ -194,14 +194,14 @@ export function CommandPalette() {
               {/* Commands List */}
               <div className="max-h-[400px] overflow-y-auto py-2">
                 {filteredCommands.length === 0 ? (
-                  <p className="px-4 py-8 text-center text-white/40 text-sm">
+                  <p className="px-4 py-8 text-center text-white/55 text-sm">
                     No commands found
                   </p>
                 ) : (
                   <>
                     {navCommands.length > 0 && (
                       <div className="px-2 py-2">
-                        <p className="px-2 py-1 text-[10px] font-semibold uppercase text-white/30">
+                        <p className="px-2 py-1 text-[11px] font-semibold uppercase text-white/55">
                           Navigation
                         </p>
                         {navCommands.map((cmd) => {
@@ -221,7 +221,7 @@ export function CommandPalette() {
 
                     {actionCommands.length > 0 && (
                       <div className="px-2 py-2">
-                        <p className="px-2 py-1 text-[10px] font-semibold uppercase text-white/30">
+                        <p className="px-2 py-1 text-[11px] font-semibold uppercase text-white/55">
                           Actions
                         </p>
                         {actionCommands.map((cmd) => {
@@ -243,7 +243,7 @@ export function CommandPalette() {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center gap-4 px-4 py-3 border-t border-white/10 text-[10px] text-white/30">
+              <div className="flex items-center gap-4 px-4 py-3 border-t border-white/10 text-[11px] text-white/55">
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 font-mono bg-white/5 rounded border border-white/10">
                     ↑↓
@@ -293,13 +293,13 @@ function CommandItemRow({
       }`}
     >
       <span
-        className={isSelected ? "text-primary" : "text-white/40"}
+        className={isSelected ? "text-primary" : "text-white/55"}
       >
         {command.icon}
       </span>
       <span className="flex-1 text-left text-sm">{command.label}</span>
       {command.shortcut && (
-        <kbd className="px-2 py-0.5 text-[10px] font-mono text-white/40 bg-white/5 rounded border border-white/10">
+        <kbd className="px-2 py-0.5 text-[11px] font-mono text-white/55 bg-white/5 rounded border border-white/10">
           {command.shortcut}
         </kbd>
       )}

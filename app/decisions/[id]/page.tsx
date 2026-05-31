@@ -15,6 +15,8 @@ import { LeftSidebar } from "@/components/dashboard/left-sidebar"
 import { MobileNav } from "@/components/dashboard/mobile-nav"
 import { ReviewMode } from "@/components/review/review-mode"
 import { InlineBlindSpots } from "@/components/review/inline-blind-spots"
+import { AICritique } from "@/components/review/ai-critique"
+import { DecisionComments } from "@/components/review/decision-comments"
 import { useNow } from "@/hooks/useNow"
 import { cn } from "@/lib/utils"
 import type { Decision, DecisionStatus, DecisionOption, DecisionReview, ExecutionStep } from "@/lib/types"
@@ -37,10 +39,10 @@ function formatDate(iso: string) {
 
 // Sections
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({ title, children, id }: { title: string; children: React.ReactNode; id?: string }) {
   return (
-    <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
-      <h2 className="text-xs font-mono text-white/45 uppercase tracking-[0.2em] mb-4">{title}</h2>
+    <div id={id} className="bg-surface-2 border border-hairline rounded-2xl p-5">
+      <h2 className="label-eyebrow mb-4">{title}</h2>
       {children}
     </div>
   )
@@ -54,7 +56,7 @@ const STATUS_PICKER_STYLES: Record<DecisionStatus, string> = {
   draft:         "bg-white/5 border-white/10 text-white/55 hover:border-white/20",
   "in-progress": "bg-primary/10 border-primary/20 text-primary hover:bg-primary/15",
   decided:       "bg-success/10 border-success/20 text-success hover:bg-success/15",
-  archived:      "bg-white/5 border-white/10 text-white/40 hover:border-white/20",
+  archived:      "bg-white/5 border-white/10 text-white/55 hover:border-white/20",
   voided:        "bg-destructive/10 border-destructive/20 text-destructive hover:bg-destructive/15",
   superseded:    "bg-warning/10 border-warning/20 text-warning hover:bg-warning/15",
 }
@@ -77,7 +79,7 @@ function StatusEditor({ current, onChange }: { current: DecisionStatus; onChange
       <button
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all",
+          "flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-lg border transition-all",
           STATUS_PICKER_STYLES[current]
         )}
         aria-haspopup="listbox"
@@ -103,15 +105,15 @@ function StatusEditor({ current, onChange }: { current: DecisionStatus; onChange
                 "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono uppercase tracking-wider transition-all",
                 s === current
                   ? cn("border", STATUS_PICKER_STYLES[s])
-                  : "text-white/45 hover:bg-white/5 hover:text-white/70"
+                  : "text-white/55 hover:bg-white/5 hover:text-white/70"
               )}
             >
               {s}
               {s === current && <Check className="w-3 h-3" />}
             </button>
           ))}
-          <div className="my-1 border-t border-white/[0.06]" />
-          <p className="px-3 py-1 text-[9px] font-mono text-white/20 uppercase tracking-wider">Terminal</p>
+          <div className="my-1 border-t border-hairline" />
+          <p className="px-3 py-1 text-[11px] font-mono text-white/55 uppercase tracking-wider">Terminal</p>
           {STATUS_FLOW_TERMINAL.map((s) => (
             <button
               key={s}
@@ -122,7 +124,7 @@ function StatusEditor({ current, onChange }: { current: DecisionStatus; onChange
                 "w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono uppercase tracking-wider transition-all",
                 s === current
                   ? cn("border", STATUS_PICKER_STYLES[s])
-                  : "text-white/35 hover:bg-white/5 hover:text-white/55"
+                  : "text-white/55 hover:bg-white/5 hover:text-white/55"
               )}
             >
               {s}
@@ -163,7 +165,7 @@ function InlineEditor({
     return (
       <button
         onClick={() => setEditing(true)}
-        className="flex items-center gap-2 text-sm text-white/45 hover:text-white/55 transition-colors"
+        className="flex items-center gap-2 text-sm text-white/55 hover:text-white/55 transition-colors"
       >
         <Pencil className="w-3.5 h-3.5" />
         {placeholder}
@@ -179,7 +181,7 @@ function InlineEditor({
       autoFocus
       rows={4}
       placeholder={placeholder}
-      className={`w-full px-4 py-3 bg-white/[0.04] border ${borderFocus} rounded-xl text-white text-sm font-mono placeholder:text-white/15 focus:outline-none resize-none leading-relaxed transition-all`}
+      className={`w-full px-4 py-3 bg-surface-2 border ${borderFocus} rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none resize-none leading-relaxed transition-all`}
     />
   ) : (
     <div className="relative group cursor-pointer" onClick={() => setEditing(true)}>
@@ -189,7 +191,7 @@ function InlineEditor({
         </pre>
       </div>
       <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Pencil className="w-3.5 h-3.5 text-white/45" />
+        <Pencil className="w-3.5 h-3.5 text-white/55" />
       </div>
     </div>
   )
@@ -218,15 +220,15 @@ function OptionsEditor({
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt, i) => (
-          <div key={i} className="p-3.5 bg-white/[0.03] border border-white/[0.07] rounded-xl">
+          <div key={i} className="p-3.5 bg-surface-1 border border-hairline rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${i === 0 ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}>
+              <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-mono font-bold ${i === 0 ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}>
                 {String.fromCharCode(65 + i)}
               </div>
               <span className="text-sm font-medium text-white">{opt.title}</span>
             </div>
             {opt.description && (
-              <p className="text-xs text-white/45 leading-relaxed">{opt.description}</p>
+              <p className="text-xs text-white/55 leading-relaxed">{opt.description}</p>
             )}
           </div>
         ))}
@@ -237,9 +239,9 @@ function OptionsEditor({
   return (
     <div className="space-y-3">
       {options.map((opt, i) => (
-        <div key={i} className="p-3.5 bg-white/[0.03] border border-primary/15 rounded-xl space-y-2">
+        <div key={i} className="p-3.5 bg-surface-1 border border-primary/15 rounded-xl space-y-2">
           <div className="flex items-center gap-2">
-            <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold ${i === 0 ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}>
+            <div className={`w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-mono font-bold ${i === 0 ? "bg-primary/15 text-primary" : "bg-secondary/15 text-secondary"}`}>
               {String.fromCharCode(65 + i)}
             </div>
             <input
@@ -247,14 +249,14 @@ function OptionsEditor({
               value={opt.title}
               onChange={(e) => updateOption(i, "title", e.target.value)}
               placeholder="Option title"
-              className="flex-1 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-sm font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-all"
+              className="flex-1 px-3 py-1.5 bg-surface-2 border border-hairline rounded-lg text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-all"
             />
             <button
               onClick={() => removeOption(i)}
               className="p-1 hover:bg-white/10 rounded-lg transition-colors"
               aria-label={`Remove option ${String.fromCharCode(65 + i)}`}
             >
-              <X className="w-3.5 h-3.5 text-white/40" />
+              <X className="w-3.5 h-3.5 text-white/55" />
             </button>
           </div>
           <textarea
@@ -262,13 +264,13 @@ function OptionsEditor({
             onChange={(e) => updateOption(i, "description", e.target.value)}
             placeholder="Description (optional)"
             rows={2}
-            className="w-full px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-all resize-none"
+            className="w-full px-3 py-1.5 bg-surface-2 border border-hairline rounded-lg text-white text-xs font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-all resize-none"
           />
         </div>
       ))}
       <button
         onClick={addOption}
-        className="w-full py-2.5 border border-dashed border-white/10 rounded-xl text-white/40 text-xs font-mono hover:bg-white/[0.03] hover:border-white/20 transition-all flex items-center justify-center gap-2"
+        className="w-full py-2.5 border border-dashed border-white/10 rounded-xl text-white/55 text-xs font-mono hover:bg-surface-1 hover:border-white/20 transition-all flex items-center justify-center gap-2"
       >
         <Plus className="w-3.5 h-3.5" />
         Add Option
@@ -320,7 +322,7 @@ function TagsEditor({
             onChange={(e) => setNewTag(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag() } }}
             placeholder="New tag?"
-            className="w-24 px-2 py-1 bg-white/[0.04] border border-white/[0.08] rounded-lg text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 transition-all"
+            className="w-24 px-2 py-1 bg-surface-2 border border-hairline rounded-lg text-white text-xs font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-all"
           />
           <button
             onClick={addTag}
@@ -342,10 +344,10 @@ function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center px-6">
       <div className="w-14 h-14 mb-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-        <AlertTriangle className="w-6 h-6 text-white/45" />
+        <AlertTriangle className="w-6 h-6 text-white/55" />
       </div>
       <p className="text-white/60 text-base mb-1">Decision not found</p>
-      <p className="text-white/45 text-sm mb-6">This decision may have been deleted or the ID is invalid.</p>
+      <p className="text-white/55 text-sm mb-6">This decision may have been deleted or the ID is invalid.</p>
       <Link
         href="/decisions"
         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white transition-all text-sm"
@@ -415,22 +417,22 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         {review.outcome && (
-          <span className={cn("text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border", REVIEW_OUTCOME_STYLES[review.outcome])}>
+          <span className={cn("text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border", REVIEW_OUTCOME_STYLES[review.outcome])}>
             Outcome: {review.outcome}
           </span>
         )}
         {review.processQuality && (
-          <span className={cn("text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border", REVIEW_PROCESS_STYLES[review.processQuality])}>
+          <span className={cn("text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border", REVIEW_PROCESS_STYLES[review.processQuality])}>
             Process: {review.processQuality}
           </span>
         )}
         {review.sameAgain && (
-          <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-secondary/10 border-secondary/25 text-secondary">
+          <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-secondary/10 border-secondary/25 text-secondary">
             {REVIEW_VERDICT_LABEL[review.sameAgain]}
           </span>
         )}
         {completed && (
-          <span className="text-[10px] font-mono text-white/35 uppercase tracking-wider ml-auto">
+          <span className="text-[11px] font-mono text-white/55 uppercase tracking-wider ml-auto">
             Reviewed {completed}
           </span>
         )}
@@ -438,7 +440,7 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
 
       {review.whatHappened && (
         <div>
-          <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">What happened</p>
+          <p className="text-[11px] font-mono text-white/55 uppercase tracking-wider mb-1.5">What happened</p>
           <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{review.whatHappened}</p>
         </div>
       )}
@@ -446,25 +448,25 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {review.originalAssumption && (
           <div>
-            <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">Original assumption</p>
+            <p className="text-[11px] font-mono text-white/55 uppercase tracking-wider mb-1.5">Original assumption</p>
             <p className="text-sm text-white/60 leading-relaxed">{review.originalAssumption}</p>
           </div>
         )}
         {review.wrongAssumption && (
           <div>
-            <p className="text-[10px] font-mono text-destructive/70 uppercase tracking-wider mb-1.5">Wrong assumption</p>
+            <p className="text-[11px] font-mono text-destructive/70 uppercase tracking-wider mb-1.5">Wrong assumption</p>
             <p className="text-sm text-white/60 leading-relaxed">{review.wrongAssumption}</p>
           </div>
         )}
         {review.underestimated && (
           <div>
-            <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">Underestimated</p>
+            <p className="text-[11px] font-mono text-white/55 uppercase tracking-wider mb-1.5">Underestimated</p>
             <p className="text-sm text-white/60 leading-relaxed">{review.underestimated}</p>
           </div>
         )}
         {review.overestimated && (
           <div>
-            <p className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1.5">Overestimated</p>
+            <p className="text-[11px] font-mono text-white/55 uppercase tracking-wider mb-1.5">Overestimated</p>
             <p className="text-sm text-white/60 leading-relaxed">{review.overestimated}</p>
           </div>
         )}
@@ -472,7 +474,7 @@ function ReviewSummary({ review }: { review: DecisionReview }) {
 
       {review.lesson && (
         <div className="rounded-xl border border-secondary/25 bg-secondary/[0.06] p-3.5">
-          <p className="text-[10px] font-mono text-secondary/70 uppercase tracking-wider mb-1.5">Lesson carried forward</p>
+          <p className="text-[11px] font-mono text-secondary/70 uppercase tracking-wider mb-1.5">Lesson carried forward</p>
           <p className="text-sm text-white/80 leading-relaxed">{review.lesson}</p>
         </div>
       )}
@@ -523,10 +525,10 @@ function ExecutionTrailSection({
       {steps.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-white/45">
+            <span className="text-xs text-white/55">
               {doneCount} of {steps.length} done
             </span>
-            <span className="text-[10px] font-mono text-white/35 tabular-nums">{pct}%</span>
+            <span className="text-[11px] font-mono text-white/55 tabular-nums">{pct}%</span>
           </div>
           <div className="h-1 rounded-full bg-white/5 overflow-hidden">
             <div
@@ -541,7 +543,7 @@ function ExecutionTrailSection({
         {steps.map((step) => (
           <li
             key={step.id}
-            className="group flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5"
+            className="group flex items-start gap-3 rounded-xl border border-hairline bg-surface-1 px-3 py-2.5"
           >
             <button
               type="button"
@@ -552,7 +554,7 @@ function ExecutionTrailSection({
                 "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-colors",
                 step.done
                   ? "border-success/50 bg-success/20 text-success"
-                  : "border-white/20 bg-white/[0.03] hover:border-white/35"
+                  : "border-white/20 bg-surface-1 hover:border-white/35"
               )}
             >
               {step.done && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
@@ -560,7 +562,7 @@ function ExecutionTrailSection({
             <span
               className={cn(
                 "min-w-0 flex-1 text-sm leading-relaxed",
-                step.done ? "text-white/35 line-through" : "text-white/70"
+                step.done ? "text-white/55 line-through" : "text-white/70"
               )}
             >
               {step.text}
@@ -568,7 +570,7 @@ function ExecutionTrailSection({
             <button
               type="button"
               onClick={() => remove(step.id)}
-              className="text-white/20 opacity-0 transition-opacity hover:text-white/50 group-hover:opacity-100"
+              className="text-white/55 opacity-0 transition-opacity hover:text-white/50 group-hover:opacity-100"
               aria-label="Remove step"
             >
               <X className="h-3.5 w-3.5" />
@@ -590,7 +592,7 @@ function ExecutionTrailSection({
           }}
           placeholder={steps.length === 0 ? "First concrete step to execute this…" : "Add a step…"}
           aria-label="New execution step"
-          className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-lg text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-primary/40 transition-colors"
+          className="flex-1 px-3 py-2 bg-surface-2 border border-hairline rounded-lg text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 transition-colors"
         />
         <button
           type="button"
@@ -639,17 +641,7 @@ export default function DecisionDetailPage() {
   const [showCelebration, setShowCelebration] = useState(false)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isReviewOpen, setIsReviewOpen] = useState(false)
-  const reviewAutoOpened = useRef(false)
-
-  // Auto-open review when ?focus=review is present
-  useEffect(() => {
-    if (!decision || reviewAutoOpened.current) return
-    const focus = searchParams.get("focus")
-    if (focus === "review") {
-      setIsReviewOpen(true)
-      reviewAutoOpened.current = true
-    }
-  }, [decision, searchParams])
+  const focusHandledRef = useRef(false)
 
   const handleReviewSave = useCallback(
     (review: DecisionReview, regret: boolean) => {
@@ -664,6 +656,39 @@ export default function DecisionDetailPage() {
     setDraft(createDraft(decision))
     setIsEditing(true)
   }, [decision])
+
+  // Deep-link focus: the dashboard "next honest action" and revisit queue link
+  // here with ?focus=… Open the review modal, or scroll to / activate the
+  // relevant section so the CTA lands somewhere actionable.
+  useEffect(() => {
+    if (!decision || focusHandledRef.current) return
+    const focus = searchParams.get("focus")
+    if (!focus) return
+    focusHandledRef.current = true
+
+    if (focus === "review") {
+      setIsReviewOpen(true)
+      return
+    }
+    if (focus === "human-frame") {
+      // The human-frame fields only render as inputs in edit mode, so open it.
+      startEditing()
+    }
+
+    const targetId =
+      focus === "revisit"      ? "revisit-controls"
+      : focus === "regret"     ? "retrospective-section"
+      : focus === "human-frame" ? "human-frame-section"
+      : null
+    if (!targetId) return
+
+    // Defer until the (possibly edit-mode) section has committed to the DOM.
+    const t = setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "center" })
+      if (focus === "revisit") document.getElementById("revisit-date")?.focus()
+    }, 80)
+    return () => clearTimeout(t)
+  }, [decision, searchParams, startEditing])
 
   const cancelEditing = useCallback(() => {
     setIsEditing(false)
@@ -738,7 +763,7 @@ export default function DecisionDetailPage() {
 
   if (isLoading) {
     return shell(
-      <div className="py-24 text-center text-white/40 text-sm">Loading decision...</div>
+      <div className="py-24 text-center text-white/55 text-sm">Loading decision...</div>
     )
   }
 
@@ -763,7 +788,7 @@ export default function DecisionDetailPage() {
     <div className="p-4 sm:p-6 max-w-4xl space-y-5">
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-white/45" aria-label="Breadcrumb">
+      <nav className="flex items-center gap-2 text-sm text-white/55" aria-label="Breadcrumb">
         <Link href="/decisions" className="hover:text-white/60 transition-colors flex items-center gap-1">
           <ArrowLeft className="w-3.5 h-3.5" />
           Decisions
@@ -792,12 +817,12 @@ export default function DecisionDetailPage() {
               }}
             />
             {decision.riskLevel && (
-              <span className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border ${RISK_STYLES[decision.riskLevel]}`}>
+              <span className={`text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border ${RISK_STYLES[decision.riskLevel]}`}>
                 {decision.riskLevel} risk
               </span>
             )}
             {decision.regret && (
-              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-destructive/10 border-destructive/25 text-destructive flex items-center gap-1">
+              <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-lg border bg-destructive/10 border-destructive/25 text-destructive flex items-center gap-1">
                 <HeartCrack className="w-2.5 h-2.5" />
                 Regret
               </span>
@@ -810,13 +835,13 @@ export default function DecisionDetailPage() {
               type="text"
               value={draft.title}
               onChange={(e) => updateDraft("title", e.target.value)}
-              className="w-full text-2xl font-semibold tracking-tight text-white leading-tight bg-transparent border-b-2 border-primary/40 focus:border-primary/70 focus:outline-none py-1 transition-colors"
+              className="w-full text-3xl sm:text-[2.125rem] font-semibold tracking-tight text-white leading-[1.1] bg-transparent border-b-2 border-primary/40 focus:border-primary/70 focus:outline-none py-1 transition-colors"
               placeholder="Decision title"
             />
           ) : (
-            <h1 className="text-2xl font-semibold tracking-tight text-white leading-tight">{decision.title}</h1>
+            <h1 className="text-3xl sm:text-[2.125rem] font-semibold tracking-tight text-white leading-[1.1] text-balance">{decision.title}</h1>
           )}
-          <p className="text-white/45 text-sm mt-1 font-mono">
+          <p className="text-white/55 text-sm mt-1.5 text-readout">
             Created {formatDate(decision.createdAt)}
           </p>
         </div>
@@ -889,7 +914,7 @@ export default function DecisionDetailPage() {
 
       {/* Regret toggle + revisit date — always accessible */}
       {!isEditing && (
-        <div className="flex flex-wrap items-center gap-3">
+        <div id="revisit-controls" className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => {
               updateDecision(decision.id, { regret: !decision.regret })
@@ -903,7 +928,7 @@ export default function DecisionDetailPage() {
               "flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs border transition-all",
               decision.regret
                 ? "bg-destructive/15 border-destructive/30 text-destructive hover:bg-destructive/10"
-                : "bg-white/[0.03] border-white/10 text-white/40 hover:bg-white/[0.06] hover:text-white/60"
+                : "bg-surface-1 border-white/10 text-white/55 hover:bg-surface-3 hover:text-white/60"
             )}
           >
             <HeartCrack className="w-3.5 h-3.5" />
@@ -911,8 +936,8 @@ export default function DecisionDetailPage() {
           </button>
 
           <div className="flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5 text-white/35" />
-            <label className="text-xs text-white/35 sr-only" htmlFor="revisit-date">Revisit date</label>
+            <Calendar className="w-3.5 h-3.5 text-white/55" />
+            <label className="text-xs text-white/55 sr-only" htmlFor="revisit-date">Revisit date</label>
             <input
               id="revisit-date"
               type="date"
@@ -925,13 +950,13 @@ export default function DecisionDetailPage() {
                   })
                 }
               }}
-              className="px-3 py-1.5 rounded-xl text-xs bg-white/[0.03] border border-white/10 text-white/50 focus:outline-none focus:border-primary/40 transition-colors"
+              className="px-3 py-1.5 rounded-xl text-xs bg-surface-1 border border-white/10 text-white/50 focus:outline-none focus:border-primary/40 transition-colors"
               aria-label="Set revisit date"
             />
             {decision.revisitAt && (
               <button
                 onClick={() => updateDecision(decision.id, { revisitAt: undefined })}
-                className="text-white/25 hover:text-white/50 transition-colors"
+                className="text-white/55 hover:text-white/50 transition-colors"
                 aria-label="Clear revisit date"
               >
                 <X className="w-3.5 h-3.5" />
@@ -1012,17 +1037,17 @@ export default function DecisionDetailPage() {
         )}
       </AnimatePresence>
 
-      <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4">
+      <section className="rounded-2xl border border-hairline bg-surface-2 p-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold text-white">Record completeness</h2>
-            <p className="mt-1 text-sm text-white/45">
+            <p className="mt-1 text-sm text-white/55">
               {qualityBreakdown.earned.length} of {qualityBreakdown.signals.length} sections filled in.
             </p>
           </div>
           {nextQualitySignal && (
             <div className="max-w-sm rounded-xl border border-primary/15 bg-primary/[0.06] px-3 py-2">
-              <p className="text-[10px] font-mono uppercase tracking-[0.16em] text-primary/70">Add next</p>
+              <p className="text-[11px] font-mono uppercase tracking-[0.16em] text-primary/70">Add next</p>
               <p className="mt-1 text-sm text-white/65">{nextQualitySignal.guidance}</p>
             </div>
           )}
@@ -1035,12 +1060,12 @@ export default function DecisionDetailPage() {
                 "rounded-xl border px-3 py-2",
                 signal.earned
                   ? "border-success/20 bg-success/[0.06]"
-                  : "border-white/[0.08] bg-black/10"
+                  : "border-hairline bg-black/10"
               )}
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-white/70">{signal.label}</span>
-                <span className={cn("text-[10px] font-mono", signal.earned ? "text-success" : "text-white/30")}>
+                <span className={cn("text-[11px] font-mono", signal.earned ? "text-success" : "text-white/55")}>
                   {signal.earned ? `+${signal.points}` : `0/${signal.points}`}
                 </span>
               </div>
@@ -1067,7 +1092,7 @@ export default function DecisionDetailPage() {
               onChange={(e) => updateDraft("rawThinking", e.target.value)}
               rows={6}
               placeholder="Your raw thinking and analysis..."
-              className="w-full px-4 py-3 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-sm font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+              className="w-full px-4 py-3 bg-surface-2 border border-primary/20 rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
             />
           ) : (
             <div className="border-l-2 border-primary/30 pl-4">
@@ -1079,13 +1104,18 @@ export default function DecisionDetailPage() {
         </SectionCard>
       )}
 
+      {/* AI reasoning critique — the model reads the brain dump (and everything
+          below) and pushes back. Hidden in edit mode to avoid critiquing a
+          half-written draft. */}
+      {!isEditing && <AICritique decision={decision} />}
+
       {/* Human frame */}
       {(displayValuesAtStake || displayHumanCost || displayGuidingPrinciple || isEditing) && (
-        <SectionCard title="Human Frame">
+        <SectionCard title="Human Frame" id="human-frame-section">
           {isEditing && draft ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
-                <label htmlFor="edit-values-at-stake" className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                <label htmlFor="edit-values-at-stake" className="text-[11px] font-mono uppercase tracking-wider text-white/55">
                   Values at stake
                 </label>
                 <textarea
@@ -1094,11 +1124,11 @@ export default function DecisionDetailPage() {
                   onChange={(e) => updateDraft("valuesAtStake", e.target.value)}
                   rows={4}
                   placeholder="What value could be compromised?"
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+                  className="w-full px-3 py-2 bg-surface-2 border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="edit-human-cost" className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                <label htmlFor="edit-human-cost" className="text-[11px] font-mono uppercase tracking-wider text-white/55">
                   Human cost
                 </label>
                 <textarea
@@ -1107,11 +1137,11 @@ export default function DecisionDetailPage() {
                   onChange={(e) => updateDraft("humanCost", e.target.value)}
                   rows={4}
                   placeholder="Who pays if this is wrong?"
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+                  className="w-full px-3 py-2 bg-surface-2 border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="edit-guiding-principle" className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+                <label htmlFor="edit-guiding-principle" className="text-[11px] font-mono uppercase tracking-wider text-white/55">
                   Guiding principle
                 </label>
                 <textarea
@@ -1120,27 +1150,27 @@ export default function DecisionDetailPage() {
                   onChange={(e) => updateDraft("guidingPrinciple", e.target.value)}
                   rows={4}
                   placeholder="What rule should still hold?"
-                  className="w-full px-3 py-2 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+                  className="w-full px-3 py-2 bg-surface-2 border border-primary/20 rounded-xl text-white text-xs font-mono placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
                 />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {displayValuesAtStake && (
-                <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-white/30">Values</div>
+                <div className="rounded-xl border border-hairline bg-surface-1 p-3">
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-white/55">Values</div>
                   <p className="mt-1.5 text-sm leading-relaxed text-white/60">{displayValuesAtStake}</p>
                 </div>
               )}
               {displayHumanCost && (
-                <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-white/30">Human cost</div>
+                <div className="rounded-xl border border-hairline bg-surface-1 p-3">
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-white/55">Human cost</div>
                   <p className="mt-1.5 text-sm leading-relaxed text-white/60">{displayHumanCost}</p>
                 </div>
               )}
               {displayGuidingPrinciple && (
-                <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-white/30">Principle</div>
+                <div className="rounded-xl border border-hairline bg-surface-1 p-3">
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-white/55">Principle</div>
                   <p className="mt-1.5 text-sm leading-relaxed text-white/60">{displayGuidingPrinciple}</p>
                 </div>
               )}
@@ -1168,7 +1198,7 @@ export default function DecisionDetailPage() {
             <div className="flex-1 space-y-2.5">
               {decision.tradeoffs.map((t) => (
                 <div key={t.axis} className="flex items-center gap-3">
-                  <span className="text-xs text-white/45 w-24 flex-shrink-0">{t.axis}</span>
+                  <span className="text-xs text-white/55 w-24 flex-shrink-0">{t.axis}</span>
                   <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full bg-primary"
@@ -1192,7 +1222,7 @@ export default function DecisionDetailPage() {
               onChange={(e) => updateDraft("preMortem", e.target.value)}
               rows={4}
               placeholder="What could go wrong? Imagine this decision failed..."
-              className="w-full px-4 py-3 bg-white/[0.04] border border-destructive/20 rounded-xl text-white text-sm font-mono placeholder:text-white/20 focus:outline-none focus:border-destructive/40 resize-none leading-relaxed transition-all"
+              className="w-full px-4 py-3 bg-surface-2 border border-destructive/20 rounded-xl text-white text-sm font-mono placeholder:text-white/45 focus:outline-none focus:border-destructive/40 resize-none leading-relaxed transition-all"
             />
           ) : (
             <div className="p-3.5 bg-destructive/[0.04] border border-destructive/[0.12] rounded-xl">
@@ -1209,7 +1239,7 @@ export default function DecisionDetailPage() {
         <SectionCard title={`Risks (${decision.risks.length})`}>
           <div className="space-y-2">
             {decision.risks.map((risk, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.07] rounded-xl">
+              <div key={i} className="flex items-center gap-3 p-3 bg-surface-1 border border-hairline rounded-xl">
                 <span className="flex-1 text-sm text-white/65">{risk.text}</span>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <div className="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
@@ -1221,7 +1251,7 @@ export default function DecisionDetailPage() {
                       }}
                     />
                   </div>
-                  <span className="text-[10px] font-mono text-white/40">{risk.severity}%</span>
+                  <span className="text-[11px] font-mono text-white/55">{risk.severity}%</span>
                 </div>
               </div>
             ))}
@@ -1286,10 +1316,10 @@ export default function DecisionDetailPage() {
       ) : null}
 
       {/* Retrospective — always editable */}
-      <SectionCard title="Retrospective">
+      <SectionCard title="Retrospective" id="retrospective-section">
         <div className="space-y-5">
           <div>
-            <p className="text-xs font-mono text-white/40 uppercase tracking-wider mb-2">What happened</p>
+            <p className="text-xs font-mono text-white/55 uppercase tracking-wider mb-2">What happened</p>
             <InlineEditor
               value={decision.retrospective}
               onSave={(text) => {
@@ -1328,13 +1358,17 @@ export default function DecisionDetailPage() {
               onChange={(e) => updateDraft("summary", e.target.value)}
               rows={3}
               placeholder="Brief summary of this decision..."
-              className="w-full px-4 py-3 bg-white/[0.04] border border-primary/20 rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
+              className="w-full px-4 py-3 bg-surface-2 border border-primary/20 rounded-xl text-white text-sm placeholder:text-white/45 focus:outline-none focus:border-primary/40 resize-none leading-relaxed transition-all"
             />
           ) : (
             <p className="text-white/60 text-sm leading-relaxed">{displaySummary}</p>
           )}
         </SectionCard>
       )}
+
+      {/* Discussion — turns the solo journal entry into a conversation. On a
+          shared instance, teammates' comments sync in here. */}
+      {!isEditing && <DecisionComments decision={decision} />}
 
       {/* Linked Experiments */}
       {linkedExperiments.length > 0 && (
@@ -1343,7 +1377,7 @@ export default function DecisionDetailPage() {
             {linkedExperiments.map((exp) => (
               <div
                 key={exp.id}
-                className="flex items-center justify-between p-3 bg-white/[0.03] border border-white/[0.07] rounded-xl"
+                className="flex items-center justify-between p-3 bg-surface-1 border border-hairline rounded-xl"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-secondary/10 border border-secondary/20 flex items-center justify-center">
@@ -1351,7 +1385,7 @@ export default function DecisionDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white">{exp.title}</p>
-                    <p className="text-xs text-white/40 font-mono">
+                    <p className="text-xs text-white/55 font-mono">
                       EXP-{String(exp.number).padStart(2, "0")} - {exp.status}
                     </p>
                   </div>
@@ -1376,7 +1410,7 @@ export default function DecisionDetailPage() {
         <div className="flex justify-end pb-2">
           <button
             onClick={handleExportRFC}
-            className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/50 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-white/55 hover:text-white/50 transition-colors"
           >
             <FileText className="w-3 h-3" />
             Export as RFC

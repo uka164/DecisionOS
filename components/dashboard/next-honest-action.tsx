@@ -33,9 +33,9 @@ const TONE: Record<Tone, { chip: string; word: string; cta: string; ring: string
     ring: "focus-visible:ring-warning/40",
   },
   info: {
-    chip: "bg-white/[0.06] text-white/60",
+    chip: "bg-surface-3 text-white/60",
     word: "When you can",
-    cta: "border-white/15 text-white/70 hover:bg-white/[0.04] focus-visible:ring-white/30",
+    cta: "border-white/15 text-white/70 hover:bg-surface-2 focus-visible:ring-white/30",
     ring: "focus-visible:ring-white/30",
   },
   positive: {
@@ -56,7 +56,7 @@ export function NextHonestAction() {
     return (
       <div
         aria-hidden="true"
-        className="h-[132px] rounded-lg border border-white/[0.06] bg-white/[0.02]"
+        className="h-[132px] rounded-lg border border-hairline bg-surface-1"
       />
     )
   }
@@ -68,7 +68,7 @@ export function NextHonestAction() {
   return (
     <section
       aria-label="Right now"
-      className="rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6"
+      className="rounded-lg border border-hairline bg-surface-1 p-5 sm:p-6"
     >
       <div className="flex items-start gap-4">
         <div
@@ -82,11 +82,11 @@ export function NextHonestAction() {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="font-mono text-[10px] uppercase text-white/40">
+            <p className="font-mono text-[11px] uppercase text-white/55">
               Right now
             </p>
             <span className="text-white/15">·</span>
-            <span className="font-mono text-[10px] uppercase text-white/45">
+            <span className="font-mono text-[11px] uppercase text-white/55">
               {tone.word}
             </span>
           </div>

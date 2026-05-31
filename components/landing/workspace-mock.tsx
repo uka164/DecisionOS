@@ -44,24 +44,24 @@ export function WorkspaceMock({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border border-white/[0.08] bg-bg-card/78 backdrop-blur-2xl",
+        "relative overflow-hidden rounded-lg border border-hairline bg-bg-card/78 backdrop-blur-2xl",
         "shadow-[0_34px_110px_-54px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04]",
         className
       )}
     >
       {/* window bar */}
-      <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3 sm:px-5">
+      <div className="flex items-center gap-3 border-b border-hairline px-4 py-3 sm:px-5">
         <div className="flex gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
           <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
           <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
         </div>
-        <div className="font-mono text-[11px] text-white/35">
+        <div className="font-mono text-[11px] text-white/55">
           decisions / q3-infra-bet
         </div>
         <div className="ml-auto hidden items-center gap-1.5 sm:flex">
           <span className="h-1.5 w-1.5 rounded-full bg-primary/80" />
-          <span className="font-mono text-[11px] text-white/35">example</span>
+          <span className="font-mono text-[11px] text-white/55">example</span>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export function WorkspaceMock({ className }: { className?: string }) {
                 className={cn(
                     "flex items-center gap-2.5 rounded-lg border px-2.5 py-2 transition-colors duration-500",
                   isActive
-                    ? "border-white/[0.12] bg-white/[0.05]"
+                    ? "border-hairline-strong bg-surface-2"
                     : "border-transparent bg-transparent"
                 )}
               >
@@ -101,7 +101,7 @@ export function WorkspaceMock({ className }: { className?: string }) {
                 <span
                   className={cn(
                     "text-xs font-medium transition-colors duration-500",
-                    isActive ? "text-white" : "text-white/45"
+                    isActive ? "text-white" : "text-white/55"
                   )}
                 >
                   {layer.label}
@@ -114,18 +114,18 @@ export function WorkspaceMock({ className }: { className?: string }) {
         {/* decision brief */}
         <motion.div
           {...col(1)}
-          className="col-span-12 rounded-lg border border-white/[0.07] bg-white/[0.02] p-4 sm:col-span-6"
+          className="col-span-12 rounded-lg border border-hairline bg-surface-1 p-4 sm:col-span-6"
         >
-          <div className="font-mono text-[10px] uppercase text-white/35">
+          <div className="font-mono text-[11px] uppercase text-white/55">
             Decision brief
           </div>
           <div className="mt-2 text-sm font-semibold leading-snug text-white">
             Adopt an event-driven architecture for ingestion
           </div>
           <div className="mt-3 space-y-1.5">
-            <div className="h-1.5 w-full rounded-full bg-white/[0.06]" />
-            <div className="h-1.5 w-[88%] rounded-full bg-white/[0.06]" />
-            <div className="h-1.5 w-[64%] rounded-full bg-white/[0.06]" />
+            <div className="h-1.5 w-full rounded-full bg-surface-3" />
+            <div className="h-1.5 w-[88%] rounded-full bg-surface-3" />
+            <div className="h-1.5 w-[64%] rounded-full bg-surface-3" />
           </div>
 
           {/* tradeoff matrix */}
@@ -138,9 +138,9 @@ export function WorkspaceMock({ className }: { className?: string }) {
             ].map((t) => (
               <div
                 key={t.l}
-                className="flex items-center justify-between rounded-md border border-white/[0.06] bg-white/[0.015] px-2.5 py-2"
+                className="flex items-center justify-between rounded-md border border-hairline bg-white/[0.015] px-2.5 py-2"
               >
-                <span className="text-[11px] text-white/45">{t.l}</span>
+                <span className="text-[11px] text-white/55">{t.l}</span>
                 <span
                   className={cn(
                     "text-[11px] font-medium",
@@ -159,18 +159,18 @@ export function WorkspaceMock({ className }: { className?: string }) {
           {...col(2)}
           className="col-span-12 space-y-3 sm:col-span-3"
         >
-          <div className="flex flex-col items-center rounded-lg border border-white/[0.07] bg-white/[0.02] px-3 py-4">
+          <div className="flex flex-col items-center rounded-lg border border-hairline bg-surface-1 px-3 py-4">
             <ScoreRing value={78} />
-            <div className="mt-2 font-mono text-[10px] uppercase text-white/40">
+            <div className="mt-2 font-mono text-[11px] uppercase text-white/55">
               Priority
             </div>
           </div>
-          <div className="space-y-1.5 rounded-lg border border-white/[0.07] bg-white/[0.02] p-3">
+          <div className="space-y-1.5 rounded-lg border border-hairline bg-surface-1 p-3">
             {OWNERS.map((o) => (
               <div key={o.name} className="flex items-center gap-2">
                 <span className={cn("h-1.5 w-1.5 flex-shrink-0 rounded-full", o.dot)} />
                 <span className="text-[11px] text-white/55">{o.name}</span>
-                <span className={cn("ml-auto text-[10px] font-medium", o.tone)}>
+                <span className={cn("ml-auto text-[11px] font-medium", o.tone)}>
                   {o.status}
                 </span>
               </div>

@@ -23,7 +23,7 @@ export default function ArchivePage() {
       </div>
       <main className="pt-16 lg:pt-0 lg:ml-64 min-h-screen">
         {isLoading ? (
-          <div className="py-24 text-center text-white/40 text-sm">Loading archive…</div>
+          <div className="py-24 text-center text-white/55 text-sm">Loading archive…</div>
         ) : error ? (
           <div className="py-24 text-center text-destructive text-sm">Error: {error}</div>
         ) : (

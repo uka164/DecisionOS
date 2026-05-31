@@ -60,7 +60,7 @@ export function FAQ() {
 
           {/* accordion column */}
           <Reveal delay={0.08}>
-            <div className="divide-y divide-white/[0.07] border-y border-white/[0.07]">
+            <div className="divide-y divide-white/[0.07] border-y border-hairline">
               {FAQS.map((item, i) => {
                 const isOpen = open === i
                 return (
@@ -84,7 +84,7 @@ export function FAQ() {
                           "flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors duration-300",
                           isOpen
                             ? "border-primary/30 bg-primary/10 text-primary"
-                            : "border-white/10 text-white/40"
+                            : "border-white/10 text-white/55"
                         )}
                       >
                         <Plus

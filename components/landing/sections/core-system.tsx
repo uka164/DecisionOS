@@ -11,19 +11,19 @@ import { Container, Section, Eyebrow, Heading, Reveal, EASE_OUT } from "../primi
 const SEVERITY = {
   critical: { dot: "bg-destructive", label: "Risk", cls: "text-destructive/90" },
   attention: { dot: "bg-warning", label: "Review", cls: "text-warning/90" },
-  info: { dot: "bg-white/35", label: "Pattern", cls: "text-white/45" },
+  info: { dot: "bg-white/35", label: "Pattern", cls: "text-white/55" },
 } as const
 
 function Panel({ children, label }: { children: ReactNode; label: string }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-bg-card/70 shadow-[0_34px_110px_-54px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04] backdrop-blur-2xl">
-      <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-2.5">
+    <div className="relative overflow-hidden rounded-xl border border-hairline bg-bg-card/70 shadow-[0_34px_110px_-54px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04] backdrop-blur-2xl">
+      <div className="flex items-center gap-3 border-b border-hairline px-4 py-2.5">
         <div className="flex gap-1.5">
           <span className="h-2 w-2 rounded-full bg-white/15" />
           <span className="h-2 w-2 rounded-full bg-white/15" />
           <span className="h-2 w-2 rounded-full bg-white/15" />
         </div>
-        <span className="font-mono text-[11px] text-white/35">{label}</span>
+        <span className="font-mono text-[11px] text-white/55">{label}</span>
       </div>
       <div className="p-4 sm:p-5">{children}</div>
     </div>
@@ -38,7 +38,7 @@ function SignalsViz() {
   ] as const
   return (
     <Panel label="app / signals">
-      <ul className="divide-y divide-white/[0.05] overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.015]">
+      <ul className="divide-y divide-white/[0.05] overflow-hidden rounded-lg border border-hairline bg-white/[0.015]">
         {rows.map((r) => {
           const sev = SEVERITY[r.sev]
           return (
@@ -47,7 +47,7 @@ function SignalsViz() {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-baseline gap-x-2">
                   <span className="text-sm font-medium text-white/90">{r.title}</span>
-                  <span className={cn("font-mono text-[10px] uppercase", sev.cls)}>{sev.label}</span>
+                  <span className={cn("font-mono text-[11px] uppercase", sev.cls)}>{sev.label}</span>
                 </div>
                 <p className="mt-1 text-[13px] leading-relaxed text-white/55 text-pretty">{r.reason}</p>
               </div>
@@ -63,22 +63,22 @@ function HealthViz() {
   const metrics = [
     { value: 1, label: "revisit health", help: "due now", tone: "text-warning" },
     { value: 2, label: "unresolved risk", help: "live decisions", tone: "text-destructive" },
-    { value: 0, label: "execution gaps", help: "clear", tone: "text-white/35" },
+    { value: 0, label: "execution gaps", help: "clear", tone: "text-white/55" },
   ]
   return (
     <Panel label="app / decision health">
-      <div className="overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.015]">
+      <div className="overflow-hidden rounded-lg border border-hairline bg-white/[0.015]">
         <div className="grid grid-cols-3 divide-x divide-white/[0.06]">
           {metrics.map((m) => (
             <div key={m.label} className="flex flex-col gap-0.5 px-4 py-4">
               <span className={cn("font-mono text-2xl tabular-nums", m.tone)}>{m.value}</span>
               <span className="text-xs font-medium text-white/55">{m.label}</span>
-              <span className="text-[11px] text-white/30">{m.help}</span>
+              <span className="text-[11px] text-white/55">{m.help}</span>
             </div>
           ))}
         </div>
       </div>
-      <p className="mt-3 text-center text-xs text-white/35">Three numbers. No dashboards to decode.</p>
+      <p className="mt-3 text-center text-xs text-white/55">Three numbers. No dashboards to decode.</p>
     </Panel>
   )
 }
@@ -86,7 +86,7 @@ function HealthViz() {
 function ThinkingViz() {
   return (
     <Panel label="decisions / q3-infra-bet">
-      <div className="font-mono text-[10px] uppercase text-white/35">Decision brief</div>
+      <div className="font-mono text-[11px] uppercase text-white/55">Decision brief</div>
       <div className="mt-1.5 text-sm font-semibold leading-snug text-white">
         Adopt event-driven architecture for ingestion
       </div>
@@ -99,12 +99,12 @@ function ThinkingViz() {
             key={o.p}
             className={cn(
               "flex items-center gap-3 rounded-lg border px-3 py-2.5",
-              o.on ? "border-primary/25 bg-primary/[0.05]" : "border-white/[0.07] bg-white/[0.02]"
+              o.on ? "border-primary/25 bg-primary/[0.05]" : "border-hairline bg-surface-1"
             )}
           >
-            <span className={cn("font-mono text-[10px]", o.on ? "text-primary" : "text-white/40")}>{o.p}</span>
+            <span className={cn("font-mono text-[11px]", o.on ? "text-primary" : "text-white/55")}>{o.p}</span>
             <span className="text-sm font-medium text-white">{o.t}</span>
-            <span className="ml-auto text-[11px] text-white/45">{o.chip}</span>
+            <span className="ml-auto text-[11px] text-white/55">{o.chip}</span>
           </div>
         ))}
       </div>
@@ -131,7 +131,7 @@ const MEM_LAST = MEM_NODES[MEM_NODES.length - 1]
 function MemoryViz() {
   return (
     <Panel label="app / memory">
-      <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase text-white/35">
+      <div className="mb-2 flex items-center justify-between font-mono text-[11px] uppercase text-white/55">
         <span>Earlier</span>
         <span className="text-primary/70">Now</span>
       </div>
@@ -189,7 +189,7 @@ function MemoryViz() {
           </linearGradient>
         </defs>
       </svg>
-      <p className="mt-1 text-center text-xs text-white/35">Older decisions inform the newest one — automatically.</p>
+      <p className="mt-1 text-center text-xs text-white/55">Older decisions inform the newest one — automatically.</p>
     </Panel>
   )
 }
@@ -225,20 +225,20 @@ function ExecutionViz() {
           >
             <div
               className={cn(
-                "flex h-7 items-center justify-center rounded-md text-[10px] font-medium",
+                "flex h-7 items-center justify-center rounded-md text-[11px] font-medium",
                 s.state === "done" && "bg-primary/15 text-primary",
                 s.state === "active" && "bg-white/[0.08] text-white",
                 s.state === "risk" && "bg-destructive/15 text-destructive",
-                s.state === "todo" && "bg-white/[0.03] text-white/35"
+                s.state === "todo" && "bg-surface-1 text-white/55"
               )}
             >
               {s.state === "done" ? <Check className="h-3.5 w-3.5" /> : null}
             </div>
-            <div className="mt-1.5 text-center text-[9px] text-white/40">{s.label}</div>
+            <div className="mt-1.5 text-center text-[11px] text-white/55">{s.label}</div>
           </motion.div>
         ))}
       </div>
-      <p className="mt-4 text-center text-xs text-white/35">Consensus is the start line — owners and a revisit date carry it home.</p>
+      <p className="mt-4 text-center text-xs text-white/55">Consensus is the start line — owners and a revisit date carry it home.</p>
     </Panel>
   )
 }
@@ -327,7 +327,7 @@ export function CoreSystem() {
                 {active === i && (
                   <motion.span
                     layoutId="core-pill"
-                    className="absolute inset-0 rounded-full border border-white/[0.12] bg-white/[0.06]"
+                    className="absolute inset-0 rounded-full border border-hairline-strong bg-surface-3"
                     transition={{ duration: 0.4, ease: EASE_OUT }}
                   />
                 )}
@@ -367,7 +367,7 @@ export function CoreSystem() {
           </motion.div>
         </AnimatePresence>
 
-        <p className="mt-10 text-center font-mono text-[11px] uppercase tracking-wide text-white/40">
+        <p className="mt-10 text-center font-mono text-[11px] uppercase tracking-wide text-white/55">
           Illustrative screens · your data stays in your browser
         </p>
       </Container>

@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CalendarClock } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import { useDecisionsStore } from "@/stores"
 import { useWizard } from "@/contexts/WizardContext"
@@ -10,6 +10,7 @@ import { useNow } from "@/hooks/useNow"
 import { useRevisitNotifications } from "@/hooks/useRevisitNotifications"
 import { LeftSidebar } from "@/components/dashboard/left-sidebar"
 import { RightSidebar } from "@/components/dashboard/right-sidebar"
+import { RevisitDigest } from "@/components/dashboard/revisit-digest"
 import { DecisionHealth } from "@/components/dashboard/decision-health"
 import { NextHonestAction } from "@/components/dashboard/next-honest-action"
 import { Signals } from "@/components/dashboard/signals"
@@ -22,7 +23,7 @@ export default function DashboardPage() {
   const decisions = useDecisionsStore((s) => s.decisions)
   const isLoading = useDecisionsStore((s) => s.isLoading)
   const error = useDecisionsStore((s) => s.error)
-  const { open } = useWizard()
+  const { openCapture } = useWizard()
   const router = useRouter()
   const revisitToastShown = useRef(false)
   const now = useNow()
@@ -74,8 +75,8 @@ export default function DashboardPage() {
         <div className="p-4 sm:p-6 space-y-5 flex-1 pb-12">
           <header className="flex items-start justify-between mb-2">
             <div>
-              <h1 className="text-balance text-2xl font-semibold text-white">Right Now</h1>
-              <p className="text-white/50 text-sm mt-1">
+              <h1 className="text-balance text-title text-white">Right Now</h1>
+              <p className="text-white/55 text-sm mt-1.5">
                 What needs your attention, and what&apos;s quietly decaying.
               </p>
             </div>
@@ -85,15 +86,15 @@ export default function DashboardPage() {
           </header>
 
           {isLoading ? (
-            <div className="py-12 text-center text-white/40 text-sm">Loading decisions…</div>
+            <div className="py-12 text-center text-white/55 text-sm">Loading decisions…</div>
           ) : error ? (
             <div className="py-12 text-center text-destructive text-sm">Error: {error}</div>
           ) : (
             <>
               {/* First-time user banner — written for the person who suspects they repeat the same mistake */}
               {isExampleOnly && (
-                <div className="max-w-2xl rounded-lg border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
-                  <p className="text-xs text-white/40">For when you can already feel the pattern.</p>
+                <div className="max-w-2xl rounded-lg border border-hairline bg-surface-1 p-5 sm:p-6">
+                  <p className="text-xs text-white/55">For when you can already feel the pattern.</p>
                   <h2 className="mt-2 text-xl font-semibold text-white leading-snug text-balance">
                     Write down the decision you're about to make.
                   </h2>
@@ -103,13 +104,13 @@ export default function DashboardPage() {
                     worked. That's the only loop that ever changes anything.
                   </p>
                   <button
-                    onClick={open}
+                    onClick={openCapture}
                     className="mt-5 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/[0.12] px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                   >
                     Log a decision
                     <ArrowRight className="w-4 h-4" />
                   </button>
-                  <p className="mt-4 text-xs text-white/30">
+                  <p className="mt-4 text-xs text-white/55">
                     Everything stays in this browser. No account. No sync. The decisions below are examples — yours don't appear in this view until you log one.
                   </p>
                 </div>
@@ -122,22 +123,9 @@ export default function DashboardPage() {
                   <DecisionHealth decisions={decisions} />
                 </div>
               )}
-              {overdueDecisions.length > 0 && (
-                <button
-                  onClick={() => router.push(`/decisions/${overdueDecisions[0].id}?focus=review`)}
-                  className="flex w-full items-start gap-3 rounded-lg border border-warning/20 bg-warning/10 p-3 text-left sm:hidden"
-                >
-                  <CalendarClock className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-medium text-white">
-                      {overdueDecisions.length} revisit{overdueDecisions.length !== 1 ? "s" : ""} due
-                    </span>
-                    <span className="block truncate text-xs text-white/45">
-                      {overdueDecisions[0].title}
-                    </span>
-                  </span>
-                </button>
-              )}
+              {/* The recurring reason to return — overdue + due-soon revisits,
+                  with one-tap Review or Snooze. Renders nothing when none due. */}
+              {!isExampleOnly && <RevisitDigest />}
 
               {/* MIDDLE — the single, deduped attention surface */}
               <Signals />
@@ -147,7 +135,7 @@ export default function DashboardPage() {
               <DecisionTimeline decisions={decisions} />
 
               {!isExampleOnly && decisions.length > 0 && inProgressCount > 0 && (
-                <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
+                <div className="flex items-center gap-3 rounded-lg border border-hairline bg-surface-1 p-4">
                   <div className="h-8 w-1 flex-shrink-0 rounded-full bg-primary/35" />
                   <p className="text-sm text-white/50 flex-1">
                     {inProgressCount} decision{inProgressCount > 1 ? "s" : ""} still open.

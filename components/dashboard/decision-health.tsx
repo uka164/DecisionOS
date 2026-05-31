@@ -57,13 +57,13 @@ export function DecisionHealth({ decisions }: { decisions: Decision[] }) {
   )
 
   if (!metrics) {
-    return <div aria-hidden className="h-[88px] rounded-lg border border-white/[0.06] bg-white/[0.015]" />
+    return <div aria-hidden className="h-[88px] rounded-lg border border-hairline bg-white/[0.015]" />
   }
 
   return (
-    <section aria-label="Decision health" className="rounded-lg border border-white/[0.06] bg-white/[0.015]">
+    <section aria-label="Decision health" className="rounded-lg border border-hairline bg-white/[0.015]">
       <div className="border-b border-white/[0.05] px-5 py-3">
-        <h2 className="font-mono text-xs uppercase text-white/40">Decision Health</h2>
+        <h2 className="font-mono text-xs uppercase text-white/55">Decision Health</h2>
       </div>
       <div className="grid grid-cols-3 divide-x divide-white/[0.06]">
         {metrics.map((m) => (
@@ -71,13 +71,13 @@ export function DecisionHealth({ decisions }: { decisions: Decision[] }) {
             <span
               className={cn(
                 "font-mono text-2xl tabular-nums",
-                m.value === 0 && m.tone !== "aligned" ? "text-white/35" : TONE_CLASS[m.tone]
+                m.value === 0 && m.tone !== "aligned" ? "text-white/55" : TONE_CLASS[m.tone]
               )}
             >
               {m.value}
             </span>
             <span className="text-xs font-medium text-white/55">{m.label}</span>
-            <span className="text-[11px] text-white/30">{m.value === 0 ? "clear" : m.help}</span>
+            <span className="text-[11px] text-white/55">{m.value === 0 ? "clear" : m.help}</span>
           </div>
         ))}
       </div>

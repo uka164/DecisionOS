@@ -9,7 +9,8 @@ import {
 } from "@/lib/mock-data"
 import { calculateQualityScoreFromDecision } from "@/lib/utils/calculateQualityScore"
 import { generateInsights } from "@/lib/insights"
-import type { Decision, Experiment, AppSettings } from "@/lib/types"
+import { getRemote, putRemote } from "@/lib/sync"
+import type { Decision, Experiment, AppSettings, RemoteSnapshot } from "@/lib/types"
 
 // ─── Shared persistence helpers ───────────────────────────────────────────────
 
@@ -17,7 +18,8 @@ function generateId(prefix: "user" | "exp"): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 }
 
-function persistAll() {
+/** Write the localStorage cache only (no server push). */
+function writeLocalCache() {
   const decisionsState = useDecisionsStore.getState()
   const experiments = useExperimentsStore.getState().experiments
   const settings = useSettingsStore.getState().settings
@@ -28,6 +30,23 @@ function persistAll() {
     lastSynced: new Date().toISOString(),
     hiddenStaticDecisionIds: decisionsState.hiddenStaticDecisionIds,
   })
+}
+
+/** The shared content that syncs to the durable server (settings excluded —
+ *  theme/identity/motion stay device-local). */
+function buildSnapshot(): Omit<RemoteSnapshot, "updatedAt"> {
+  const decisionsState = useDecisionsStore.getState()
+  return {
+    decisions: decisionsState.decisions.filter(isPersistableDecision),
+    experiments: useExperimentsStore.getState().experiments,
+    hiddenStaticDecisionIds: decisionsState.hiddenStaticDecisionIds,
+  }
+}
+
+/** Called after every mutation: cache locally, then debounce a server push. */
+function persistAll() {
+  writeLocalCache()
+  markLocalMutation()
 }
 
 // ─── Decisions Store ──────────────────────────────────────────────────────────
@@ -41,6 +60,8 @@ interface DecisionsState {
   addDecision: (decision: Omit<Decision, "id" | "createdAt" | "qualityScore">) => Decision
   updateDecision: (id: string, patch: Partial<Decision>) => void
   deleteDecision: (id: string) => void
+  addComment: (decisionId: string, text: string, answersDecisiveQuestion?: boolean) => void
+  deleteComment: (decisionId: string, commentId: string) => void
   setError: (error: string | null) => void
 }
 
@@ -90,6 +111,39 @@ export const useDecisionsStore = create<DecisionsState>((set) => ({
       hiddenStaticDecisionIds: isStaticDecisionId(id)
         ? Array.from(new Set([...state.hiddenStaticDecisionIds, id]))
         : state.hiddenStaticDecisionIds,
+    }))
+    persistAll()
+  },
+
+  // Comments are decision activity, not decision progress — they intentionally
+  // do NOT bump updatedAt or recompute qualityScore (so a comment never resets
+  // the aging/staleness signals).
+  addComment: (decisionId, text, answersDecisiveQuestion) => {
+    const body = text.trim()
+    if (!body) return
+    const author = useSettingsStore.getState().settings.displayName?.trim() || "You"
+    const comment = {
+      id: `comment-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      author,
+      text: body,
+      createdAt: new Date().toISOString(),
+      ...(answersDecisiveQuestion ? { answersDecisiveQuestion: true } : {}),
+    }
+    set((state) => ({
+      decisions: state.decisions.map((d) =>
+        d.id === decisionId ? { ...d, comments: [...(d.comments ?? []), comment] } : d
+      ),
+    }))
+    persistAll()
+  },
+
+  deleteComment: (decisionId, commentId) => {
+    set((state) => ({
+      decisions: state.decisions.map((d) =>
+        d.id === decisionId
+          ? { ...d, comments: (d.comments ?? []).filter((c) => c.id !== commentId) }
+          : d
+      ),
     }))
     persistAll()
   },
@@ -195,7 +249,9 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     set((state) => ({
       settings: { ...state.settings, ...patch },
     }))
-    persistAll()
+    // Settings are device-local — cache them, but don't push to the shared
+    // server (so changing your theme doesn't ping everyone's sync).
+    writeLocalCache()
   },
 }))
 
@@ -218,6 +274,7 @@ export function importStoreData(
         useDecisionsStore.getState().hydrate()
         useExperimentsStore.getState().hydrate()
         useSettingsStore.getState().hydrate()
+        markLocalMutation()
       }
       resolve(result)
     }
@@ -231,6 +288,119 @@ export function clearAllStores(): void {
   useDecisionsStore.getState().hydrate()
   useExperimentsStore.getState().hydrate()
   useSettingsStore.getState().hydrate()
+  // Propagate the reset to the server too, so "reset" means reset (and a poll
+  // can't pull the wiped data back in).
+  markLocalMutation()
+}
+
+// ─── Sync (durable server-backed persistence) ─────────────────────────────────
+// localStorage is the instant offline cache; the server file is the source of
+// truth once reachable. Settings stay device-local. Conflict model is
+// last-write-wins at the snapshot level, guarded so an in-progress local edit is
+// never clobbered by a poll. CRDT/OT would be the upgrade for heavy concurrency.
+
+export type SyncMode = "local" | "syncing" | "synced" | "error"
+
+interface SyncState {
+  mode: SyncMode
+  lastSyncedAt: string | null
+  serverAvailable: boolean
+}
+
+export const useSyncStore = create<SyncState>(() => ({
+  mode: "local",
+  lastSyncedAt: null,
+  serverAvailable: false,
+}))
+
+let lastAppliedRemoteAt: string | null = null
+let pendingPush = false
+let pushTimer: ReturnType<typeof setTimeout> | null = null
+let syncInitialized = false
+const PUSH_DEBOUNCE_MS = 800
+const POLL_INTERVAL_MS = 20_000
+
+function setSync(patch: Partial<SyncState>) {
+  useSyncStore.setState(patch)
+}
+
+/** Mark local state dirty and debounce a push (only meaningful once a server
+ *  is known reachable; otherwise the change is safe in localStorage and will
+ *  push when the server appears). */
+function markLocalMutation() {
+  pendingPush = true
+  if (!useSyncStore.getState().serverAvailable) return
+  if (pushTimer) clearTimeout(pushTimer)
+  pushTimer = setTimeout(() => void pushNow(), PUSH_DEBOUNCE_MS)
+}
+
+async function pushNow() {
+  if (pushTimer) { clearTimeout(pushTimer); pushTimer = null }
+  if (!useSyncStore.getState().serverAvailable) return
+  setSync({ mode: "syncing" })
+  const res = await putRemote(buildSnapshot())
+  if (res.ok) {
+    pendingPush = false
+    lastAppliedRemoteAt = res.updatedAt ?? lastAppliedRemoteAt
+    setSync({ mode: "synced", lastSyncedAt: res.updatedAt ?? new Date().toISOString() })
+  } else {
+    setSync({ mode: "error" })
+  }
+}
+
+function applySnapshot(snapshot: RemoteSnapshot) {
+  useDecisionsStore.setState({
+    decisions: mergeWithStaticState(snapshot.decisions, snapshot.hiddenStaticDecisionIds),
+    hiddenStaticDecisionIds: snapshot.hiddenStaticDecisionIds,
+    isLoading: false,
+  })
+  useExperimentsStore.setState({
+    experiments: snapshot.experiments.length > 0 ? snapshot.experiments : STATIC_EXPERIMENTS,
+  })
+  writeLocalCache()
+  lastAppliedRemoteAt = snapshot.updatedAt
+}
+
+async function syncFromServer() {
+  const { available, snapshot } = await getRemote()
+  if (!available) {
+    setSync({ mode: "local", serverAvailable: false })
+    return
+  }
+  if (!useSyncStore.getState().serverAvailable) setSync({ serverAvailable: true })
+
+  // Unpushed local changes win — push them and don't overwrite ourselves.
+  if (pendingPush) { await pushNow(); return }
+
+  if (snapshot && snapshot.decisions.length > 0) {
+    if (snapshot.updatedAt !== lastAppliedRemoteAt) applySnapshot(snapshot)
+    setSync({ mode: "synced", lastSyncedAt: snapshot.updatedAt })
+  } else {
+    // Server empty → seed it from local state on first run.
+    const local = buildSnapshot()
+    if (local.decisions.length > 0 || local.experiments.length > 0) {
+      await pushNow()
+    } else {
+      setSync({ mode: "synced" })
+    }
+  }
+}
+
+/** Manual "sync now" for the UI. */
+export function syncNow(): void {
+  void syncFromServer()
+}
+
+function initSync(): void {
+  if (syncInitialized || typeof window === "undefined") return
+  syncInitialized = true
+  void syncFromServer()
+  if (typeof window.addEventListener === "function") {
+    window.addEventListener("focus", () => void syncFromServer())
+  }
+  if (typeof setInterval === "function") {
+    setInterval(() => void syncFromServer(), POLL_INTERVAL_MS)
+  }
 }
 
 // ─── Hydration hook (call once in layout) ─────────────────────────────────────
@@ -239,6 +409,7 @@ export function hydrateAllStores(): void {
   useDecisionsStore.getState().hydrate()
   useExperimentsStore.getState().hydrate()
   useSettingsStore.getState().hydrate()
+  initSync()
 }
 
 // ─── Cross-tab sync ───────────────────────────────────────────────────────────

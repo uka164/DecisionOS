@@ -106,11 +106,11 @@ function EmptyMapState({ onCreateClick }: { onCreateClick: () => void }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
       <div className="w-16 h-16 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-        <Network className="w-8 h-8 text-white/20" />
+        <Network className="w-8 h-8 text-white/55" />
       </div>
       <div className="text-center">
         <p className="text-white/50 text-sm font-medium mb-1">No decisions in the map</p>
-        <p className="text-white/25 text-xs">Create your first decision to see it take shape here</p>
+        <p className="text-white/55 text-xs">Create your first decision to see it take shape here</p>
       </div>
       <button
         onClick={onCreateClick}
@@ -552,8 +552,8 @@ export function NeuralMapView() {
 
       {/* Legend + search */}
       <div className="absolute top-4 left-4 space-y-3">
-        <div className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-4 backdrop-blur-xl">
-          <h2 className="text-xs font-medium uppercase text-white/45 mb-3 flex items-center gap-2">
+        <div className="rounded-lg border border-hairline bg-surface-1 p-4 backdrop-blur-xl">
+          <h2 className="text-xs font-medium uppercase text-white/55 mb-3 flex items-center gap-2">
             <Network className="w-3.5 h-3.5 text-primary/70" />
             Decision Observatory
           </h2>
@@ -565,28 +565,28 @@ export function NeuralMapView() {
               </div>
             ))}
           </div>
-          <div className="mt-3 pt-3 border-t border-white/[0.07] flex items-center gap-2">
+          <div className="mt-3 pt-3 border-t border-hairline flex items-center gap-2">
             <div className="flex items-end gap-0.5">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="rounded-full bg-white/25" style={{ width: 4 + i * 2, height: 4 + i * 2 }} />
               ))}
             </div>
-            <span className="text-[10px] text-white/35 uppercase">= impact · dimmer = older</span>
+            <span className="text-[11px] text-white/55 uppercase">= impact · dimmer = older</span>
           </div>
-          <div className="mt-2 text-[10px] text-white/30 font-mono">
+          <div className="mt-2 text-[11px] text-white/55 font-mono">
             {nodeCount} decision{nodeCount !== 1 ? "s" : ""} · {edges.length} link{edges.length !== 1 ? "s" : ""}
           </div>
         </div>
 
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Filter memory…"
             aria-label="Filter decision memory nodes"
-            className="w-52 rounded-lg border border-white/[0.08] bg-white/[0.03] py-2.5 pl-9 pr-3 text-sm text-white backdrop-blur-xl transition-colors placeholder:text-white/30 focus:border-primary/50 focus:outline-none"
+            className="w-52 rounded-lg border border-hairline bg-surface-1 py-2.5 pl-9 pr-3 text-sm text-white backdrop-blur-xl transition-colors placeholder:text-white/45 focus:border-primary/50 focus:outline-none"
           />
         </div>
       </div>
@@ -594,18 +594,18 @@ export function NeuralMapView() {
       {/* Zoom controls */}
       <div className="absolute bottom-4 left-4 flex items-center gap-2">
         <button onClick={() => setZoom(viewRef.current.zoom + 0.15)} aria-label="Zoom in"
-          className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
+          className="rounded-lg border border-hairline bg-surface-1 p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
           <ZoomIn className="w-4 h-4 text-white/70" />
         </button>
         <button onClick={() => setZoom(viewRef.current.zoom - 0.15)} aria-label="Zoom out"
-          className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
+          className="rounded-lg border border-hairline bg-surface-1 p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
           <ZoomOut className="w-4 h-4 text-white/70" />
         </button>
         <button onClick={resetView} aria-label="Reset view"
-          className="rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
+          className="rounded-lg border border-hairline bg-surface-1 p-2.5 backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-white/10">
           <Maximize2 className="w-4 h-4 text-white/70" />
         </button>
-        <span className="text-xs text-white/40 font-mono ml-2 bg-white/5 px-2 py-1 rounded">
+        <span className="text-xs text-white/55 font-mono ml-2 bg-white/5 px-2 py-1 rounded">
           {zoomPct}%
         </span>
       </div>
@@ -630,34 +630,34 @@ export function NeuralMapView() {
               </div>
               <button onClick={() => setSelectedId(null)} aria-label="Close panel"
                 className="p-1.5 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0">
-                <X className="w-4 h-4 text-white/40" />
+                <X className="w-4 h-4 text-white/55" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <p className="text-[10px] font-medium uppercase text-white/40 mb-2">Impact</p>
+                <p className="text-[11px] font-medium uppercase text-white/55 mb-2">Impact</p>
                 <div className="flex gap-1.5">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="flex-1 h-2.5 rounded-full"
                       style={{ backgroundColor: i <= selected.impact ? colors[selectedStatus] : "rgba(255,255,255,0.08)" }} />
                   ))}
                 </div>
-                <p className="text-xs text-white/45 mt-1.5 font-mono">
+                <p className="text-xs text-white/55 mt-1.5 font-mono">
                   {selected.impact}/5 · record {selected.qualityScore}% complete
                 </p>
               </div>
 
               {selected.revisitAt && (
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-medium uppercase text-white/40">Revisit</span>
+                  <span className="text-[11px] font-medium uppercase text-white/55">Revisit</span>
                   <span className="text-xs text-white/65 font-mono">{formatDate(selected.revisitAt)}</span>
                 </div>
               )}
 
               {selected.executionTrail && selected.executionTrail.length > 0 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-medium uppercase text-white/40">Execution</span>
+                  <span className="text-[11px] font-medium uppercase text-white/55">Execution</span>
                   <span className="text-xs text-white/65 font-mono">
                     {selected.executionTrail.filter((s) => s.done).length}/{selected.executionTrail.length} done
                   </span>
@@ -665,7 +665,7 @@ export function NeuralMapView() {
               )}
 
               <div>
-                <p className="text-[10px] font-medium uppercase text-white/40 mb-2 flex items-center gap-1.5">
+                <p className="text-[11px] font-medium uppercase text-white/55 mb-2 flex items-center gap-1.5">
                   <Link2 className="w-3 h-3" />
                   Connected ({dependencies.length})
                 </p>
@@ -684,7 +684,7 @@ export function NeuralMapView() {
                     )
                   })}
                   {dependencies.length === 0 && (
-                    <span className="text-xs text-white/30">No connections yet</span>
+                    <span className="text-xs text-white/55">No connections yet</span>
                   )}
                 </div>
               </div>

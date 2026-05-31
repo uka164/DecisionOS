@@ -43,10 +43,10 @@ function EmptyState({ hasFilters, onClear }: { hasFilters: boolean; onClear: () 
   return (
     <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
       <div className="w-14 h-14 mb-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-        <SlidersHorizontal className="w-6 h-6 text-white/30" />
+        <SlidersHorizontal className="w-6 h-6 text-white/55" />
       </div>
       <p className="text-white/60 text-base mb-1">No decisions match your filters.</p>
-      <p className="text-white/30 text-sm mb-5">
+      <p className="text-white/55 text-sm mb-5">
         {hasFilters ? "Clear filters or create a new one." : "Create your first decision to get started."}
       </p>
       {hasFilters && (
@@ -73,7 +73,7 @@ function ViewToggle({ view, onChange }: { view: "list" | "map"; onChange: (v: "l
           "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
           view === "list"
             ? "bg-white/10 text-white shadow-sm"
-            : "text-white/40 hover:text-white/60"
+            : "text-white/55 hover:text-white/60"
         )}
       >
         <LayoutList className="w-3.5 h-3.5" />
@@ -86,7 +86,7 @@ function ViewToggle({ view, onChange }: { view: "list" | "map"; onChange: (v: "l
           "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
           view === "map"
             ? "bg-white/10 text-white shadow-sm"
-            : "text-white/40 hover:text-white/60"
+            : "text-white/55 hover:text-white/60"
         )}
       >
         <Network className="w-3.5 h-3.5" />
@@ -124,7 +124,7 @@ function DecisionsContent() {
     filters.tags.length > 0 ||
     filters.statuses.length > 0
 
-  if (isLoading) return <div className="py-24 text-center text-white/40 text-sm">Loading decisions…</div>
+  if (isLoading) return <div className="py-24 text-center text-white/55 text-sm">Loading decisions…</div>
   if (error)     return <div className="py-24 text-center text-destructive text-sm">Error: {error}</div>
 
   return (
@@ -150,14 +150,14 @@ function DecisionsContent() {
       {view === "list" && (
         <div className="space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/55 pointer-events-none" />
             <input
               type="search"
               value={filters.search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by title or thinking…"
               aria-label="Search decisions"
-              className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all"
+              className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/45 focus:outline-none focus:border-primary/50 focus:bg-surface-3 transition-all"
             />
             {filters.search && (
               <button
@@ -165,7 +165,7 @@ function DecisionsContent() {
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Clear search"
               >
-                <X className="w-3.5 h-3.5 text-white/40" />
+                <X className="w-3.5 h-3.5 text-white/55" />
               </button>
             )}
           </div>
@@ -203,7 +203,7 @@ function DecisionsContent() {
               {hasFilters && (
                 <button
                   onClick={resetFilters}
-                  className="px-3 py-1 rounded-lg text-xs font-medium border border-white/10 bg-white/5 text-white/40 hover:text-white/60 transition-colors min-h-[32px]"
+                  className="px-3 py-1 rounded-lg text-xs font-medium border border-white/10 bg-white/5 text-white/55 hover:text-white/60 transition-colors min-h-[32px]"
                   aria-label="Reset all filters"
                 >
                   Reset
@@ -236,7 +236,7 @@ export default function DecisionsPage() {
         <LeftSidebar />
       </div>
       <main className="pt-16 lg:pt-0 lg:ml-64 min-h-screen">
-        <Suspense fallback={<div className="py-24 text-center text-white/40 text-sm">Loading…</div>}>
+        <Suspense fallback={<div className="py-24 text-center text-white/55 text-sm">Loading…</div>}>
           <DecisionsContent />
         </Suspense>
       </main>

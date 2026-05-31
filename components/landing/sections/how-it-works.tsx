@@ -59,12 +59,12 @@ export function HowItWorks() {
               return (
                 <StaggerItem key={step.title}>
                   <div className="group flex flex-col items-center text-center">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/[0.08] bg-bg-card/60 text-white/50 backdrop-blur-md transition-all duration-500 group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-hairline bg-bg-card/60 text-white/50 backdrop-blur-md transition-all duration-500 group-hover:border-primary/30 group-hover:bg-primary/10 group-hover:text-primary">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <span className="mt-3 font-mono text-[10px] text-white/30">0{i + 1}</span>
+                    <span className="mt-3 font-mono text-[11px] text-white/55">0{i + 1}</span>
                     <h3 className="mt-1 text-base font-semibold text-white">{step.title}</h3>
-                    <p className="mt-1.5 text-sm leading-relaxed text-white/45">{step.line}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-white/55">{step.line}</p>
                   </div>
                 </StaggerItem>
               )
@@ -80,12 +80,12 @@ export function HowItWorks() {
             return (
               <StaggerItem key={step.title}>
                 <div className="relative">
-                  <span className="absolute -left-8 flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-bg-card text-white/55">
+                  <span className="absolute -left-8 flex h-8 w-8 items-center justify-center rounded-lg border border-hairline bg-bg-card text-white/55">
                     <Icon className="h-4 w-4" />
                   </span>
                   <div className="pt-0.5">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-mono text-[10px] text-white/30">0{i + 1}</span>
+                      <span className="font-mono text-[11px] text-white/55">0{i + 1}</span>
                       <h3 className="text-sm font-semibold text-white">{step.title}</h3>
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-white/50">{step.line}</p>

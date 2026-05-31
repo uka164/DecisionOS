@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar, Zap, RotateCcw, X, Eye, EyeOff, Archive, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
+import { EASE_SIGNATURE } from "@/lib/motion"
 import type { Decision as StoreDecision } from "@/lib/types"
 
 interface ArchivedDecision {
@@ -80,7 +81,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
       <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div>
           <h2 className="text-xl font-semibold text-white">Decision History</h2>
-          <p className="text-sm text-white/40">Closed decisions and their downstream links</p>
+          <p className="text-sm text-white/55">Closed decisions and their downstream links</p>
         </div>
         <button
           onClick={() => setShowDecay(!showDecay)}
@@ -95,10 +96,10 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
       {archivedDecisions.length === 0 && (
       <div className="flex-1 flex flex-col items-center justify-center py-24 text-center px-6">
           <div className="w-14 h-14 mb-5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-            <Archive className="w-6 h-6 text-white/20" />
+            <Archive className="w-6 h-6 text-white/55" />
           </div>
           <p className="text-white/50 text-base mb-1">No closed decisions yet</p>
-          <p className="text-white/30 text-sm max-w-sm mb-5">
+          <p className="text-white/55 text-sm max-w-sm mb-5">
             You haven&apos;t closed any decisions yet. Move a decision to
             &ldquo;Archived&rdquo; from its detail page to see it here.
           </p>
@@ -151,9 +152,9 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                       return (
                         <motion.div
                           key={decision.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
+                          initial={{ opacity: 0, filter: "blur(5px)" }}
+                          animate={{ opacity: 1, filter: "blur(0px)" }}
+                          transition={{ delay: index * 0.06, duration: 0.42, ease: EASE_SIGNATURE }}
                           className="relative"
                           style={{
                             transform: showDecay ? `translateZ(${-decayLevel * 100}px)` : "none",
@@ -209,7 +210,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                               <div className="flex items-start justify-between mb-2">
                                 <div>
                                   <h3 className="text-sm font-medium text-white">{decision.title}</h3>
-                                  <p className="text-xs text-white/40 font-mono">{decision.date}</p>
+                                  <p className="text-xs text-white/55 font-mono">{decision.date}</p>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   {[...Array(5)].map((_, i) => (
@@ -236,7 +237,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                                 <div className="mt-3 pt-3 border-t border-white/5">
                                   <div className="flex items-center gap-1.5">
                                     <Zap className="w-3 h-3 text-secondary" />
-                                    <span className="text-[10px] text-secondary uppercase tracking-wider">
+                                    <span className="text-[11px] text-secondary uppercase tracking-wider">
                                       Linked to:
                                     </span>
                                   </div>
@@ -244,7 +245,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                                     {decision.echoTargets?.map((target) => (
                                       <span
                                         key={target}
-                                        className="text-[10px] px-1.5 py-0.5 bg-secondary/20 text-secondary rounded"
+                                        className="text-[11px] px-1.5 py-0.5 bg-secondary/20 text-secondary rounded"
                                       >
                                         {target}
                                       </span>
@@ -256,12 +257,12 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                               {/* Status Badge */}
                               <div className="absolute top-3 right-3">
                                 <span
-                                  className={`text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                                  className={`text-[11px] px-1.5 py-0.5 rounded uppercase tracking-wider ${
                                     decision.status === "voided"
                                       ? "bg-destructive/20 text-destructive"
                                       : decision.status === "superseded"
                                       ? "bg-warning/20 text-warning"
-                                      : "bg-white/10 text-white/40"
+                                      : "bg-white/10 text-white/55"
                                   }`}
                                 >
                                   {decision.status}
@@ -281,10 +282,10 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
 
       {/* Timeline Scrubber */}
       {archivedDecisions.length > 0 && (
-        <div className="px-6 py-4 border-t border-white/10 bg-white/[0.02]">
+        <div className="px-6 py-4 border-t border-white/10 bg-surface-1">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-4">
-              <Calendar className="w-4 h-4 text-white/40" />
+              <Calendar className="w-4 h-4 text-white/55" />
               <div className="flex-1 flex items-center gap-2">
                 {years.map((year) => (
                   <button
@@ -296,7 +297,7 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
                   </button>
                 ))}
               </div>
-              <span className="text-xs text-white/30 font-mono">
+              <span className="text-xs text-white/55 font-mono">
                 {archivedDecisions.length} archived
               </span>
             </div>
@@ -327,14 +328,14 @@ export function ArchiveTimeline({ storeDecisions, onRestore }: ArchiveTimelinePr
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 id="archived-decision-title" className="text-lg font-semibold text-white">{selectedDecision.title}</h3>
-                  <p className="text-sm text-white/40 font-mono">{selectedDecision.date}</p>
+                  <p className="text-sm text-white/55 font-mono">{selectedDecision.date}</p>
                 </div>
                 <button
                   onClick={() => setSelectedDecision(null)}
                   className="p-1 hover:bg-white/10 rounded-lg transition-colors"
                   aria-label="Close archived decision preview"
                 >
-                  <X className="w-5 h-5 text-white/40" />
+                  <X className="w-5 h-5 text-white/55" />
                 </button>
               </div>
 

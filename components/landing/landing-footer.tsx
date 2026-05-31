@@ -30,7 +30,7 @@ const COLUMNS = [
 
 export function LandingFooter() {
   return (
-    <footer id="site-footer" className="relative border-t border-white/[0.06] py-16">
+    <footer id="site-footer" className="relative border-t border-hairline py-16">
       <Container>
         <div className="grid gap-12 lg:grid-cols-[1.5fr_2fr]">
           <div>
@@ -40,7 +40,7 @@ export function LandingFooter() {
                 Decision<span className="text-white/55">OS</span>
               </span>
             </a>
-            <p className="mt-4 max-w-xs text-pretty text-sm leading-relaxed text-white/45">
+            <p className="mt-4 max-w-xs text-pretty text-sm leading-relaxed text-white/55">
               A private, local-first journal for decisions you want to learn
               from instead of merely remember.
             </p>
@@ -54,7 +54,7 @@ export function LandingFooter() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {COLUMNS.map((col) => (
               <div key={col.title}>
-                <h4 className="font-mono text-[10px] uppercase text-white/35">
+                <h4 className="font-mono text-[11px] uppercase text-white/55">
                   {col.title}
                 </h4>
                 <ul className="mt-4 space-y-2.5">
@@ -74,11 +74,11 @@ export function LandingFooter() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center">
-          <p className="text-xs text-white/35">
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-hairline pt-8 sm:flex-row sm:items-center">
+          <p className="text-xs text-white/55">
             &copy; {new Date().getFullYear()} DecisionOS. All rights reserved.
           </p>
-          <p className="font-mono text-[11px] text-white/30">
+          <p className="font-mono text-[11px] text-white/55">
             Designed for people who want cleaner judgment loops.
           </p>
         </div>

@@ -47,7 +47,7 @@ export function ProductProof() {
                   const Icon = t.icon
                   return (
                     <li key={t.title} className="flex gap-3.5">
-                      <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-primary">
+                      <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-hairline bg-surface-1 text-primary">
                         <Icon className="h-4 w-4" />
                       </span>
                       <div>

@@ -26,22 +26,31 @@
   --background: #020408;
   --foreground: #ffffff;
 
-  /* Accent colours */
-  --brand: #8b5cf6;
+  /* Accent colours — magenta primary, indigo secondary (clearly separated hues) */
+  --brand: #6366f1;
   --primary: #e879f9;
   /* magenta action */
   --primary-glow: rgba(232, 121, 249, 0.18);
-  --secondary: #8b5cf6;
-  /* violet-500 — brand accent, used sparingly */
-  --secondary-glow: rgba(139, 92, 246, 0.11);
+  --secondary: #6366f1;
+  /* indigo-500 — reflection / memory / Option B, used sparingly */
+  --secondary-glow: rgba(99, 102, 241, 0.12);
   --accent-glow: rgba(232, 121, 249, 0.16);
   /* alias for primary glow */
   --accent-primary-alpha: rgba(232, 121, 249, 0.24);
   /* neural-background node color */
 
-  /* Borders */
+  /* Named surface tints — 3 elevation levels. Use bg-surface-1/2/3 instead of
+     hand-sprinkled bg-white/[0.0x]. surface-1 = base raised, surface-2 = card,
+     surface-3 = hover / emphasis. */
+  --surface-1: rgba(255, 255, 255, 0.025);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-3: rgba(255, 255, 255, 0.065);
+
+  /* Borders — two levels only. border-hairline = default, -strong = emphasis. */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-accent: rgba(232, 121, 249, 0.22);
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
 
   /* Mesh gradient layers — kept faint so most surfaces read as calm neutral */
   --mesh-1: rgba(232, 121, 249, 0.04);
@@ -55,8 +64,8 @@
   --primary-foreground: #020408;
   --secondary-foreground: #ffffff;
   --muted: rgba(255, 255, 255, 0.05);
-  --muted-foreground: rgba(255, 255, 255, 0.5);
-  --accent: #8b5cf6;
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --accent: #6366f1;
   --accent-foreground: #ffffff;
   /* Semantic roles — color only carries meaning, never decoration.
      destructive = risk/blocked · warning = review/attention · success = aligned/complete (teal) */
@@ -85,22 +94,28 @@
 
   --background: #070b18;
 
-  --brand: #8b5cf6;
+  --brand: #6366f1;
   --primary: #e879f9;
   /* magenta action */
   --primary-glow: rgba(232, 121, 249, 0.16);
-  --secondary: #8b5cf6;
-  /* violet-400 — brand accent, used sparingly */
-  --secondary-glow: rgba(139, 92, 246, 0.11);
+  --secondary: #6366f1;
+  /* indigo-500 — reflection / memory, used sparingly */
+  --secondary-glow: rgba(99, 102, 241, 0.12);
   --accent-glow: rgba(232, 121, 249, 0.16);
   --accent-primary-alpha: rgba(232, 121, 249, 0.24);
   /* neural-background node color */
 
+  --surface-1: rgba(255, 255, 255, 0.025);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-3: rgba(255, 255, 255, 0.065);
+
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-accent: rgba(232, 121, 249, 0.22);
+  --hairline: rgba(255, 255, 255, 0.07);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
 
   --mesh-1: rgba(232, 121, 249, 0.04);
-  --mesh-2: rgba(139, 92, 246, 0.03);
+  --mesh-2: rgba(99, 102, 241, 0.03);
 
   --primary-rgb: 232, 121, 249;
   --ring: #e879f9;
@@ -121,22 +136,28 @@
 
   --background: #0e0819;
 
-  --brand: #8b5cf6;
+  --brand: #6366f1;
   --primary: #e879f9;
   /* fuchsia-400 */
   --primary-glow: rgba(232, 121, 249, 0.18);
-  --secondary: #8b5cf6;
-  /* violet brand */
-  --secondary-glow: rgba(139, 92, 246, 0.11);
+  --secondary: #6366f1;
+  /* indigo brand */
+  --secondary-glow: rgba(99, 102, 241, 0.13);
   --accent-glow: rgba(232, 121, 249, 0.18);
   --accent-primary-alpha: rgba(232, 121, 249, 0.3);
   /* neural-background node color */
 
+  --surface-1: rgba(255, 255, 255, 0.025);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-3: rgba(255, 255, 255, 0.065);
+
   --border-subtle: rgba(255, 255, 255, 0.07);
   --border-accent: rgba(232, 121, 249, 0.30);
+  --hairline: rgba(255, 255, 255, 0.07);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
 
   --mesh-1: rgba(232, 121, 249, 0.05);
-  --mesh-2: rgba(139, 92, 246, 0.03);
+  --mesh-2: rgba(99, 102, 241, 0.03);
 
   --primary-rgb: 232, 121, 249;
   --ring: #e879f9;
@@ -158,21 +179,27 @@
   --background: #f4f6f8;
   --foreground: #0f172a;
 
-  --brand: #7c3aed;
+  --brand: #4f46e5;
   --primary: #be185d;
   /* grounded magenta action */
   --primary-glow: rgba(190, 24, 93, 0.16);
-  --secondary: #7c3aed;
-  /* violet brand */
-  --secondary-glow: rgba(124, 58, 237, 0.12);
+  --secondary: #4f46e5;
+  /* indigo brand */
+  --secondary-glow: rgba(79, 70, 229, 0.13);
   --accent-glow: rgba(190, 24, 93, 0.16);
   --accent-primary-alpha: rgba(190, 24, 93, 0.2);
 
+  --surface-1: rgba(15, 23, 42, 0.03);
+  --surface-2: rgba(15, 23, 42, 0.05);
+  --surface-3: rgba(15, 23, 42, 0.08);
+
   --border-subtle: rgba(15, 23, 42, 0.1);
   --border-accent: rgba(190, 24, 93, 0.22);
+  --hairline: rgba(15, 23, 42, 0.1);
+  --hairline-strong: rgba(15, 23, 42, 0.16);
 
   --mesh-1: rgba(190, 24, 93, 0.035);
-  --mesh-2: rgba(124, 58, 237, 0.025);
+  --mesh-2: rgba(79, 70, 229, 0.025);
 
   /* Override the white/black axis so Tailwind's text-white/*, bg-white/*,
      border-white/* utilities flip to dark-on-light automatically. */
@@ -187,8 +214,8 @@
   --primary-foreground: #ffffff;
   --secondary-foreground: #ffffff;
   --muted: rgba(15, 23, 42, 0.05);
-  --muted-foreground: rgba(15, 23, 42, 0.5);
-  --accent: #0d9488;
+  --muted-foreground: rgba(15, 23, 42, 0.62);
+  --accent: #4f46e5;
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
@@ -212,6 +239,15 @@
   --color-bg-body: var(--bg-body);
   --color-bg-card: var(--bg-card);
   --color-bg-surface: var(--bg-surface);
+
+  /* Elevation surfaces — use bg-surface-1/2/3 */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+
+  /* Hairline borders — use border-hairline / border-hairline-strong */
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
 
   /* Theme accent tokens — use text-primary, bg-primary/10, border-primary/30 */
   --color-brand: var(--brand);
@@ -282,6 +318,49 @@
     outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-radius: 8px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TYPE SCALE — hierarchy comes from size + weight, not opacity.
+   Pair a confident heading with calm body text. Use these in place of the
+   old text-2xl-everywhere / opacity-as-hierarchy pattern.
+   ═══════════════════════════════════════════════════════════════════════ */
+@layer components {
+  /* The one loud moment on a screen — page hero titles. */
+  .text-display {
+    font-size: clamp(2rem, 1.2rem + 3.2vw, 3.25rem);
+    line-height: 1.04;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  /* Section / panel titles — confident but not shouting. */
+  .text-title {
+    font-size: clamp(1.375rem, 1rem + 1.4vw, 1.875rem);
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -0.018em;
+  }
+
+  /* Mono microlabel / eyebrow. 11px legibility floor, theme-aware colour
+     (flips automatically in dawn). Replaces inline
+     `text-[10px] font-mono text-white/40 uppercase tracking-...`. */
+  .label-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    /* 11px */
+    line-height: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--foreground) 58%, transparent);
+  }
+
+  /* Numeric / tabular readouts (metrics, percentages). */
+  .text-readout {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
 }
 

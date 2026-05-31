@@ -28,8 +28,8 @@ const SEVERITY_STYLES: Record<
   info: {
     icon: Info,
     iconClass: "text-white/55",
-    ring: "border-white/[0.1] bg-white/[0.025]",
-    chip: "bg-white/[0.06] border-white/15 text-white/65",
+    ring: "border-hairline bg-surface-1",
+    chip: "bg-surface-3 border-white/15 text-white/65",
     label: "Note",
   },
 }
@@ -74,7 +74,7 @@ export function InlineBlindSpots({ decisionId }: InlineBlindSpotsProps) {
                   <span className="text-sm font-semibold text-white">{spot.title}</span>
                   <span
                     className={cn(
-                      "text-[10px] font-mono uppercase tracking-wider px-1.5 py-px rounded border",
+                      "text-[11px] font-mono uppercase tracking-wider px-1.5 py-px rounded border",
                       styles.chip
                     )}
                   >
@@ -85,7 +85,7 @@ export function InlineBlindSpots({ decisionId }: InlineBlindSpotsProps) {
                   <span className="text-white/75">{spot.why}</span>
                 </p>
                 <p className="text-xs text-white/65 mt-1.5 leading-relaxed">
-                  <span className="text-white/40 mr-1.5">Try:</span>
+                  <span className="text-white/55 mr-1.5">Try:</span>
                   {spot.suggestion}
                 </p>
               </div>

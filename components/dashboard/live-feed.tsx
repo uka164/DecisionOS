@@ -32,10 +32,10 @@ const STATUS_ICON: Record<DecisionStatus, React.ElementType> = {
 }
 
 const STATUS_COLOR: Record<DecisionStatus, string> = {
-  draft:         "text-white/40",
+  draft:         "text-white/55",
   "in-progress": "text-primary",
   decided:       "text-success",
-  archived:      "text-white/30",
+  archived:      "text-white/55",
   voided:        "text-destructive",
   superseded:    "text-warning",
 }
@@ -66,21 +66,21 @@ export function LiveFeed() {
 
   return (
     <section>
-      <div className="overflow-hidden rounded-lg border border-white/[0.08] bg-white/[0.02]">
+      <div className="overflow-hidden rounded-lg border border-hairline bg-surface-1">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold text-white">System Memory</h2>
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-              <span className="text-[10px] text-white/40">
+              <span className="text-[11px] text-white/55">
                 {decisions.length} decision{decisions.length !== 1 ? "s" : ""}
               </span>
             </span>
           </div>
           <Link
             href="/decisions"
-            className="flex items-center gap-1 text-[10px] text-white/35 hover:text-primary transition-colors"
+            className="flex items-center gap-1 text-[11px] text-white/55 hover:text-primary transition-colors"
           >
             View All
             <ArrowRight className="w-3 h-3" />
@@ -90,13 +90,13 @@ export function LiveFeed() {
         {/* Feed */}
         <div className="max-h-[240px] overflow-y-auto p-3">
           {isLoading ? (
-            <div className="py-6 text-center text-white/25 text-xs">Loading…</div>
+            <div className="py-6 text-center text-white/55 text-xs">Loading…</div>
           ) : feedItems.length === 0 ? (
             <div className="py-8 text-center">
-              <p className="text-white/35 text-xs mb-3">No decisions yet.</p>
+              <p className="text-white/55 text-xs mb-3">No decisions yet.</p>
               <button
                 onClick={() => router.push("/app")}
-                className="text-[10px] text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+                className="text-[11px] text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
               >
                 Create your first one
               </button>
@@ -111,14 +111,14 @@ export function LiveFeed() {
                   <li key={item.id}>
                     <button
                       onClick={() => router.push(`/decisions/${item.id}`)}
-                      className="w-full flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0 hover:bg-white/[0.03] transition-colors rounded-lg px-1 text-left"
+                      className="w-full flex items-center gap-3 py-1.5 border-b border-white/5 last:border-0 hover:bg-surface-1 transition-colors rounded-lg px-1 text-left"
                     >
                       <Icon className={`w-4 h-4 shrink-0 ${color}`} />
                       <p className="flex-1 text-xs text-white/60 min-w-0 truncate">
                         {verb}{" "}
                         <span className="text-white/85 font-medium">"{item.title}"</span>
                       </p>
-                      <span className="text-[10px] text-white/35 font-mono shrink-0 ml-auto">
+                      <span className="text-[11px] text-white/55 font-mono shrink-0 ml-auto">
                         {timeAgo(item.createdAt)}
                       </span>
                     </button>

@@ -69,7 +69,7 @@ export function DecisionsDecay() {
               className="pointer-events-none absolute -inset-6 -z-10 rounded-[2rem] opacity-60 blur-2xl"
               style={{ background: "radial-gradient(60% 60% at 40% 40%, var(--secondary-glow), transparent 70%)" }}
             />
-            <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-bg-card/60 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04]">
+            <div className="relative overflow-hidden rounded-2xl border border-hairline bg-bg-card/60 shadow-[0_40px_120px_-60px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.04]">
               <div className="relative aspect-[16/11] w-full sm:aspect-[16/10]">
                 <Image
                   src="/visuals/human-cost.jpg"

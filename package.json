@@ -19,6 +19,7 @@
     "bundle:analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.100.1",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.12",
     "@radix-ui/react-alert-dialog": "1.1.15",
@@ -58,6 +59,7 @@
     "lucide-react": "^0.564.0",
     "next": "^16.2.6",
     "next-themes": "^0.4.6",
+    "pg": "^8.21.0",
     "react": "^19",
     "react-day-picker": "9.13.2",
     "react-dom": "^19",
@@ -76,6 +78,7 @@
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^22",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cross-env": "^10.1.0",

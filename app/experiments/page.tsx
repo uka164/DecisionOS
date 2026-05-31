@@ -18,7 +18,7 @@ export default function ExperimentsPage() {
       </div>
       <main className="pt-16 lg:pt-0 lg:ml-64 min-h-screen flex flex-col">
         {isLoading ? (
-          <div className="py-24 text-center text-white/40 text-sm">Loading experiments…</div>
+          <div className="py-24 text-center text-white/55 text-sm">Loading experiments…</div>
         ) : error ? (
           <div className="py-24 text-center text-destructive text-sm">Error: {error}</div>
         ) : (

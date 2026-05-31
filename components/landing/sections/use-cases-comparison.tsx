@@ -45,7 +45,7 @@ export function UseCasesComparison() {
             <Stagger className="space-y-2.5">
               {USE_CASES.map((u) => (
                 <StaggerItem key={u.domain}>
-                  <div className="flex items-baseline gap-4 rounded-lg border border-white/[0.07] bg-white/[0.02] px-5 py-4 transition-colors hover:border-white/[0.14]">
+                  <div className="flex items-baseline gap-4 rounded-lg border border-hairline bg-surface-1 px-5 py-4 transition-colors hover:border-hairline-strong">
                     <span className="w-24 flex-shrink-0 text-sm font-semibold text-white">
                       {u.domain}
                     </span>
@@ -73,7 +73,7 @@ export function UseCasesComparison() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 border-t border-white/[0.08] pt-4 text-xs leading-relaxed text-white/40">
+              <p className="mt-5 border-t border-hairline pt-4 text-xs leading-relaxed text-white/55">
                 Other tools cover one or two of these. None hold the whole loop —
                 from reasoning to remembered outcome.
               </p>
